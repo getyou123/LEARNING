@@ -65,6 +65,7 @@ docker ps -l列出最近创建的容器
 docker ps -n 3列出最近创建的3个容器
 docker ps -q只显示容器ID
 docker ps --no-trunc显示当前所有正在运行的容器完整信息
+docker logs CONTAINER_ID # 查询指定的日志信息
 ```
 
 ```shell
@@ -92,6 +93,10 @@ docker top 容器ID或容器名称    查看容器内运行的进程
 docker inspect 容器ID或容器名称   查看容器内部细节
 docker attach 容器ID   进到容器内
 docker exec 容器ID   进到容器内
+```
+
+```shell
+docker cp 4b1a0fe53315:/etc/mysql/ /mydata/mysql/conf # 把容器中数据导出到宿主机器
 ```
 
 
@@ -185,11 +190,26 @@ docker run --name ubuntu_bash --rm -i -t ubuntu bash 启动一个
 ### 构建一个centos的镜像：
 拉取：docker pull centos
 新建&启动容器： docker run -it centos /bin/bash
-查看正在运行的docker容器： docker ps![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061459937.png)
+查看正在运行的docker容器： docker ps ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061459937.png)
 停止容器 docker kill  2aa6d3f122ee ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061501719.png)
 删除容器 docker rm  2aa6d3f122ee ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061506584.png)
 删除镜像 docker rmi e6a0117ec169 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061507247.png)
 
 
 ### 启动mysql的docker镜像
+1. 没有设置cnf的对应卷
 docker run --name mysql57 -e MYSQL_ROOT_PASSWORD=123456 -v /Users/haoguowang/Documents/Docker_use/mysql57/logs:/logs -v /Users/haoguowang/Documents/Docker_use/mysql57/data:/var/lib/mysql -p 3306:3306 -d  mysql:5.7 --platform linux/amd64
+2. 设置conf的卷
+主要是需要三个进行映射
+- 宿主机创建数据存放目录映射到容器
+- 宿主机创建配置文件目录映射到容器
+- 宿主机创建日志目录映射到容器
+
+例子：
+```shell
+docker run --name mysql5.7 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -d  -v /Users/haoguowang/Documents/Docker_use/mysql57/data:/var/lib/mysql -v /Users/haoguowang/Documents/Docker_use/mysql57/conf:/etc/mysql/ -v /Users/haoguowang/Documents/Docker_use/mysql57/logs:/var/log/mysql mysql:5.7 --platform linux/amd64
+```
+
+处理错误：启动之后直接失败，通过docker logs 看
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061835701.png)
+主要是因为配置文件不在，宿主机的...../mysql/conf是空的，所以找不到/etc/mysql/conf.d中conf.d这个目录，导致容器创建失败
