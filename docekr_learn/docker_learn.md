@@ -10,6 +10,10 @@
 本身docker是Cs的架构的，所以每次使用docker要先启动自己手守护进程
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061353235.png)
 ---
+
+--- 
+# docker配置加速器
+
 ### docker的基础命令
 ```shell
 docker version #查看docker的版本信息 docker -v
@@ -57,6 +61,8 @@ docker run [可选参数] image
 -P 随机指定端口(大写的P)
 exit 停止并退出容器（后台方式运行则仅退出）
 Ctrl+P+Q 不停止容器退出
+
+ 进入已经运行的容器中：docker exec -it 243c32535da7 /bin/bash
 ```
 
 ```shell
@@ -81,7 +87,7 @@ docker rm -f $(docker ps -a -q)删除多个容器这个是删除所有的容器
 ```shell
 docker容器日志查看：
 docker logs -f -t --since --tail 容器ID或容器名称查看容器日志
-如：docker logs -f -t --since=”2018-09-10” --tail=10 f9e29e8455a5
+如： docker logs -f -t --since="2018-09-10" --tail=10 f9e29e8455a5
 -f : 查看实时日志
 -t : 查看日志产生的日期
 --since : 此参数指定了输出日志开始日期，即只输出指定日期之后的日志
@@ -92,7 +98,7 @@ docker logs -f -t --since --tail 容器ID或容器名称查看容器日志
 docker top 容器ID或容器名称    查看容器内运行的进程
 docker inspect 容器ID或容器名称   查看容器内部细节
 docker attach 容器ID   进到容器内
-docker exec 容器ID   进到容器内
+docker exec 容器ID   进入容器内: docker exec -it XXX /bin/bash
 ```
 
 ```shell
@@ -197,19 +203,26 @@ docker run --name ubuntu_bash --rm -i -t ubuntu bash 启动一个
 
 
 ### 启动mysql的docker镜像
-1. 没有设置cnf的对应卷
-docker run --name mysql57 -e MYSQL_ROOT_PASSWORD=123456 -v /Users/haoguowang/Documents/Docker_use/mysql57/logs:/logs -v /Users/haoguowang/Documents/Docker_use/mysql57/data:/var/lib/mysql -p 3306:3306 -d  mysql:5.7 --platform linux/amd64
-2. 设置conf的卷
+```shell
+docker run --name mysql5.7 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -d  -v /Users/haoguowang/Documents/Docker_use/mysql57/data:/var/lib/mysql -v /Users/haoguowang/Documents/Docker_use/mysql57/conf:/etc/mysql -v /Users/haoguowang/Documents/Docker_use/mysql57/logs:/var/log/mysql mysql:5.7
+```
 主要是需要三个进行映射
 - 宿主机创建数据存放目录映射到容器
 - 宿主机创建配置文件目录映射到容器
 - 宿主机创建日志目录映射到容器
 
-例子：
-```shell
-docker run --name mysql5.7 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -d  -v /Users/haoguowang/Documents/Docker_use/mysql57/data:/var/lib/mysql -v /Users/haoguowang/Documents/Docker_use/mysql57/conf:/etc/mysql/ -v /Users/haoguowang/Documents/Docker_use/mysql57/logs:/var/log/mysql mysql:5.7 --platform linux/amd64
-```
-
 处理错误：启动之后直接失败，通过docker logs 看
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061835701.png)
-主要是因为配置文件不在，宿主机的...../mysql/conf是空的，所以找不到/etc/mysql/conf.d中conf.d这个目录，导致容器创建失败
+主要是因为配置文件不在，宿主机的...../mysql/conf是空的，所以找不到/etc/mysql/conf.d中conf.d这个目录，导致容器创建失败，去指定的路径下建立文件夹和指定的文件
+
+从官网的信息可以看到 https://hub.docker.com/_/mysql 
+- 容器的配置文件是：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301071036476.png)
+- 容器的数据存储为：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301071037839.png)
+- 一般可以不配置log，而是通过docker logs 来查看相应的容器日志 
+
+进入到容器中：dokcer exec -it d70a5deda3eb /bin/bash
+然后登录mysql中：mysql -uroot  -p
+可以看到数据已经加载到容器中了：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301070023731.png)
+当我们配置了数据卷的对应关系：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301070033786.png)
+
+
