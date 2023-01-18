@@ -55,16 +55,20 @@ git存储的文件的快照版本，其实就是文件的状态快照，所以�
 删除并提交这个变化 git rm file
 移除对于文件的追踪 git rm --cached file.txt
 从远程仓库中抓取与拉取 git fetch orgin, 命令会将数据拉取到本地仓库,它并不会自动合并或修改当前的工作
-git标签 git tag -a tagName -m "my tag" 这个是带comment的标签,本地打完标签之后再推送到远程
+git标签 git tag -a tagName -m "my tag" 这个是带comment的标签,本地打完标签之后再推送到远程,最好只在master下打tag
 查看git的标签 git tag -l
 删除标签 git tag -d XXX
+提交tag到远程 git push origin tag_id 一般只有主分支才产出tag
 创建信分支 git branch -b <branch name>
-删除分支 git branch -D <branch name>
+删除本地分支 git branch -D <branch name> 强制删除
+删除远程分支 git push origin -d pr_test
 拉取远程分支并创建本地分支 git checkout -b 本地分支名x origin/远程分支名x
 查看本地分支和远程分支的追踪关系 git branch -vv
 修改本地分支和远程分支的对应关系 git branch --set-upstream-to origin/分支名
 拉取 git pull 这个底层是 git fetch + git merge 
 并将master分支重置为develop git reset --hard develop  强制转本地分支为develop,然后可以强制进行提交远程 git push origin master --force
+设置提交代码时的用户信息 git config [--global] user.name "[name]" 
+                     git config [--global] user.email "[email address]"
 ```
 
 
