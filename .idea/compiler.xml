@@ -5,6 +5,8 @@
       <directory url="file://$PROJECT_DIR$/kafka_learn/src/main/resources/archetype-resources" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/tool_learn/shell/src/main/resources/archetype-resources" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/hadoop_learn/src/main/resources/archetype-resources" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/tool_learn/git/jenkins/src/main/resources/archetype-resources" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/tool_learn/jenkins/src/main/resources/archetype-resources" includeSubdirectories="true" />
     </excludeFromCompile>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
@@ -14,9 +16,10 @@
         <outputRelativeToContentRoot value="true" />
         <module name="maven_learn" />
         <module name="hive_learn" />
-        <module name="git" />
         <module name="hadoop_learn" />
+        <module name="git" />
         <module name="shell" />
+        <module name="jenkins" />
         <module name="tool_learn" />
         <module name="kafka_learn" />
         <module name="jdbc_learn" />

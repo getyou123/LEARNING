@@ -36,6 +36,7 @@ git存储的文件的快照版本，其实就是文件的状态快照，所以�
 进行文件的提交 git commit -m "Initial Commit" 如果是需要大量的记录的信息的话还是不加 -m 启动编辑器来编辑比较好
 查看git的提交日志 git log 或者是 git log --pretty=short
 添加远程仓库地址 git remote add <shortname> <url>
+删除远程仓库地址 git remote remove <shortname>
 检查远程仓库地址,可能不止一个 git remote -v 
 推送分支到远程仓库 git push [origin] [my_branch]
 查看工作区和暂存区的所有文件差异 git diff
@@ -57,7 +58,7 @@ git存储的文件的快照版本，其实就是文件的状态快照，所以�
 git标签 git tag -a tagName -m "my tag" 这个是带comment的标签,本地打完标签之后再推送到远程
 查看git的标签 git tag -l
 删除标签 git tag -d XXX
-创建分支 git branch <branch name>
+创建信分支 git branch -b <branch name>
 删除分支 git branch -D <branch name>
 拉取远程分支并创建本地分支 git checkout -b 本地分支名x origin/远程分支名x
 查看本地分支和远程分支的追踪关系 git branch -vv
@@ -113,3 +114,12 @@ https://www.yiibai.com/git/git_rebase.html
 ### git pull 
 一个git pull 底层其实是git fetch + git merge
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171801408.png)一般来说不建议无脑的使用git pull，都是先git fetch 然后git diff 然后再git merge
+
+
+### git 使用ssh不使用https，这个在一定程度上可以避免输入密码和本地项目过大导致的数据上传失败
+- 远程仓库添加需要登录的机器的公钥信息 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301181037535.png)
+- 删除本地远程仓库关联  ``` git remote remove origin ```
+- 添加远程仓库关联 ``` git remote add origin git@github.com:getyou123/LEARNING.git ```
+
+### github项目和本地项目的关联
+- 如果已经有项目 git init 过了，那就直接在github web端新建项目，本地项目git remote add origin <url>,然后git push -u origin <branch_name>
