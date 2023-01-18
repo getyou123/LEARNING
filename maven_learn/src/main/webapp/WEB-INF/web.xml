@@ -4,4 +4,38 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
+  <!-- 配置 Web 应用初始化参数指定视图前缀、后缀 -->
+  <!--
+      物理视图举例：/WEB-INF/pages/index.html
+      对应逻辑视图：index
+  -->
+  <context-param>
+    <param-name>view-prefix</param-name>
+    <param-value>/WEB-INF/pages/</param-value>
+  </context-param>
+
+  <context-param>
+    <param-name>view-suffix</param-name>
+    <param-value>.html</param-value>
+  </context-param>
+
+  <filter>
+    <!-- 配置 这个filter -->
+    <filter-name>txFilter</filter-name>
+    <filter-class>com.getyou123.imperial.court.filter.TransactionFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <!-- 配置这个filter的生效范围 -->
+    <filter-name>txFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <servlet>
+    <servlet-name>portalServlet</servlet-name>
+    <servlet-class>com.getyou123.imperial.court.servlet.module.PortalServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>portalServlet</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
 </web-app>

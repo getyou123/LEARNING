@@ -4,6 +4,28 @@ package com.getyou123.imperial.court.entity;
  * 实体的定义的类
  */
 public class Emp {
+    public Emp(Integer empId, String empName, String empPosition, String loginAccount, String loginPassword) {
+        this.empId = empId;
+        this.empName = empName;
+        this.empPosition = empPosition;
+        this.loginAccount = loginAccount;
+        this.loginPassword = loginPassword;
+    }
+
+    public Emp() {
+    }
+
+    @Override
+    public String toString() {
+        return "Emp{" +
+                "empId=" + empId +
+                ", empName='" + empName + '\'' +
+                ", empPosition='" + empPosition + '\'' +
+                ", loginAccount='" + loginAccount + '\'' +
+                ", loginPassword='" + loginPassword + '\'' +
+                '}';
+    }
+
     private Integer empId;
     private String empName;
     private String empPosition;

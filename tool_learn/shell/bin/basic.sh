@@ -86,7 +86,9 @@ ps -ef
 # 端口
 netstat -tunlp | grep
 
-
-
 # grep 查询周围几行
-grep -A
+grep -A 100 "keyword" ./1.txt
+
+# 定时任务配置crontab
+crontab -e # 配置
+crontab -l # 列出定时任务

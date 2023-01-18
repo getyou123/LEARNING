@@ -16,35 +16,44 @@ import java.util.Properties;
  */
 
 public class JdbcUtilImperialCourt {
-    // 将数据源对象设置为静态属性，保证大对象的单一实例，这块是静态的方法
+    // 数据源成员变量设置为静态资源，保证大对象的单例性；同时保证静态方法中可以访问
     private static DataSource dataSource;
 
     // 由于 ThreadLocal 对象需要作为绑定数据时 k-v 对中的 key，所以要保证唯一性
     // 加 static 声明为静态资源即可保证唯一性
     private static ThreadLocal<Connection> threadLocal = new ThreadLocal<>();
 
+    // 在静态代码块中初始化数据源
     static {
-        // 1.创建一个用于存储外部属性文件信息的Properties对象
-        Properties properties = new Properties();
-        // 2.使用当前类的类加载器加载外部属性文件：jdbc.properties
-        InputStream inputStream = JdbcUtilImperialCourt.class.getClassLoader().getResourceAsStream("jdbc.properties");
+
         try {
-            // 3.将外部属性文件jdbc.properties中的数据加载到properties对象中
-            properties.load(inputStream);
-            // 4.创建数据源对象
+            // 操作思路分析：
+            // 从 jdbc.properties 文件中读取连接数据库的信息
+            // 为了保证程序代码的可移植性，需要基于一个确定的基准来读取这个文件
+            // 确定的基准：类路径的根目录。resources 目录下的内容经过构建操作中的打包操作后会确定放在 WEB-INF/classes 目录下。
+            // WEB-INF/classes 目录存放编译好的 *.class 字节码文件，所以这个目录我们就称之为类路径。
+            // 类路径无论在本地运行还是在服务器端运行都是一个确定的基准。
+            // 操作具体代码：
+            // 1、获取当前类的类加载器
+            ClassLoader classLoader = JdbcUtilImperialCourt.class.getClassLoader();
+            // 2、通过类加载器对象从类路径根目录下读取文件
+            InputStream stream = classLoader.getResourceAsStream("jdbc.properties");
+            // 3、使用 Properties 类封装属性文件中的数据
+            Properties properties = new Properties();
+            properties.load(stream);
+
+            // 4、根据 Properties 对象（已封装了数据库连接信息）来创建数据源对象
             dataSource = DruidDataSourceFactory.createDataSource(properties);
-            System.out.println("成功加载了配置文件" + dataSource);
         } catch (Exception e) {
-            System.out.println("数据连接错误");
             e.printStackTrace();
+            // 为了避免在真正抛出异常后，catch 块捕获到异常从而掩盖问题，
+            // 这里将所捕获到的异常封装为运行时异常继续抛出
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * 用于返回这个数据库连接
-     * 先从threadLocal中获取，然后再去datasource中拿
-     *
+     * 工具方法：获取数据库连接并返回
      * @return
      */
     public static Connection getConnection() {
@@ -67,7 +76,6 @@ public class JdbcUtilImperialCourt {
         }
         return connection;
     }
-
 
     /**
      * 释放数据库连接

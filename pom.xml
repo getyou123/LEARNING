@@ -106,7 +106,11 @@
     <module>maven_learn</module>
     <module>tool_learn</module>
     <module>tool_learn/shell</module>
-      <module>docekr_learn</module>
+    <module>docker_learn</module>
+    <module>jdbc_learn</module>
+    <module>tool_learn/git</module>
+    <module>hadoop_learn</module>
+    <module>hive_learn</module>
   </modules>
 
   <!--dependencyManagement 标签用于控制子模块的依赖版本等信息 -->
@@ -216,7 +220,6 @@
           <groupId>mysql</groupId>
           <artifactId>mysql-connector-java</artifactId>
           <version>${mysql.version}</version>
-          <scope>test</scope>
         </dependency>
 
         <dependency>

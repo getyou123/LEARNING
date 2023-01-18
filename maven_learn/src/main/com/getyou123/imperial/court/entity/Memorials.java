@@ -112,4 +112,23 @@ public class Memorials {
         this.feedbackContent = feedbackContent;
         this.memorialsStatus = memorialsStatus;
     }
+
+    @Override
+    public String toString() {
+        return "Memorials{" +
+                "memorialsId=" + memorialsId +
+                ", memorialsTitle='" + memorialsTitle + '\'' +
+                ", memorialsContent='" + memorialsContent + '\'' +
+                ", memorialsContentDigest='" + memorialsContentDigest + '\'' +
+                ", memorialsEmp=" + memorialsEmp +
+                ", memorialsEmpName='" + memorialsEmpName + '\'' +
+                ", memorialsCreateTime='" + memorialsCreateTime + '\'' +
+                ", feedbackTime='" + feedbackTime + '\'' +
+                ", feedbackContent='" + feedbackContent + '\'' +
+                ", memorialsStatus=" + memorialsStatus +
+                '}';
+    }
+
+    public Memorials() {
+    }
 }
