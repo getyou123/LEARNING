@@ -108,3 +108,14 @@ note：这里是前端开发完了，然后再让后端介入
 
 ### web.xml元素的顺序需要注意下
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171122968.png)
+
+
+
+## 大数据应用常用打包方式
+通过maven将项目打成 JAR 包的常用打包方式如下：
+- 不加任何插件，直接使用 mvn package 打包，这个存在局限性，只有不使用任何的第三方的jar才可，不过可以通过 spark 提交时候的--jars 来补充，不过这存在版本不一致风险；所以最好是把所有的依赖都打包到一个jar中，直接提交这个jar是最好的，即 ALL IN ONE
+- 使用 maven-assembly-plugin 插件：
+- 使用 maven-shade-plugin 插件；
+- 使用 maven-jar-plugin 和 maven-dependency-plugin 插件；
+
+### 使用 maven-assembly-plugin 插件

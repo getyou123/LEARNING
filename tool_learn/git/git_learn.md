@@ -11,7 +11,9 @@
 
 ### git的基础和原理
 git存储的文件的快照版本，其实就是文件的状态快照，所以如何理解下面的图呢：
+
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171635125.png)
+
 里面的节点就是一个文件快照，然后分支其实是指针，指向不同的快照，git 记录的不是差异的比较，而是快照
 
 ### git的四个区域
@@ -69,6 +71,7 @@ git标签 git tag -a tagName -m "my tag" 这个是带comment的标签,本地打�
 并将master分支重置为develop git reset --hard develop  强制转本地分支为develop,然后可以强制进行提交远程 git push origin master --force
 设置提交代码时的用户信息 git config [--global] user.name "[name]" 
                      git config [--global] user.email "[email address]"
+显示指定文件是什么人在什么时间修改过 $ git blame [file]               
 ```
 
 
@@ -96,7 +99,8 @@ git stash
 git pull
 git stash pop
 ```
-note：这个主要是在工作空间进行的操作，暂时隐藏了工作空间，然后又弹出栈![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171742603.png)
+note：这个主要是在工作空间进行的操作，暂时隐藏了工作空间，然后又弹出栈
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171742603.png)
 
 ### git ignore
 添加[.gitignore](..%2F..%2F.gitignore) 文件，然后进行配置哪些文件进行忽略，之后git add .gitignore,git commit
@@ -117,7 +121,10 @@ https://www.yiibai.com/git/git_rebase.html
 
 ### git pull 
 一个git pull 底层其实是git fetch + git merge
-![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171801408.png)一般来说不建议无脑的使用git pull，都是先git fetch 然后git diff 然后再git merge
+
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171801408.png)
+
+一般来说不建议无脑的使用git pull，都是先git fetch 然后git diff 然后再git merge
 
 
 ### git 使用ssh不使用https，这个在一定程度上可以避免输入密码和本地项目过大导致的数据上传失败
