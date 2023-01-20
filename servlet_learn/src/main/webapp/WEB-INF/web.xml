@@ -1,0 +1,50 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>Archetype Created Web Application</display-name>
+  <servlet>
+    <servlet-name>MyFirstServletNAME</servlet-name>
+    <servlet-class>MyFirstServlet</servlet-class>
+    <!--初始化参数 -->
+    <init-param>
+      <param-name>user_name</param-name>
+      <param-value>root</param-value>
+    </init-param>
+
+    <init-param>
+      <param-name>url</param-name>
+      <param-value>jdbc:mysql://localhost:3306/db_imperial_court</param-value>
+    </init-param>
+  </servlet>
+
+  <!-- 获取Request中的参数 -->
+  <servlet>
+    <servlet-name>HttpRequestLineName</servlet-name>
+    <servlet-class>RequestLine</servlet-class>
+  </servlet>
+
+  <!-- 获取form表单中的参数 -->
+  <servlet>
+    <servlet-name>HttpRequestFormName</servlet-name>
+    <servlet-class>RequestParam</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>HttpRequestLineName</servlet-name>
+    <url-pattern>/RequestLine</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>MyFirstServletNAME</servlet-name>
+    <url-pattern>/first</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>HttpRequestFormName</servlet-name>
+    <url-pattern>/form</url-pattern>
+  </servlet-mapping>
+
+
+</web-app>

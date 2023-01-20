@@ -3,6 +3,12 @@
 持久化层
 表述层
 
+三个层次 
+- 自己使用java web 底层的数据打包war包进行运行展示页面，页面使用thymeleaf，自己封装jdbc工具类
+- 使用SSM框架
+- 使用springboot
+
+
 
 ### 包结构介绍
 - [dao](src%2Fmain%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Fdao) 这个是实现数据库操作的，也是需要一个总的basedao封装需要的基本的操作
@@ -34,39 +40,41 @@ TransactionFilter这个filter![](https://raw.githubusercontent.com/getyou123/git
 ### 如何实现事务控制呢
 实现事务的代码主要有
 ```java
-try {
-            // 1、获取数据库连接
-            connection = JdbcUtilImperialCourt.getConnection();
-            // 重要操作：关闭自动提交功能
-            connection.setAutoCommit(false);
-            // 2、核心操作
-            filterChain.doFilter(servletRequest, servletResponse);
-            // 3、提交事务
-            connection.commit();
-        } catch (Exception e) {
-            try {
-                // 4、回滚事务
-                connection.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-
-            // 页面显示：将这里捕获到的异常发送到指定页面显示
-            // 获取异常信息
-            String message = e.getMessage();
-
-            // 将异常信息存入请求域
-            request.setAttribute("systemMessage", message);
-
-            // 将请求转发到指定页面
-            request.getRequestDispatcher("/").forward(request, servletResponse);
-
-        } finally {
-
-            // 5、释放数据库连接
-            JdbcUtilImperialCourt.releaseConnection(connection);
-
+class c {
+try
+    {
+        // 1、获取数据库连接
+        connection = JdbcUtilImperialCourt.getConnection();
+        // 重要操作：关闭自动提交功能
+        connection.setAutoCommit(false);
+        // 2、核心操作
+        filterChain.doFilter(servletRequest, servletResponse);
+        // 3、提交事务
+        connection.commit();
+    } catch(Exception e){
+        try {
+            // 4、回滚事务
+            connection.rollback();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
+
+        // 页面显示：将这里捕获到的异常发送到指定页面显示
+        // 获取异常信息
+        String message = e.getMessage();
+
+        // 将异常信息存入请求域
+        request.setAttribute("systemMessage", message);
+
+        // 将请求转发到指定页面
+        request.getRequestDispatcher("/").forward(request, servletResponse);
+    } finally{
+
+        // 5、释放数据库连接
+        JdbcUtilImperialCourt.releaseConnection(connection);
+
+    }
+}
 ```
 可以看出需要保持是同一个的事务的连接，实现方法上可以将数据库连接绑定到当前线程，思路上就是先从本地线程获取connection然后再去datasource中获取；
 
@@ -82,29 +90,47 @@ https://zhuanlan.zhihu.com/p/102744180
 其实就是一个ThreadLocalMap然后每个进程作为key然后获取其中的数据，键值为当前ThreadLocal变量，value为变量副本（即T类型的变量）
 ThreadLocal在数据库连接池获取中的使用方式：
 在dbutil中，获取链接的时候，先获取当前的线程作为key，然后再从TreadLocal中获取，不行的话再从datasource中获取
+[为啥需要绑定到线程上](#jump)
+
 ```java
+   class c {
     // 1、尝试从当前线程检查是否存在已经绑定的 Connection 对象
     connection = threadLocal.get();
     // 2、检查 Connection 对象是否为 null
-    if (connection == null) {
-    // 3、如果为 null，则从数据源获取数据库连接
-    connection = dataSource.getConnection();
-    // 4、获取到数据库连接后绑定到当前线程
-    threadLocal.set(connection);
+    if(connection == null) {
+        // 3、如果为 null，则从数据源获取数据库连接
+        connection = dataSource.getConnection();
+        // 4、获取到数据库连接后绑定到当前线程
+        threadLocal.set(connection);
+    }
+}
 ```
 
 ### 什么是前后端分离
 ***服务器端渲染***：
 熟悉的JSP，还有Velocity、Freemarker、Thymeleaf等视图模板技术。虽然具体语法各不相同，但是它们都有一个共通的特点，就是在固定内容中可以穿插表达式等形式的动态内容。将视图模板中的动态内容转换为对应的Java代码并执行，然后使用计算得到的具体数据替换原来的动态部分。这样整个文件的动态内容就可以作为确定的响应结果返回给浏览器。在这种模式下，前端工程师将前端页面全部开发完成，交给后端程序员加入到项目中。此时不可避免的需要后端程序员根据需要对前端代码进行补充和调整。
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171058510.png)
-note：这里是前端开发完了，然后再让后端介入
+note：这里是前端开发完了，然后再让后端介入，后端是在前端工程师的基础上进行加工的;总结来说就是在页面上的指定位置的数据进行替换即可
 
 ***前后端分离***：
 前端程序和后端程序使用JSON格式进行交互，所以项目启动时前端工程和后端工程师需要坐在一起开会，商量确定JSON格式的具体细节。然后分头开发。后端工程师在把后端的代码发布到测试服务器前，前端工程师无法调用后端程序拿到真实数据，所以使用Mock.js生成假数据。直到后端工程师开发完成，后端程序发布到了测试服务器上，前端工程师再从Mock.js切换到实际后端代码。![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171100952.png)
 - 前端专注于展示后端给到的数据，做好填充，和后端只是约定格式的数据（一般是json）交互；
 - 好处在于解耦，减少后端的开发工作量，不然后端还得继续渲染好页面给前端
 
-### 
+### 关于视图层中的thymeleaf的使用
+这是一个服务器渲染的引擎；这块的代码都是公用的，主要说明下其实就是把需要填空的地方使用这个模板进行填空
+
+
+### 关于逻辑视图和物理视图
+- 逻辑视图是指访问地址中除了前缀和后缀之外的东西 地址 = 前缀 + 逻辑视图 + 后缀
+- 物理视图是指具体的页面的各个html页面或者jsp等页面
+- javaWeb这个实际构建的就是从逻辑地址返回指定的物理地址的这个映射
+
+note:放在WEB-INF这个是为了不让直接使用浏览器访问，只能通过java代码访问，这个是个最佳实践，经验总结之处
+
+### 关于servlet
+[servlet_learn.md](..%2Fservlet_learn%2Fservlet_learn.md)着重理解下其中的servlet的线程安全问题，就能理解数据库连接绑定到当前线程， <span id="jump">为啥需要绑定到线程上</span>
+
 
 ### web.xml元素的顺序需要注意下
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171122968.png)
@@ -113,9 +139,10 @@ note：这里是前端开发完了，然后再让后端介入
 
 ## 大数据应用常用打包方式
 通过maven将项目打成 JAR 包的常用打包方式如下：
-- 不加任何插件，直接使用 mvn package 打包，这个存在局限性，只有不使用任何的第三方的jar才可，不过可以通过 spark 提交时候的--jars 来补充，不过这存在版本不一致风险；所以最好是把所有的依赖都打包到一个jar中，直接提交这个jar是最好的，即 ALL IN ONE
+- 不在pom中加任何插件，直接使用 mvn package 打包；这个存在局限性，只有不使用任何的第三方的jar才可，不过可以通过 spark 提交时候的--jars 来补充，不过这存在版本不一致风险；所以最好是把所有的依赖都打包到一个jar中，直接提交这个jar是最好的，即 ALL IN ONE
 - 使用 maven-assembly-plugin 插件：
 - 使用 maven-shade-plugin 插件；
 - 使用 maven-jar-plugin 和 maven-dependency-plugin 插件；
 
 ### 使用 maven-assembly-plugin 插件
+https://github.com/heibaiying/BigData-Notes/blob/master/notes/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%BA%94%E7%94%A8%E5%B8%B8%E7%94%A8%E6%89%93%E5%8C%85%E6%96%B9%E5%BC%8F.md

@@ -18,6 +18,7 @@
         <module name="hive_learn" />
         <module name="hadoop_learn" />
         <module name="git" />
+        <module name="servlet_learn" />
         <module name="shell" />
         <module name="jenkins" />
         <module name="tool_learn" />

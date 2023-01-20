@@ -48,7 +48,7 @@ docker rmi -f $(docker images -p) #通过docker images -p查询到的镜像ID来
 
 ```shell
 docker run [可选参数] image
-#参数说明
+# 参数说明
 –name="名字" 指定容器名字
 -d 后台方式运行
 -it 使用交互方式运行,进入容器查看内容
@@ -192,7 +192,6 @@ docker run --name ubuntu_bash --rm -i -t ubuntu bash 启动一个
 
 
 
-
 ### 构建一个centos的镜像：
 拉取：docker pull centos
 新建&启动容器： docker run -it centos /bin/bash
@@ -220,10 +219,36 @@ docker run --name mysql5.7 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -d  -v /Us
 - 容器的数据存储为：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301071037839.png)
 - 一般可以不配置log，而是通过docker logs 来查看相应的容器日志 
 
-进入到容器中：dokcer exec -it d70a5deda3eb /bin/bash
+进入到容器中：docker exec -it d70a5deda3eb /bin/bash
 然后登录mysql中：mysql -uroot  -p
 可以看到数据已经加载到容器中了：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301070023731.png)
 当我们配置了数据卷的对应关系：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301070033786.png)
 
 ### docker中进行编译doris
 
+
+### docker中部署tomcat
+- 首先拉取tomcat镜像，`docker pull tomcat:8.5.85-jre8-temurin-jammy`
+- 在idea中编译产出war包 
+- 做一个软连接  ln -s /Users/XXX/IdeaProjects/LEARNING/servlet_learn/target/servlet_learn.war ./servlet_learn.war
+- 启动容器 ``` docker run --name tomcat_for_servlet_learn -p 8080:8080 -v /Users/XXX/Documents/Docker_use/servlet_learn/:/usr/local/tomcat/webapps/ -d tomcat:8.5.85-jre8-temurin-jammy ```，注意下这里的卷
+
+即idea mvn package 产出的war包，是docker 中的 tomcat 所指向的加载的war包
+
+tomcat出现404的解决方式：
+主要原因是因为tomcat的版本过高就会存在这个问题
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301201415827.png)
+
+进入容器进行修复 docker exec -it XXX /bin/bash
+然后移动文件 cp -r webapps.dist/* webapps/  这里注意是把里面的内容放在webapps/ 下
+重启容器docker restart XXX
+
+```shell
+# webapps 下的内容正常来说是类似
+root@0ec7e79b9916:/usr/local/tomcat/webapps# pwd
+/usr/local/tomcat/webapps
+root@0ec7e79b9916:/usr/local/tomcat/webapps# ls
+docs  examples  host-manager  manager  ROOT  servlet_learn_1  servlet_learn_1.war  servlet_learn.war
+```
+
+如果war发生变化需要，重启容器

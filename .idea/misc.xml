@@ -3,6 +3,7 @@
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/maven_learn" />
+    <file type="web" url="file://$PROJECT_DIR$/servlet_learn" />
   </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
