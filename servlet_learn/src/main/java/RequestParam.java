@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
+/**
+ * 从表单额请求中获取相应的数据
+ */
 public class RequestParam extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
