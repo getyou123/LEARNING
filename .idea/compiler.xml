@@ -22,13 +22,13 @@
         <module name="shell" />
         <module name="jenkins" />
         <module name="tool_learn" />
-        <module name="kafka_learn" />
         <module name="jdbc_learn" />
         <module name="docker_learn" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="kafka" target="1.5" />
+      <module name="kafka_learn" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

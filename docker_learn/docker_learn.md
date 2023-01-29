@@ -252,3 +252,5 @@ docs  examples  host-manager  manager  ROOT  servlet_learn_1  servlet_learn_1.wa
 ```
 
 如果war发生变化需要，重启容器
+
+docker中获取tomcat的运行日志情况： 日志位置 /usr/local/tomcat/logs

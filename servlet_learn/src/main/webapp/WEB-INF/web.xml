@@ -44,7 +44,6 @@
 
 
   <!-- 下面是servlet-mapping -->
-
   <servlet-mapping>
     <servlet-name>HttpRequestLineName</servlet-name>
     <url-pattern>/RequestLine</url-pattern>

@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/LEARNING.iml" filepath="$PROJECT_DIR$/LEARNING.iml" />
-      <module fileurl="file://$PROJECT_DIR$/kafka_learn/kafka_learn.iml" filepath="$PROJECT_DIR$/kafka_learn/kafka_learn.iml" />
     </modules>
   </component>
 </project>

@@ -13,6 +13,7 @@
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/kafka_learn/pom.xml" />
         <option value="$PROJECT_DIR$/tool_learn/git/jenkins/pom.xml" />
       </set>
     </option>

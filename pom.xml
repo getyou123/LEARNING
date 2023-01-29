@@ -102,7 +102,6 @@
 
   <!--  这里配置父项目的子模块 -->
   <modules>
-    <module>kafka_learn</module>
     <module>maven_learn</module>
     <module>tool_learn</module>
     <module>tool_learn/shell</module>
