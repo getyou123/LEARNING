@@ -112,6 +112,8 @@
     <module>hive_learn</module>
     <module>tool_learn/jenkins</module>
     <module>servlet_learn</module>
+    <module>Book_Note</module>
+      <module>tool_learn/other</module>
   </modules>
 
   <!--dependencyManagement 标签用于控制子模块的依赖版本等信息 -->
