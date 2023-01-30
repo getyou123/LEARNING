@@ -96,7 +96,7 @@ docker logs -f -t --since --tail 容器ID或容器名称查看容器日志
 
 ```shell
 docker top 容器ID或容器名称    查看容器内运行的进程
-docker inspect 容器ID或容器名称   查看容器内部细节
+docker inspect 容器ID或容器名称   # 查看容器内部细节，包括看里面的卷
 docker attach 容器ID   进到容器内
 docker exec 容器ID   进入容器内: docker exec -it XXX /bin/bash
 ```
@@ -228,9 +228,10 @@ docker run --name mysql5.7 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -d  -v /Us
 
 
 ### docker中部署tomcat
+
+#### servlet学习使用
 - 首先拉取tomcat镜像，`docker pull tomcat:8.5.85-jre8-temurin-jammy`
-- 在idea中编译产出war包 
-- 做一个软连接  ln -s /Users/XXX/IdeaProjects/LEARNING/servlet_learn/target/servlet_learn.war ./servlet_learn.war
+- 在idea中编译产出war包 放在宿主机的卷
 - 启动容器 ``` docker run --name tomcat_for_servlet_learn -p 8080:8080 -v /Users/XXX/Documents/Docker_use/servlet_learn/:/usr/local/tomcat/webapps/ -d tomcat:8.5.85-jre8-temurin-jammy ```，注意下这里的卷
 
 即idea mvn package 产出的war包，是docker 中的 tomcat 所指向的加载的war包
@@ -252,5 +253,11 @@ docs  examples  host-manager  manager  ROOT  servlet_learn_1  servlet_learn_1.wa
 ```
 
 如果war发生变化需要，重启容器
-
 docker中获取tomcat的运行日志情况： 日志位置 /usr/local/tomcat/logs
+
+#### maven_learn学习使用
+```shell
+docker run --name tomcat_for_maven_learn -p 8081:8080 -v /Users/haoguowang/Documents/Docker_use/maven_learn/:/usr/local/tomcat/webapps/ -d tomcat:8.5.85-jre8-temurin-jammy
+docker tomcat中访问 docker mysql容器，首先获取docker msyql的ip 地址，docker inspect 然后获取之后更新 jdbc.property localhost=> msyql的ip
+
+```
