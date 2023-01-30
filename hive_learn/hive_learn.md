@@ -514,12 +514,14 @@ hive> select split('abtcdtef','t') from tableName;
 
 
 
-### hive ddl
+### hive sql总结案例总结使用
 ```
-create table XXX
+建表
+create table XXX(
 
-
+)
 partitoined by (pt string)
+stored as orc
 ```
 
 ```
@@ -533,3 +535,24 @@ alter table dwd_offline.XXX add columns(device_uuid string COMMENT 'device_uuid'
 增加字段默认是在表的最后的，然后如果更新完sql的话还是最好的先把分区drop掉，然后再insert
 ```
 
+```
+hive表更新列
+alter table XXX change age age int comment 'XXX'
+alter table XXX change age age int comment 'XXX' after name_col
+```
+
+
+```
+hive修改表名字
+alter table table_name rename to table_name2;
+```
+
+```
+hive表限制不可被drop
+ALTER TABLE table_name PARTITION(dt='2020-01-01') ENABLE NO_DROP;
+```
+
+```
+hive表限制不可被查询
+ALTER TABLE table_name PARTITION(dt='2020-01-01') ENABLE OFFLINE;
+```
