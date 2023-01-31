@@ -8,6 +8,16 @@
 - [JDBCUtilDruid.java](src%2Fmain%2Fjava%2Forg%2Fjdbc_basic%2FJDBCUtilDruid.java) 简单封装的一个druid连接池util
 - [ApacheDBUtil.java](src%2Fmain%2Fjava%2Forg%2Fjdbc_basic%2FApacheDBUtil.java) 一个使用apache DBUtil + druid连接池的例子,把返回结果封装为Bean
 
+
+#### 主要内容总结
+- 如何防止sql注入
+- 如何实现事务
+- 如何进行批处理
+- 使用druid连接池关联连接
+- 自己封装的一个jdbcUtil[JdbcUtilImperialCourt.java](..%2Fmaven_learn%2Fsrc%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Futil%2FJdbcUtilImperialCourt.java)
+
+
+
 #### jdbc的主要作用
 - 就是访问各种数据的统一一个规范入口，比如mysql oracle db2等
 - jdbc可以访问所有提供了jdbc接口的数据库
