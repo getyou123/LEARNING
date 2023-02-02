@@ -6,8 +6,34 @@
 三个层次 
 - 自己使用java web 底层的数据打包war包进行运行展示页面，页面使用thymeleaf，自己封装jdbc工具类
 - 使用SSM框架
-- 使用springboot
+-  使用springboot
 
+回答这些问题：
+- 如何控制请求到响应返回都是在一个事务控制下呢？
+- 如何搭配每个request来使用连接池呢？
+- [TransactionFilter.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Ffilter%2FTransactionFilter.java) 的作用
+- 对于每个请求，如何在filter中排除静态资源的请求呢？
+- 封装工具类 [JdbcUtilImperialCourt.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Futil%2FJdbcUtilImperialCourt.java)中的TreadLocal是怎样工作的？
+- 如何组织各个模块，比如登录，注册，登出等呢？
+- 显示首页（这个就是登录页面）
+- 一个功能的开发的基本步骤，比如是登录的流程和基本步骤是咋样的
+
+
+### 这个项目里的总结一个功能的开发和基本流转的情况：
+- 页面这个不用多说 提交收集相关数据封装到请求里，这之后经过txFilter的过滤，到达指定的servlet上
+- 这个项目只配置了一个filter，这个txFilter的功能主要是获取数据库连接然后实现事务操作，之后的请求会打在指定的servlet上
+- servlet的层次
+  - [ViewBaseServlet.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Fservlet%2Fbase%2FViewBaseServlet.java) 继承这个类，所有的servlet类具有处理视图信息的能力
+  - [ModelBaseServlet.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Fservlet%2Fbase%2FModelBaseServlet.java) 进一步继承 ViewBaseServlet，其实是接收到请求，然后按照method去调用servlet的指定方法
+  - 其他模块的servlet的开发
+    - 第一，要继承ModelBaseServlet，然后开发自己的逻辑，这样servlet就具有页面展示和按照method方法是去调用指定的方法的能力
+    - 第二，开发自己的逻辑，主要是去调用[service](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Fservice)里面的服务
+  - service的开发：这个是服务于servlet的
+    - 进一步划分为api 和 impl ，impl 持有对应的 Dao的实现
+    - 主要的逻辑控制在
+  - DAO的开发： 这个是服务于service的
+    - BaseDao具有数据的数据库sql的增删改查的基础功能
+    - 每个Dao继承BaseDao实现每个Dao api的接口
 
 
 ### 包结构介绍
@@ -25,6 +51,8 @@
 - 基础的增删改查
 - 查询返回单个bean对象
 - 查询返回多个bean对象，返回一个list
+- 但是实际操作返回的数据类型是不定的
+- 持有一个queryRunner，接受参数等执行sql
 
 ***注意这里需要所有的实体类必须要有一个无参的构造函数***![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301161348879.png)https://blog.csdn.net/weixin_42422429/article/details/81671648
 
@@ -34,8 +62,11 @@ dao包中baseDao声明和实现了基础的查询操作，其中的类型目前�
 
 ### 关于filter的说明
 整体的filter的工作模式![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171021864.png)
-[TransactionFilter.java](src%2Fmain%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Ffilter%2FTransactionFilter.java) 这个其中包含了filter，因为在[web.xml](src%2Fmain%2Fwebapp%2FWEB-INF%2Fweb.xml)中配置了所有的都需要过
-TransactionFilter这个filter![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171018938.png)因此在TransactionFilter中配置了过滤静态资源的逻辑![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171019302.png)
+
+[TransactionFilter.java](src%2Fmain%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Ffilter%2FTransactionFilter.java) 这个文件的说明
+- 这个文件主要是在filter这层增加，获取数据连接和执行servlet时候都需要的事务操作的封装，这个搭配后面的所有的内容都要出错就抛出runTimeException
+- 这个其中包含了对于所有的请求request的filter，因为在[web.xml](src%2Fmain%2Fwebapp%2FWEB-INF%2Fweb.xml)中配置了所有的都需要过 TransactionFilter这个filter![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171018938.png)
+- 基于上面一点，需要在TransactionFilter中配置排除请求静态资源的逻辑，因为访问静态资源不需要访问数据库![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171019302.png)
 
 ### 如何实现事务控制呢
 实现事务的代码主要有
@@ -131,10 +162,52 @@ note:放在WEB-INF这个是为了不让直接使用浏览器访问，只能通�
 ### 关于servlet
 [servlet_learn.md](..%2Fservlet_learn%2Fservlet_learn.md)着重理解下其中的servlet的线程安全问题，就能理解数据库连接绑定到当前线程， <span id="jump">为啥需要绑定到线程上</span>
 
-
 ### web.xml元素的顺序需要注意下
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171122968.png)
 
+### ModelBaseServlet文件说明：
+- 这个所有的登录 注册模块的基类的servlet，这类继承了 ViewBaseServlet
+- 他们的关系如图：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301291402568.png)
+- 这个类扩展了 httpServlet 本来只是能使用doGet 和 doPost：
+  - 每个请求附带一个请求参数，表明自己要调用的目标方法
+  - Servlet 根据目标方法名通过反射调用目标方法
+
+### 关于首页
+- 首页只是用来展示固定的页面就可
+- 只需要继承[ViewBaseServlet.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Fservlet%2Fbase%2FViewBaseServlet.java) 而不需要继承[ModelBaseServlet.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Fservlet%2Fbase%2FModelBaseServlet.java)
+- 当前项目首页html 位置放在 [index.html](src%2Fmain%2Fwebapp%2FWEB-INF%2Fpages%2Findex.html) ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301291613544.png) 这个index.html中增加了method的参数，写明了提交到哪个servlet(auth)，写明了method(login)的标签
+- 首页的配置和流转过程中 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301291653718.png)
+- 更详细的调用过程 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301291709793.png)
+
+### 登录功能
+登录功能的流程：
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301312027906.png)
+这个流程细节为
+- [index.html](src%2Fmain%2Fwebapp%2FWEB-INF%2Fpages%2Findex.html)
+- 按照 [web.xml](src%2Fmain%2Fwebapp%2FWEB-INF%2Fweb.xml) 跳转到[TransactionFilter.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Ffilter%2FTransactionFilter.java) 进一步到[AuthServlet.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Fservlet%2Fmodule%2FAuthServlet.java)
+- 其实登录的最终结果就是在session中的存储了emp对象
+
+### 退出功能
+- 也是[AuthServlet.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Fservlet%2Fmodule%2FAuthServlet.java)中实现sesion失效
+- 然后转到首页
+- 开发过程也是：
+  - 页面 指定好参数
+  - servlet中完成逻辑
+  - 写好接下来的跳转的方向
+
+### 显示列表
+
+
+
+
+
+### maven 命令总结
+```shell
+mvn clean package -DskipTests # 跳过测试
+
+
+
+```
 
 
 ## 大数据应用常用打包方式
@@ -146,3 +219,20 @@ note:放在WEB-INF这个是为了不让直接使用浏览器访问，只能通�
 
 ### 使用 maven-assembly-plugin 插件
 https://github.com/heibaiying/BigData-Notes/blob/master/notes/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%BA%94%E7%94%A8%E5%B8%B8%E7%94%A8%E6%89%93%E5%8C%85%E6%96%B9%E5%BC%8F.md
+
+
+### maven在pom中配置跳过测试
+```xml
+    <build>
+        <finalName>maven_learn</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+```

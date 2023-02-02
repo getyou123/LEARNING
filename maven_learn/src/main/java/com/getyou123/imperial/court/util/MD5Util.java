@@ -1,5 +1,7 @@
 package com.getyou123.imperial.court.util;
 
+import org.junit.jupiter.api.Test;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -45,5 +47,4 @@ public class MD5Util {
 
         return encoded;
     }
-
 }

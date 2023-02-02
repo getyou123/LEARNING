@@ -9,3 +9,6 @@ File Expander IDEA插件
 
 ### 每行代码上提示谁做了啥更新
 GitToolBox IDEA插件
+
+### 数据库表信息生成java类
+Easy Code IDEA插件

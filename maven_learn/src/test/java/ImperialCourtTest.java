@@ -1,7 +1,10 @@
 import com.getyou123.imperial.court.dao.BaseDao;
+import com.getyou123.imperial.court.dao.impl.MemorialsDaoImpl;
 import com.getyou123.imperial.court.entity.Emp;
 import com.getyou123.imperial.court.util.JdbcUtilImperialCourt;
+import com.getyou123.imperial.court.util.MD5Util;
 import org.junit.Test;
+
 import java.sql.Connection;
 import java.util.List;
 
@@ -22,12 +25,14 @@ public class ImperialCourtTest {
      */
 
     private BaseDao<Emp> baseDao = new BaseDao<>();
+
     @Test
     public void testGetSingleBean() {
         String sql = "select emp_id empId,emp_name empName,emp_position empPosition,login_account loginAccount,login_password loginPassword from t_emp where emp_id=?";
         Emp emp = baseDao.getSingleBean(sql, Emp.class, 1);
         System.out.println("emp = " + emp);
     }
+
     @Test
     public void testGetBeanList() {
         String sql = "select emp_id empId,emp_name empName,emp_position empPosition,login_account loginAccount,login_password loginPassword from t_emp";
@@ -47,5 +52,16 @@ public class ImperialCourtTest {
 
     }
 
+    @Test
+    public void getString() {
+        String xueye0 = MD5Util.encode("xueye0");
+        System.out.println(xueye0);
+    }
+
+    @Test
+    public void MemorialsDaoImplTest(){
+        MemorialsDaoImpl memorialsDao = new MemorialsDaoImpl();
+        System.out.println(memorialsDao.selectAllMemorialsDigest());
+    }
 
 }

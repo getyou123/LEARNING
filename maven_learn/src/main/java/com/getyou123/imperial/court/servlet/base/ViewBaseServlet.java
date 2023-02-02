@@ -28,7 +28,7 @@ public class ViewBaseServlet extends HttpServlet {
         // ①HTML是默认模式，明确设置是为了代码更容易理解
         templateResolver.setTemplateMode(TemplateMode.HTML);
 
-        // ②设置前缀
+        // ②设置前缀 从web.xml中配置为 /WEB-INF/pages/
         String viewPrefix = servletContext.getInitParameter("view-prefix");
 
         templateResolver.setPrefix(viewPrefix);
