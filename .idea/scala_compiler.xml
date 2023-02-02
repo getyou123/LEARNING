@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ScalaCompilerConfiguration">
-    <profile name="Maven 1" modules="LEARNING,docekr_learn,docker_learn,git,hadoop_learn,hive_learn,jdbc_learn,jenkins,kafka_learn,maven_learn,servlet_learn,shell,tool_learn" />
-  </component>
-</project>
