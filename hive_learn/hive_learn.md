@@ -556,3 +556,30 @@ ALTER TABLE table_name PARTITION(dt='2020-01-01') ENABLE NO_DROP;
 hive表限制不可被查询
 ALTER TABLE table_name PARTITION(dt='2020-01-01') ENABLE OFFLINE;
 ```
+
+
+
+```
+hive 设置队列
+set mapreduce.job.queuename=offline;
+```
+
+
+```
+hive 设置executor
+set spark.executor.instances=100;
+set spark.executor.memory=5G;
+set spark.executor.cores=2;
+```
+
+
+```
+hive 设置diver
+set spark.driver.cores=4;
+set spark.driver.memory=8G;
+```
+
+```shell
+hive使用skewjoin
+
+```
