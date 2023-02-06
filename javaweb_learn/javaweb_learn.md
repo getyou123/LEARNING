@@ -17,6 +17,8 @@
 - 如何组织各个模块，比如登录，注册，登出等呢？
 - 显示首页（这个就是登录页面）
 - 一个功能的开发的基本步骤，比如是登录的流程和基本步骤是咋样的
+- 登录和登出的实质是啥？
+- 登录检测的是如何实现？
 
 
 ### 这个项目里的总结一个功能的开发和基本流转的情况：
@@ -187,7 +189,7 @@ note:放在WEB-INF这个是为了不让直接使用浏览器访问，只能通�
 - 其实登录的最终结果就是在session中的存储了emp对象
 
 ### 退出功能
-- 也是[AuthServlet.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Fservlet%2Fmodule%2FAuthServlet.java)中实现sesion失效
+- 也是[AuthServlet.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Fservlet%2Fmodule%2FAuthServlet.java)中logout方法实现session失效
 - 然后转到首页
 - 开发过程也是：
   - 页面 指定好参数
@@ -195,19 +197,36 @@ note:放在WEB-INF这个是为了不让直接使用浏览器访问，只能通�
   - 写好接下来的跳转的方向
 
 ### 显示列表
-
+- 承接从首页的登录成功，然后转到这个显示列表页面
+- 页面部分是[memorials-list.html](src%2Fmain%2Fwebapp%2FWEB-INF%2Fpages%2Fmemorials-list.html)
+- 是在[AuthServlet.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Fservlet%2Fmodule%2FAuthServlet.java) 中的login 中进一步转到的页面
+- 也是开发servlet[WorkServlet.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Fservlet%2Fmodule%2FWorkServlet.java)中的方法showMemorialsDigestList
+- 开发service 
+- 开发dao & daoImpl
+- 返回页面memorials-detail
 
 ### 显示某个数据详情
+- 承接显示列表的，显示内容可以点击的href中是包含 id的  ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302061459716.png)
+- 这里从页面传递了多个参数到servlet（包括id 和method）
 
 
 ### 更新数据的已读和未读状态
-
+- 流程上从列表页点击详情时候就要发出数据变为已读的请求
+- 也是两个参数一个是id一个是method
+- 实现在这里[WorkServlet.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2Fimperial%2Fcourt%2Fservlet%2Fmodule%2FWorkServlet.java) showMemorialsDetail
+- 即显示详情时候就更新了状态
 
 
 ### 回复信息
-
-
+- 对于没回回复的数据增加接受回复框内的数据输入
+- 输入到servlet中
+- 写入到数据库中
 
 ### 登录检测
+进行登录检测的流程图是：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302061520021.png)
 
-
+核心也是在filter中增加逻辑控制：
+- 获取session中的用户信息是否为空
+- 这里还涉及到两个filter的先后生效关系
+- 最好是先执行loginFilter再去执行txFilter节约性能
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302061534134.png)
