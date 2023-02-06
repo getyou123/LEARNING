@@ -73,7 +73,8 @@
     </td>
 
     <td>
-      <a th:href="@{/work?method=detail}">奏折详情</a>
+      <!--  这里传输2个参数 -->
+      <a th:href="@{/work(method='showMemorialsDetail',memorialsId=${memorials.memorialsId})}">奏折详情</a>
     </td>
   </tr>
   </tbody>

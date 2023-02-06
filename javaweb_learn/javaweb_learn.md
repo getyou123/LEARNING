@@ -1,4 +1,4 @@
-## 一个简单实现web的项目来串起来使用的maven的技术
+## 一个简单实现web的项目
 
 持久化层
 表述层
@@ -198,6 +198,19 @@ note:放在WEB-INF这个是为了不让直接使用浏览器访问，只能通�
 ### 显示列表
 
 
+### 显示某个数据详情
+
+
+### 更新数据的已读和未读状态
+
+
+
+### 回复信息
+
+
+
+### 登录检测
+
 
 
 
@@ -236,3 +249,6 @@ https://github.com/heibaiying/BigData-Notes/blob/master/notes/%E5%A4%A7%E6%95%B0
         </plugins>
     </build>
 ```
+
+### 
+todo ： https://zhuanlan.zhihu.com/p/119306367

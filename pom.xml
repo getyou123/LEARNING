@@ -102,7 +102,7 @@
 
   <!--  这里配置父项目的子模块 -->
   <modules>
-    <module>maven_learn</module>
+    <module>javaweb_learn</module>
     <module>tool_learn</module>
     <module>tool_learn/shell</module>
     <module>docker_learn</module>
