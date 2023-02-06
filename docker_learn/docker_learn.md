@@ -255,9 +255,9 @@ docs  examples  host-manager  manager  ROOT  servlet_learn_1  servlet_learn_1.wa
 如果war发生变化需要，重启容器
 docker中获取tomcat的运行日志情况： 日志位置 /usr/local/tomcat/logs
 
-#### maven_learn学习使用
+#### javaweb_learn学习使用
 ```shell
-docker run --name tomcat_for_maven_learn -p 8081:8080 -v /Users/haoguowang/Documents/Docker_use/maven_learn/:/usr/local/tomcat/webapps/ -d tomcat:8.5.85-jre8-temurin-jammy
+docker run --name tomcat_for_javaweb_learn -p 8081:8080 -v /Users/haoguowang/Documents/Docker_use/javaweb_learn/:/usr/local/tomcat/webapps/ -d tomcat:8.5.85-jre8-temurin-jammy、
 docker tomcat中访问 docker mysql容器，首先获取docker msyql的ip 地址，docker inspect 然后获取之后更新 jdbc.property localhost=> msyql的ip
 
 ```
