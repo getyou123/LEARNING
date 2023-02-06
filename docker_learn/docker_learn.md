@@ -229,7 +229,7 @@ docker run --name mysql5.7 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -d  -v /Us
 
 ### docker中部署tomcat
 
-#### servlet学习使用
+#### servlet学习使用[servlet_learn](..%2Fservlet_learn)
 - 首先拉取tomcat镜像，`docker pull tomcat:8.5.85-jre8-temurin-jammy`
 - 在idea中编译产出war包 放在宿主机的卷
 - 启动容器 ``` docker run --name tomcat_for_servlet_learn -p 8080:8080 -v /Users/XXX/Documents/Docker_use/servlet_learn/:/usr/local/tomcat/webapps/ -d tomcat:8.5.85-jre8-temurin-jammy ```，注意下这里的卷
@@ -255,9 +255,8 @@ docs  examples  host-manager  manager  ROOT  servlet_learn_1  servlet_learn_1.wa
 如果war发生变化需要，重启容器
 docker中获取tomcat的运行日志情况： 日志位置 /usr/local/tomcat/logs
 
-#### javaweb_learn学习使用
+#### javaweb_learn学习使用[javaweb_learn](..%2Fjavaweb_learn)
 ```shell
 docker run --name tomcat_for_javaweb_learn -p 8081:8080 -v /Users/haoguowang/Documents/Docker_use/javaweb_learn/:/usr/local/tomcat/webapps/ -d tomcat:8.5.85-jre8-temurin-jammy、
 docker tomcat中访问 docker mysql容器，首先获取docker msyql的ip 地址，docker inspect 然后获取之后更新 jdbc.property localhost=> msyql的ip
-
 ```
