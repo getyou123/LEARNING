@@ -122,9 +122,9 @@ Maven 中的依赖关系是有传递性的。例如：项目B依赖项目C（B �
     ```
       - 也可以通过配置不同的profile来实现指定和生效多个远程仓库
 
-### maven 私服
+### maven 私服 @TODO
 
-### maven 部署构件到远程仓库
+### maven 部署构件到远程仓库 @TODO
 
 
 ### maven镜像配置
@@ -197,7 +197,7 @@ maven只是定义了抽象的生命周期，实际哪个生命周期的哪个阶
   - 执行mvn verify就会调用这个插件的goal
 
 
-### maven helper的使用
+### maven helper的使用 @TODO
 
 ## 大数据应用常用打包方式
 通过maven将项目打成 JAR 包的常用打包方式如下：
