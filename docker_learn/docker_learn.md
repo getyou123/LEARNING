@@ -260,3 +260,43 @@ docker中获取tomcat的运行日志情况： 日志位置 /usr/local/tomcat/log
 docker run --name tomcat_for_javaweb_learn -p 8081:8080 -v /Users/haoguowang/Documents/Docker_use/javaweb_learn/:/usr/local/tomcat/webapps/ -d tomcat:8.5.85-jre8-temurin-jammy、
 docker tomcat中访问 docker mysql容器，首先获取docker msyql的ip 地址，docker inspect 然后获取之后更新 jdbc.property localhost=> msyql的ip
 ```
+
+
+#### es_learn学习
+- 搭建单机的版本的es
+```shell
+ ~/Documents/Docker_use/es_learn  mkdir config                                                                                                                              ok  base py
+ ~/Documents/Docker_use/es_learn  mkdir data                                                                                                                                ok  base py
+ ~/Documents/Docker_use/es_learn  mkdir plugins                                                                                                                        127 err  base py
+ ~/Documents/Docker_use/es_learn  ll                                                                                                                                        ok  base py
+total 0
+drwxr-xr-x@ 2 haoguowang  staff    64B  2  6 17:44 config
+drwxr-xr-x@ 2 haoguowang  staff    64B  2  6 17:44 data
+drwxr-xr-x@ 2 haoguowang  staff    64B  2  6 17:44 plugins
+ ~/Documents/Docker_use/es_learn  echo "http.host: 0.0.0.0" >> ./config/elasticsearch.yml                                                                                   ok  base py
+ ~/Documents/Docker_use/es_learn  tree                                                                                                                                      ok  base py
+.
+├── config
+│   └── elasticsearch.yml
+├── data
+└── plugins
+```
+
+```shell
+docker run --name elasticsearch -p 9200:9200  -p 9300:9300 \                                                                  125 err  base py
+-e "discovery.type=single-node" \
+-e ES_JAVA_OPTS="-Xms84m -Xmx512m" \
+-v /Users/haoguowang/Documents/Docker_use/es_learn/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+-v /Users/haoguowang/Documents/Docker_use/es_learn/data:/usr/share/elasticsearch/data \
+-v /Users/haoguowang/Documents/Docker_use/es_learn/plugins:/usr/share/elasticsearch/plugins \
+-d elasticsearch:7.12.0
+```
+
+访问9200之后出现相应的信息：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302061750782.png)
+
+- 搭建kibana
+  1. 拉取镜像 ``` docker pull --platform linux/x86_64 kibana:7.8.0  ```
+  2. 启动一个container ```docker run -it -d -e ELASTICSEARCH_URL=http://127.0.0.1:9200 --name kibana --network=host kibana:7.8.0``` 其中的ip 使用docker ps 获取es实例的ip
+  3. 进入kibana容器中，修改 config/kibana.yml ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302071733057.png)
+  4. 重启容器，这个会耗时很久注意等待
+  5. 最终可以在kibana中使用dev tool ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302071734954.png)
