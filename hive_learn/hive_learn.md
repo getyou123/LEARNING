@@ -583,3 +583,23 @@ set spark.driver.memory=8G;
 hive使用skewjoin
 
 ```
+
+
+``` 
+hive实现解析json数组并进行行转列
+
+SELECT explode(split(regexp_replace(regexp_replace('[{"website":"baidu.com","name":"百度"},{"website":"google.com","name":"谷歌"}]', '\\[|\\]',''),'\\}\\,\\{','\\}\\;\\{'),'\\;'));
+{"website":"baidu.com","name":"百度"}
+{"website":"google.com","name":"谷歌"}
+```
+
+``` 
+hive 重新计算某个分区信息
+analyze table ods.XXXX partition(pt='${pt}') compute statistics;
+```
+
+
+```
+hive 设置任务名称
+set mapred.job.name = my_job_name
+```
