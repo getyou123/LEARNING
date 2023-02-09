@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 顶层定义了最基本的级别，不超过这个级别就是不被收集，优先级最高，比Logger中的高，一般设置为debug -->
+<Configuration status="WARN" name="defaultLogConfig"
+               packages="">
+    <!-- 定义下面使用的property -->
+    <properties>
+        <property name="LOG_LEVEL">INFO</property>
+        <property name="LOG_HOME">/Users/haoguowang/IdeaProjects/LEARNING/tool_learn/log_learn/src/log</property>
+        <property name="patternlayout">
+            [%t] %d{yyyy-MM-dd HH:mm:ss SSS} %-5level %logger{1} %L %M - %msg%xEx%n
+        </property>
+        <property name="self_log_file_name">${LOG_HOME}/my_test.log</property>
+    </properties>
+
+
+    <!-- 这个标签定义了所有的数据输出位置 -->
+    <Appenders>
+        <!-- 这个是第一个输出Appender 这个是向控制台输出 -->
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${patternlayout}"/>
+        </Console>
+
+        <!-- 这是第二个输出Appender 滚动文件输出 最开始的log文件 然后是按照大小的归档文件命名 -->
+        <RollingFile name="RollingFile" fileName="${self_log_file_name}"
+                     filePattern="${LOG_HOME}/self_log_file_name-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${patternlayout}"/>
+            <Policies>
+                <!-- 根据上图：filePattern的设置，每隔一天生成一个日志文件。-->
+                <TimeBasedTriggeringPolicy/>
+                <!--如果果今天的文件大小到了设定的size，则会新生成一个文件，上面的%i就表示今天的第几个文件-->
+                <SizeBasedTriggeringPolicy size="20 MB"/>
+            </Policies>
+            <!--
+               DefaultRolloverStrategy属性如不设置，
+               则默认为最多同一文件夹下7个文件，这里设置了5
+            -->
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+
+
+    </Appenders>
+
+
+    <Loggers>
+        <!-- 这里引用上面定义的输出端，需要指明输出的Appender的名字。 -->
+        <!-- 配置指定的类的收集的日志级别 -->
+        <AsyncLogger name="org.example.App1" level="${LOG_LEVEL}" additivity="false" >
+            <AppenderRef ref="RollingFile"/>
+        </AsyncLogger>
+
+        <!-- 其他没配置的类的日志收集级别 -->
+        <Root level="WARN">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+
+</Configuration>

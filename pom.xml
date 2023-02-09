@@ -115,6 +115,10 @@
     <module>Book_Note</module>
     <module>tool_learn/other</module>
     <module>maven_learn</module>
+    <module>elasticsearch_learn</module>
+    <module>tool_learn/lombok_learn</module>
+    <module>java_basic_learn</module>
+    <module>tool_learn/log_learn</module>
   </modules>
 
   <!--dependencyManagement 标签用于控制子模块的依赖版本等信息 -->
