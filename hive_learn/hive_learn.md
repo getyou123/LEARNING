@@ -1,4 +1,4 @@
-## hive常见的函数
+`## hive常见的函数
 
 ### 聚合函数
 count(),max(),min(),sum(),avg()
@@ -602,4 +602,49 @@ analyze table ods.XXXX partition(pt='${pt}') compute statistics;
 ```
 hive 设置任务名称
 set mapred.job.name = my_job_name
+```
+
+``` 
+hive 创建数据库
+create database test
+```
+
+```
+hive切换数据库 删除数据库
+use database;
+drop database hive;
+ 
+```
+
+
+``` 
+hive 内部表外部表和转换
+内部表也加管理表：HIVE同时管理元数据和实际数据的表，删除之后数据也被删
+外部表：HIVE只是管理元数据，删除之后只是删除了元数据，实际数据还在那里
+EXTERNAL 外部表 实际数据不用移动到指定的路径，删除时候不会涉及到数据删除，只是简单的删除了元数据
+
+desc formatted emppart
+alter table emppart tblproperties('EXTERNAL'='TRUE');注意是大写，否则不生效
+```
+
+``` 
+hive加载数据到表中
+load数据时候需要加上load data local inpath '/data/test.txt' into table emppart partition(date="20200504")
+```
+
+``` 
+hive 查看分区的情况和总数：
+show partitioins emppart;
+
+hive 删除分区
+alter table emppart drop partition(data="20200521");
+
+hive 增加分区
+alter table emppart add partition(date="20200521")
+```
+
+
+``` 
+hive修改表名
+alter table emmpart rename to emmpart1;
 ```
