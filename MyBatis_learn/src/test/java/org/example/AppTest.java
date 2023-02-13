@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Unit test for simple App.
@@ -136,6 +137,81 @@ public class AppTest {
         User user = new User(null, "insertUser", "1234456", 11, "男", "79990@qq.com");
         // 执行操作
         userMapper.insertUserByUserObj(user);
+        sqlSession.close();
+    }
+
+    @Test
+    public void testGetUserByPara() {
+        // 获取 sqlSession 对象
+        SqlSession sqlSession = SqlSessionUtil.getSqlSession();
+        // 获取Mapper代理实现类对象
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        // 执行操作
+        User User1 = userMapper.getUserByPara("admin1", "123456");
+        System.out.println(User1);
+        sqlSession.close();
+    }
+
+    @Test
+    public void testGetAllCount() {
+        // 获取 sqlSession 对象
+        SqlSession sqlSession = SqlSessionUtil.getSqlSession();
+        // 获取Mapper代理实现类对象
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        // 执行操作
+        Integer allCount = userMapper.getAllCount();
+        System.out.println(allCount);
+        sqlSession.close();
+    }
+
+
+    @Test
+    public void testGetMapFromTable() {
+        // 获取 sqlSession 对象
+        SqlSession sqlSession = SqlSessionUtil.getSqlSession();
+        // 获取Mapper代理实现类对象
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        // 执行操作
+        Map<String, Object> mapFromTable = userMapper.getMapFromTable();
+        System.out.println(mapFromTable);
+        sqlSession.close();
+    }
+
+
+    @Test
+    public void testGetAllMapFromTable() {
+        // 获取 sqlSession 对象
+        SqlSession sqlSession = SqlSessionUtil.getSqlSession();
+        // 获取Mapper代理实现类对象
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        // 执行操作
+        List<Map<String, Object>> allMapFromTable = userMapper.getAllMapFromTable();
+        for (Map<String, Object> M : allMapFromTable) {
+            System.out.println(M);
+        }
+        sqlSession.close();
+    }
+
+
+    /**
+     * map map结构
+     * {
+     * 2={password=123456, sex=男, id=2, age=23, email=12345@qq.com, username=admin},
+     * 3={password=123456, sex=男, id=3, age=23, email=12345@qq.com, username=admin},
+     * 4={password=123456, sex=男, id=4, age=23, email=12345@qq.com, username=admin},
+     * 5={password=123456, sex=男, id=5, age=23, email=12345@qq.com, username=admin1},
+     * 6={password=1234456, sex=男, id=6, age=11, email=79990@qq.com, username=insertUser}
+     * }
+     */
+    @Test
+    public void testGetAllMapAsMapFromTable() {
+        // 获取 sqlSession 对象
+        SqlSession sqlSession = SqlSessionUtil.getSqlSession();
+        // 获取Mapper代理实现类对象
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        // 执行操作
+        Map<String, Object> allMapAsMapFromTable = userMapper.getAllMapAsMapFromTable();
+        System.out.println(allMapAsMapFromTable);
         sqlSession.close();
     }
 }
