@@ -7,7 +7,7 @@
 - [AppDruidL.java](src%2Fmain%2Fjava%2Forg%2Fjdbc_basic%2FAppDruidL.java) 基础的从druid获取jdbc connect
 - [JDBCUtilDruid.java](src%2Fmain%2Fjava%2Forg%2Fjdbc_basic%2FJDBCUtilDruid.java) 简单封装的一个druid连接池util
 - [ApacheDBUtil.java](src%2Fmain%2Fjava%2Forg%2Fjdbc_basic%2FApacheDBUtil.java) 一个使用apache DBUtil + druid连接池的例子,把返回结果封装为Bean
-
+- [GetAutoId.java](src%2Fmain%2Fjava%2Forg%2Fjdbc_basic%2FGetAutoId.java) 插入并获取mysql的id 
 
 #### 主要内容总结
 - 如何防止sql注入
