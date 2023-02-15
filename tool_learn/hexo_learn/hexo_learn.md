@@ -18,7 +18,7 @@ deploy:
   type: git
   repository: git@github.com:用户名/用户名.github.io.git
   branch: master
-# 之后hexo d 部署到githubpages
+# 之后hexo d 部署到github pages
 
 # 访问 https://用户名.github.io 即可
 
