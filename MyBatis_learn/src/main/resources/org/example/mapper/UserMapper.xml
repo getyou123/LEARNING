@@ -100,4 +100,31 @@
         from t_user
     </select>
 
+
+    <!--    User getUserByLikeName();-->
+    <select id="getUserByLikeName" resultType="User">
+        select *
+        from t_user
+        where username like "%"#{username}"%"
+    </select>
+
+    <!--void DeleteMultiUser(@Param("ids") String ids);-->
+    <delete id="deleteMultiUser">
+        delete
+        from t_user
+        where id in (${ids})
+    </delete>
+
+    <!-- List<User>  getUserList(@Param("tableName") String tableName);-->
+    <select id="getUserList" resultType="User">
+        select *
+        From ${tableName}
+    </select>
+
+    <!-- int getIdAfterInsert(User user);-->
+    <insert id="getIdAfterInsert" useGeneratedKeys="true" keyProperty="id">
+        insert into t_user
+        values (null, #{username}, #{password}, #{age}, #{sex}, #{email})
+    </insert>
+
 </mapper>

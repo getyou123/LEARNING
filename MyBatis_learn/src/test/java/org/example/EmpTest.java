@@ -4,7 +4,9 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.example.mapper.EmpMapper;
 import org.example.mapper.UserMapper;
+import org.example.pojo.Emp;
 import org.example.pojo.User;
 import org.example.utils.SqlSessionUtil;
 import org.junit.Test;
@@ -18,7 +20,7 @@ import java.util.Map;
 /**
  * Unit test for simple App.
  */
-public class AppTest {
+public class EmpTest {
 
     @Test
     public void TestInert() throws IOException {
@@ -214,4 +216,98 @@ public class AppTest {
         System.out.println(allMapAsMapFromTable);
         sqlSession.close();
     }
+
+
+    @Test
+    public void testGetUserByLikeName() {
+        // 获取 sqlSession 对象
+        SqlSession sqlSession = SqlSessionUtil.getSqlSession();
+        // 获取Mapper代理实现类对象
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        // 执行操作
+        List<User> oot = userMapper.getUserByLikeName("ad");
+        System.out.println(oot);
+        sqlSession.close();
+    }
+
+    @Test
+    public void testDeleteMultiUser() {
+        // 获取 sqlSession 对象
+        SqlSession sqlSession = SqlSessionUtil.getSqlSession();
+        // 获取Mapper代理实现类对象
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        // 执行操作
+        userMapper.deleteMultiUser("9,10");
+        sqlSession.close();
+    }
+
+    @Test
+    public void testGetUserList() {
+        // 获取 sqlSession 对象
+        SqlSession sqlSession = SqlSessionUtil.getSqlSession();
+        // 获取Mapper代理实现类对象
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        // 执行操作
+        List<User> tUser = userMapper.getUserList("t_user");
+        for (User user : tUser) {
+            System.out.println(user);
+        }
+    }
+
+
+    @Test
+    public void testGetIdAfterInsert() {
+        // 获取 sqlSession 对象
+        SqlSession sqlSession = SqlSessionUtil.getSqlSession();
+        // 获取Mapper代理实现类对象
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        // 执行操作
+        User user = new User(null, "insertUser", "1234456", 11, "男", "79990@qq.com");
+        userMapper.getIdAfterInsert(user);
+        System.out.println(user);
+    }
+
+
+    @Test
+    public void testGetEmpByEmpId() {
+        // 获取 sqlSession 对象
+        SqlSession sqlSession = SqlSessionUtil.getSqlSession();
+        // 获取Mapper代理实现类对象
+        EmpMapper EmpMapper = sqlSession.getMapper(EmpMapper.class);
+        Emp aEmp = EmpMapper.getEmpByEmpId(1);
+        System.out.println(aEmp);
+    }
+
+    @Test
+    public void testGetEmpByEmpId1() {
+        // 获取 sqlSession 对象
+        SqlSession sqlSession = SqlSessionUtil.getSqlSession();
+        // 获取Mapper代理实现类对象
+        EmpMapper EmpMapper = sqlSession.getMapper(EmpMapper.class);
+        Emp aEmp = EmpMapper.getEmpByEmpId1(1);
+        System.out.println(aEmp);
+    }
+
+    @Test
+    public void testGetEmpByEmpId2() {
+        // 获取 sqlSession 对象
+        SqlSession sqlSession = SqlSessionUtil.getSqlSession();
+        // 获取Mapper代理实现类对象
+        EmpMapper EmpMapper = sqlSession.getMapper(EmpMapper.class);
+        Emp aEmp = EmpMapper.getEmpByEmpId2(1);
+        System.out.println(aEmp);
+    }
+
+
+
+    @Test
+    public void testGetEmpByEmpIdByStep() {
+        // 获取 sqlSession 对象
+        SqlSession sqlSession = SqlSessionUtil.getSqlSession();
+        // 获取Mapper代理实现类对象
+        EmpMapper EmpMapper = sqlSession.getMapper(EmpMapper.class);
+        Emp aEmp = EmpMapper.getEmpByEmpIdByStep(1);
+        System.out.println(aEmp);
+    }
+
 }

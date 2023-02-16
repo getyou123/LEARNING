@@ -6,6 +6,18 @@
 
     <!-- 引入具体的properties 文件-->
     <properties resource="jdbc.ssm.properties"/>
+
+    <settings>
+        <!-- 开启类对象属性和mysql字段驼峰映射 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!-- 开启延迟加载总开关 -->
+        <setting name="lazyLoadingEnabled" value="true" />
+        <!--开启Mybatis的sql执行相关信息打印-->
+        <setting name="logImpl" value="STDOUT_LOGGING" />
+    </settings>
+
+
+
     <!-- 这里定义了org.example.pojo.User的别名，然后再其他的mapper.xml中返回类型就可以用 -->
     <typeAliases>
 <!--        <typeAlias type="org.example.pojo.User" alias="self_user_df"></typeAlias>-->

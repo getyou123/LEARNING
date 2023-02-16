@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.EmpMapper">
+
+    <!-- 自定义的对应关系名称 映射结果为 Emp类对象-->
+    <resultMap id="userMap" type="Emp">
+        <!-- id设置的是主键的 -->
+        <id property="empId" column="emp_id"></id>
+        <!-- result设置普通字段的映射关系 mysql中_ java 对象的是驼峰 -->
+        <result property="empName" column="emp_name"></result>
+        <result property="sex" column="sex"></result>
+    </resultMap>
+
+    <!--Emp getEmpByEmpId(@Param("empId") String empId);-->
+    <!--这里的resultMap指明使用resultMap中的Emp 这个type-->
+    <select id="getEmpByEmpId" resultMap="userMap">
+        select *
+        from t_emp
+        where emp_id = #{empId}
+    </select>
+
+
+    <resultMap id="userMap1" type="Emp">
+        <!-- id设置的是主键的 -->
+        <id property="empId" column="emp_id"></id>
+        <!-- result设置普通字段的映射关系 mysql中_ java 对象的是驼峰 -->
+        <result property="empName" column="emp_name"></result>
+        <result property="sex" column="sex"></result>
+        <result property="dept.deptId" column="dept_id"></result>
+        <result property="dept.deptName" column="dept_name"></result>
+    </resultMap>
+
+    <!--Emp getEmpByEmpId1(@Param("empId") String empId);-->
+    <select id="getEmpByEmpId1" resultMap="userMap1">
+        select t_emp.*,
+               t_dept.*
+        from t_dept
+                 join t_emp
+                      on t_dept.dept_id = t_emp.dept_id
+        where t_emp.emp_id = #{empId} and emp_name = 'admin1'
+    </select>
+
+
+    <!-- Emp getEmpByEmpId2(@Param("empId") Integer empId);-->
+    <resultMap id="userMap2" type="Emp">
+        <!-- id设置的是主键的 -->
+        <id property="empId" column="emp_id"></id>
+        <!-- result设置普通字段的映射关系 mysql中_ java 对象的是驼峰 -->
+        <result property="empName" column="emp_name"></result>
+        <result property="sex" column="sex"></result>
+        <association property="dept" javaType="Dept">
+            <id property="deptId" column="dept_id"></id>
+            <result property="deptName" column="dept_name"></result>
+        </association>
+    </resultMap>
+    <select id="getEmpByEmpId2" resultMap="userMap2">
+        select t_emp.*,
+               t_dept.*
+        from t_dept
+                 join t_emp
+                      on t_dept.dept_id = t_emp.dept_id
+        where t_emp.emp_id = #{empId} and emp_name = 'admin1'
+    </select>
+
+   <!--Emp getEmpByEmpIdByStep(@Param("empId") Integer empId);-->
+    <resultMap id="userMapStep" type="Emp">
+        <!-- id设置的是主键的 -->
+        <id property="empId" column="emp_id"></id>
+        <!-- result设置普通字段的映射关系 mysql中_ java 对象的是驼峰 -->
+        <result property="empName" column="emp_name"></result>
+        <result property="sex" column="sex"></result>
+        <association property="dept"
+                     select="org.example.mapper.DeptMapper.getDeptByDeptId" column="dept_id">
+        </association>
+    </resultMap>
+    <select id="getEmpByEmpIdByStep" resultMap="userMapStep">
+        select t_emp.*,
+               t_dept.*
+        from t_dept
+                 join t_emp
+                      on t_dept.dept_id = t_emp.dept_id
+        where t_emp.emp_id = #{empId} and emp_name = 'admin1'
+    </select>
+
+
+</mapper>
