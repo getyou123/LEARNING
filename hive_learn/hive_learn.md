@@ -643,8 +643,13 @@ hive 增加分区
 alter table emppart add partition(date="20200521")
 ```
 
-
 ``` 
 hive修改表名
 alter table emmpart rename to emmpart1;
+```
+
+``` 
+hive select 排除某个字段
+set hive.support.quoted.identifiers=none
+SELECT `(pt|user_name)?+.+` FROM <table>;
 ```
