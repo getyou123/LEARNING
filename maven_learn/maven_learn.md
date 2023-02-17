@@ -230,3 +230,7 @@ https://github.com/heibaiying/BigData-Notes/blob/master/notes/%E5%A4%A7%E6%95%B0
 
 ### 
 todo ： https://zhuanlan.zhihu.com/p/119306367
+
+
+### jar包的下载地址
+- https://nowjava.com/jar/
