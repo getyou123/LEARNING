@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!-- 引入具体的properties 文件-->
+    <properties resource="jdbc.ssm.properties"/>
+
+    <settings>
+        <!-- 开启类对象属性和mysql字段驼峰映射 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!-- 开启延迟加载总开关 -->
+        <setting name="lazyLoadingEnabled" value="true" />
+        <!--开启Mybatis的sql执行相关信息打印-->
+<!--        <setting name="logImpl" value="STDOUT_LOGGING" />-->
+    </settings>
+
+
+
+    <!-- 这里定义了org.example.pojo.User的别名，然后再其他的mapper.xml中返回类型就可以用 -->
+    <typeAliases>
+<!--        <typeAlias type="org.example.pojo.User" alias="self_user_df"></typeAlias>-->
+        <package name="org.example.pojo"/>
+    </typeAliases>
+    <!--
+        设置连接数据库的环境：
+            default指明默认的
+    -->
+    <environments default="prod">
+        <!--
+          environment 这个id不能重复
+          transactionManager 用于设置事务管理器
+          type设置事务管理的方式 MANAGED|JDBC jdbc-使用原生的事务管理方式 MANAGED-整合spring的
+          dataSource type POOLED|UNPOOLED|JNDI 是否使用连接池|使用上下文的中的数据源
+        -->
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <!-- 数据源的配置 -->
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/ssm?serverTimezone=UTC"/>
+                <property name="username" value="root"/>
+                <property name="password" value="123456"/>
+            </dataSource>
+        </environment>
+        <environment id="prod">
+            <transactionManager type="JDBC"/>
+            <!-- 数据源的配置 -->
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.ssm.driver}"/>
+                <property name="url" value="${jdbc.ssm.url}"/>
+                <property name="username" value="${jdbc.ssm.username}"/>
+                <property name="password" value="${jdbc.ssm.password}"/>
+            </dataSource>
+        </environment>
+
+    </environments>
+    <!--引入映射文件-->
+    <mappers>
+        <!-- package和实际的mapper的包是同名 -->
+        <package name="org.example.mapper"/>
+        <!-- 最好是不要使用 mapper 这个单独的-->
+        <!--  <mapper resource="org/example/mapper/UserMapper.xml"/>-->
+    </mappers>
+</configuration>

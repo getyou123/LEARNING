@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.UserMapper">
+    <!--int insertUser();-->
+    <insert id="insertUser">
+        insert into t_user
+        values (null, 'admin', '123456', 23, '男', '12345@qq.com')
+    </insert>
+
+    <!-- void updateUser(); -->
+    <update id="updateUser">
+        update t_user
+        set username = 'root',
+            password = '123'
+        where id = 1
+    </update>
+
+    <!-- void deleteUser();-->
+    <delete id="deleteUser">
+        delete
+        from t_user
+        where id = 1
+    </delete>
+
+    <!--User getUserById();-->
+    <select id="getUserById" resultType="org.example.pojo.User">
+        select *
+        from t_user
+        where id = 2
+    </select>
+
+    <!--List<User> getAllUser();-->
+    <select id="getAllUser" resultType="User">
+        select *
+        from t_user
+    </select>
+
+    <!--User getUserByName();-->
+    <select id="getUserByName" resultType="User">
+        select *
+        from t_user
+        where username = #{username}
+    </select>
+
+    <!--User checkLogin(String username,String password); -->
+    <select id="checkLogin" resultType="User">
+        select *
+        from t_user
+        where username = #{param1}
+          and password = #{param2}
+    </select>
+
+    <!-- User checkLoginMap(Map<String,String> M);-->
+    <select id="checkLoginMap" resultType="User">
+        select *
+        from t_user
+        where username = #{username}
+          and password = #{password}
+    </select>
+
+    <!--void insertUserByUserObj(User user);-->
+    <insert id="insertUserByUserObj">
+        insert into t_user
+        values (null, #{username}, #{password}, #{age}, #{sex}, #{email})
+    </insert>
+
+    <!--void getUserByPara(@Param("username") String username, @Param("password") String password);-->
+    <select id="getUserByPara" resultType="User">
+        select *
+        from t_user
+        where username = #{username}
+          and password = #{password}
+    </select>
+
+
+    <!--   Integer getAllCount();-->
+    <select id="getAllCount" resultType="Integer">
+        select count(1)
+        from t_user
+    </select>
+
+    <!--    Map<String,Object> getMapFromTable();-->
+    <select id="getMapFromTable" resultType="map">
+        select *
+        from t_user
+        where id = 2
+    </select>
+
+    <!--    Map<String,Object> getAllMapFromTable();-->
+    <select id="getAllMapFromTable" resultType="map">
+        select *
+        from t_user
+    </select>
+
+    <!--    Map<String, Object> getAllMapAsMapFromTable();-->
+    <select id="getAllMapAsMapFromTable" resultType="map">
+        select *
+        from t_user
+    </select>
+
+
+    <!--    User getUserByLikeName();-->
+    <select id="getUserByLikeName" resultType="User">
+        select *
+        from t_user
+        where username like "%"#{username}"%"
+    </select>
+
+    <!--void DeleteMultiUser(@Param("ids") String ids);-->
+    <delete id="deleteMultiUser">
+        delete
+        from t_user
+        where id in (${ids})
+    </delete>
+
+    <!-- List<User>  getUserList(@Param("tableName") String tableName);-->
+    <select id="getUserList" resultType="User">
+        select *
+        From ${tableName}
+    </select>
+
+    <!-- int getIdAfterInsert(User user);-->
+    <insert id="getIdAfterInsert" useGeneratedKeys="true" keyProperty="id">
+        insert into t_user
+        values (null, #{username}, #{password}, #{age}, #{sex}, #{email})
+    </insert>
+
+</mapper>
