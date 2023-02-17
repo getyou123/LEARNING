@@ -300,3 +300,15 @@ docker run --name elasticsearch -p 9200:9200  -p 9300:9300 \                    
   3. 进入kibana容器中，修改 config/kibana.yml ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302071733057.png)
   4. 重启容器，这个会耗时很久注意等待
   5. 最终可以在kibana中使用dev tool ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302071734954.png)
+
+### docker安装mongo db
+```shell
+# 拉取镜像
+docker pull mongo:4.4
+# 启动容器，开启验证
+docker run -itd --name mongo -v /Users/haoguowang/Documents/Docker_use/mongodb_use:/data/db -p 27017:27017 mongo:4.4 --auth   ok  base py
+# 进入容器
+docker exec -it mongo mongo admin
+# 创建用户和授权
+ db.createUser({ user:'root',pwd:'123456',roles:[ { role:'userAdminAnyDatabase', db: 'admin'},'readWriteAnyDatabase']});
+```
