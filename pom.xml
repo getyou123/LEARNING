@@ -120,6 +120,10 @@
     <module>java_basic_learn</module>
     <module>tool_learn/log_learn</module>
     <module>tool_learn/hexo_learn</module>
+    <module>spark_learn</module>
+    <module>MyBatis_learn</module>
+    <module>mysql_learn</module>
+    <module>MyBatis_learn/mybatis_basic</module>
   </modules>
 
   <!--dependencyManagement 标签用于控制子模块的依赖版本等信息 -->
