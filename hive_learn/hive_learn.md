@@ -653,3 +653,31 @@ hive select 排除某个字段
 set hive.support.quoted.identifiers=none
 SELECT `(pt|user_name)?+.+` FROM <table>;
 ```
+
+
+```
+hive 四个by的区别
+order by 全局一个reducer，数据量大有风险，生产环境不用这个
+sort by 每个reducer或者说是分区内有序，依赖map.reduce.tasks 一般来说和distrbute by一起使用
+distrbute by 指定分区的key，需要结合，DISTRIBUTE BY 语句要写在 SORT BY 语句之前
+cluster by = distribute by +sort by，只能是升序排列。
+```
+
+
+``` 
+hive 实现全局有序
+1. 如果是使用order by 的话全局数据过多的时候会存在执行慢，甚至失败的情况，因为只有一个reducer
+2. 如果是需要全局数据有序的话，可以使用udf进行分区，按照排序字段的key的范围进行分区，也就是cluster by，但是要自己写 分区的类
+```
+
+``` 
+hive求top N的优化
+1. 可以使用子查询进行优化：
+--从表中获取name长度为TOP10的数据
+select a.id,a.name from 
+(
+ select id,name  from <table_name>  
+ distribute by length(name)  sort by length(name) desc limit 10
+ ) a 
+ order by length(a.user_name) desc limit 10;
+```
