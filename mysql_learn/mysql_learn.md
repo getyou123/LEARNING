@@ -914,12 +914,31 @@ CREATE TABLE 表名(
 ALTER TABLE engine_demo_table ENGINE = InnoDB;
 ```
 
+#### mysql中引擎对比
 
-#### mysql各种引擎对比
-| 引擎    |   innodb | MyISAM |
-|-------|---------:|:------:|
-| 事务    |       支持 |  不支持   |
-| 锁机制   |     最小行锁 |  最小表锁  |
-| 缓存 | 数据和索引都缓存 | 只缓存索引  |
-| 内存要求 |        低 |   高    |
+- innodb 和 MyISAM的对比
 
+| 引擎   |  innodb   | MyISAM |
+|------|:---------:|:------:|
+| 事务   |    支持     |  不支持   |
+| 锁机制  |   最小行锁    |  最小表锁  |
+| 缓存   | 数据和索引都缓存  | 只缓存索引  |
+| 内存要求 |     低     |   高    |
+| 外键   |    支持     |  不支持   |
+
+- archive 用于数据存档
+- Blackhole
+- CSV 
+``` 
+CREATE TABLE test (
+i INT NOT NULL, 
+c CHAR(10) NOT NULL
+) ENGINE = CSV;
+落到文件系统的后台中是csv文件，直接使用wps就可打开
+```
+- Memory 置于内存的表 掉电遗失
+- Federated 访问远程表
+- Merge 引擎
+- NDB 引擎
+
+### mysql的索引
