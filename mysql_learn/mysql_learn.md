@@ -1,3 +1,12 @@
+### 回答问题
+- mysql的逻辑体系结构 3层是哪三层
+- 一条mysql查询语句的执行过程
+
+
+
+
+
+
 ### mysql5.7 和 mysql8
 - 驱动类不同 
   - 5.7 com.mysql.jdbc.Driver
@@ -650,7 +659,7 @@ SET DEFAULT ROLE ALL TO 'kangshifu'@'localhost';
 ### mysql的体系结构（逻辑结构）
 逻辑结构如图： ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302201826535.png)
 
-这里展示的是mysql 8之前的，mysql 8 干掉了查询缓存，因为查询缓存要求 sql是一模一样，显得很鸡肋
+这里展示的是mysql 8之前的，mysql8干掉了***查询缓存***，因为查询缓存要求 sql是一模一样，显得很鸡肋
 
 上图进一步细化为：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302201827363.png)
 
@@ -661,7 +670,256 @@ SET DEFAULT ROLE ALL TO 'kangshifu'@'localhost';
    - 身份认证，权限认证
    - 从后台的线程池中申请一个线程去相应这个请求
 2. 第二层：服务层
+   - SQL Interface: SQL接口
+   - Parser: 解析器 词法分析，语法分析
+   - Optimizer: 查询优化器
+   - Caches & Buffers: 查询缓存组件
 3. 第三层：引擎层
+   - 真正的负责了MySQL中数据的存储和提取，对物理服务器级别 维护的底层数据执行操作
+4. 第四层：存储层
+
+总的类似这样的三层结构：
+
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302210934638.png)
+
 
 ### mysql的执行流程
+依据上面的体系结构，一条sql的执行流程是![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302210937395.png)
+- 客户端网络通信
+- 查询缓存是否命中（很鸡肋 ，mysql8 抛弃了这个特性）
+- 解析器：主要经过 词法分析（识别词） 语法分析（识别语法） 语义分析（识别干啥） 语法树
+- 优化器：逻辑查询优化 物理查询优化 到此生成了执行计划
+- 执行器：按照执行计划下放到存储引擎去执行
+- 是否需要写到缓存
+- 返回结果集
+
+
+### mysql分析指定语句的执行耗时
+``` 
+# 确认profiling 是否开启
+select @@profiling;
+show variables like 'profiling';
+
+# 开启profiling
+set profiling=1;
+mysql> select @@profiling;
++-------------+
+| @@profiling |
++-------------+
+|           1 |
++-------------+
+
+# 查看最近的几次查询
+show profils;
+mysql> show profiles;
++----------+------------+---------------------------------+
+| Query_ID | Duration   | Query                           |
++----------+------------+---------------------------------+
+|        1 | 0.00232225 | select @@profiling              |
+|        2 | 0.02331050 | show variables like 'profiling' |
+|        3 | 0.09385625 | show databases                  |
+|        4 | 0.01302050 | SELECT DATABASE()               |
+|        5 | 0.00949500 | show databases                  |
+|        6 | 0.00317200 | show tables                     |
+|        7 | 0.00964175 | show tables                     |
+|        8 | 0.05024050 | select * From t_emp             |
++----------+------------+---------------------------------+
+
+
+# 查看单次查询的耗时细节
+show profile;
+mysql> show profile;
++----------------------+----------+
+| Status               | Duration |
++----------------------+----------+
+| starting             | 0.001866 |
+| checking permissions | 0.000100 | 权限检查
+| Opening tables       | 0.000426 | 打开表
+| init                 | 0.000251 | 初始化
+| System lock          | 0.000450 | 锁系统
+| optimizing           | 0.000027 | 优化查询
+| statistics           | 0.000290 |
+| preparing            | 0.000118 | 准备
+| executing            | 0.000012 | 执行
+| Sending data         | 0.046382 |
+| end                  | 0.000049 |
+| query end            | 0.000061 |
+| closing tables       | 0.000040 |
+| freeing items        | 0.000053 |
+| cleaning up          | 0.000117 |
++----------------------+----------+
+15 rows in set, 1 warning (0.02 sec)
+
+# 指定查看某个QUERY_ID的profile来看
+show profile for query 8;
+mysql> show profile for query 8;
++----------------------+----------+
+| Status               | Duration |
++----------------------+----------+
+| starting             | 0.001866 |
+| checking permissions | 0.000100 |
+| Opening tables       | 0.000426 |
+| init                 | 0.000251 |
+| System lock          | 0.000450 |
+| optimizing           | 0.000027 |
+| statistics           | 0.000290 |
+| preparing            | 0.000118 |
+| executing            | 0.000012 |
+| Sending data         | 0.046382 |
+| end                  | 0.000049 |
+| query end            | 0.000061 |
+| closing tables       | 0.000040 |
+| freeing items        | 0.000053 |
+| cleaning up          | 0.000117 |
++----------------------+----------+
+15 rows in set, 1 warning (0.01 sec)
+```
+
+
+### 关于mysql的查询缓存的情况（只针对mysql5.7，mysql 8之后移除了）
+- 即使在mysql 5.7中也是需要手动开启
+- 这个功能很鸡肋
+- 一般不需要开启
+- %query_cache_type% 这个变量在mysql的配置文件中可以显式的指明的
+  - query_cache_type=0 表示OFF
+  - query_cache_type=1 表示ON
+  - query_cache_type=2 表示 DEMAND，只缓存select语句中通过SQL_CACHE指定需要缓存的查询
+
+``` 
+# 查询是否开启了缓存
+select @@query_cache_type;
++--------------------+
+| @@query_cache_type |
++--------------------+
+| ON |
++--------------------+
+
+# have_query_cache 设置查询缓存是否可用
++------------------+-------+
+| Variable_name    | Value |
++------------------+-------+
+| have_query_cache | YES   |
++------------------+-------+
+
+# 查看查询缓存的工作情况
+show status like "%Qcache%"
++-------------------------+---------+
+| Variable_name           | Value   |
++-------------------------+---------+
+| Qcache_free_blocks      | 1       | 目前还处于空闲状态的 Query Cache 中内存 Block 数目
+| Qcache_free_memory      | 1031832 | 查询缓存目前剩余空间大小
+| Qcache_hits             | 0       | 查询缓存的命中次数
+| Qcache_inserts          | 0       | 查询缓存插入的次数。
+| Qcache_lowmem_prunes    | 0       | 当 Query Cache 内存容量不够，需要从中删除老的 Query Cache 以给新的 Cache 对象使用的次数
+| Qcache_not_cached       | 1       | 没有被 Cache 的 SQL 数，包括无法被 Cache 的 SQL 以及由于 query_cache_type 设置的不会被 Cache 的 SQL
+| Qcache_queries_in_cache | 0       | 目前在 Query Cache 中的 SQL 数量
+| Qcache_total_blocks     | 1       | Query Cache 中总的 Block 数量  
++-------------------------+---------+
+8 rows in set (0.05 sec)
+
+# 在开启缓存情况下使用缓存
+SELECT SQL_CACHE id,field FROM table WHERE 1
+
+# 强制不使用缓存
+SELECT SQL_NO_CACHE id,field FROM table WHERE 1
+
+# 整理查询缓存碎片
+FLUSH QUERY CACHE
+```
+
+### mysql5.7开启缓存前后的执行细节对比
+不命中cache之前：
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302211009142.png)
+
+命中cache时候：
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302211010738.png)
+
+可以看出命中时候查询加快的速度很快，当然完全是看命中率的，最好是把较小的静态表作cache。
+
+### mysql数据库缓冲池
+1. 缓冲池的工作原理
+   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302211119275.png)
+   - InnoDB 缓冲池包括了数据页、索引页、插入缓冲、锁信息、自适应 Hash 和数据字典 信息等。
+   - 主要按照数据的冷热程度来进行预加载
+   - 在数据库进行页面读操作的时候，首先会判断该页面是否在缓冲池中，如果存在就直接读取，如果不存在，就会通过内存或磁盘将页面存放到缓冲池中再进行读取。
+2. 查询缓存和缓冲池的区别
+   - 查询缓存存储的是查询的结果
+   - 缓冲池缓存的是mysql的自身需要的一些数据信息，索引信息等
+3. 查看/设置缓冲池的大小
+``` 
+# 查看大小 单位B 字节 /1024/1024
+show variables like 'innodb_buffer_pool_size';
+
+# 更改缓冲池大小 256MB
+set global innodb_buffer_pool_size = 268435456;
+
+# 多个Buffer Pool实例
+ [server]
+innodb_buffer_pool_instances = 2
+```
+
+### mysql存储引擎
+- 插件式的存储引擎，实际指明是的表的存储结构（以前叫表处理器）
+- 主要是接受执行计划，处理相应的请求
+- 主要的存储引擎
+  - innodb
+  - myIsam
+``` 
+# 查看mysql提供什么存储引擎:
+show engines;
+mysql> show engines;
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+| Engine             | Support | Comment                                                        | Transactions | XA   | Savepoints |
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+| InnoDB             | DEFAULT | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+| MRG_MYISAM         | YES     | Collection of identical MyISAM tables                          | NO           | NO   | NO         |
+| MEMORY             | YES     | Hash based, stored in memory, useful for temporary tables      | NO           | NO   | NO         |
+| BLACKHOLE          | YES     | /dev/null storage engine (anything you write to it disappears) | NO           | NO   | NO         |
+| MyISAM             | YES     | MyISAM storage engine                                          | NO           | NO   | NO         |
+| CSV                | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+| ARCHIVE            | YES     | Archive storage engine                                         | NO           | NO   | NO         |
+| PERFORMANCE_SCHEMA | YES     | Performance Schema                                             | NO           | NO   | NO         |
+| FEDERATED          | NO      | Federated MySQL storage engine                                 | NULL         | NULL | NULL       |
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+9 rows in set (0.05 sec)
+上面的展示信息
+- 默认是哪个引擎
+- 是否支持事务
+- 是否支持分布式
+- 支持savePoint
+
+# 查看默认的存储引擎
+show variables like '%storage_engine%';
+或者
+SELECT @@default_storage_engine;
+mysql> SELECT @@default_storage_engine;
++--------------------------+
+| @@default_storage_engine |
++--------------------------+
+| InnoDB                   |
++--------------------------+
+1 row in set (0.02 sec)
+
+# 修改默认的存储引擎
+临时修改 SET DEFAULT_STORAGE_ENGINE=MyISAM;
+永久修改 my.cnf 文件: default-storage-engine=MyISAM 后重启
+
+
+# 创建表时指定存储引擎
+CREATE TABLE 表名( 
+建表语句;
+)  ENGINE=InnoDB;
+
+# 修改表的存储引擎
+ALTER TABLE engine_demo_table ENGINE = InnoDB;
+```
+
+
+#### mysql各种引擎对比
+| 引擎    |   innodb | MyISAM |
+|-------|---------:|:------:|
+| 事务    |       支持 |  不支持   |
+| 锁机制   |     最小行锁 |  最小表锁  |
+| 缓存 | 数据和索引都缓存 | 只缓存索引  |
+| 内存要求 |        低 |   高    |
 
