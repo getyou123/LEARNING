@@ -1,10 +1,12 @@
 ### 回答问题
 - mysql的逻辑体系结构 3层是哪三层
-- 一条mysql查询语句的执行过程
+- 一条mysql查询语句的执行过程（上面的三层结构）
 - hash 模式和Btree模式的区别和优点缺点
-- B树和B+树的区别
+- B树和B+树的区别？
 - B+树是如何支持索引的？从查询到单条结果返回的命中的过程（画图->目录页之间的查找过程->数据页内二分、槽、分组内的二分）
 - 页中的页目录的作用？
+- 索引失效的几个case？
+- join的底层原理？驱动表 被驱动表？
 
 
 
@@ -429,7 +431,9 @@ with table_name as (
 ```
 
 ### mysql中的字符集设置
-在MySQL 8.0版本之前，默认字符集为 latin1 ，utf8字符集指向的是 utf8mb3 。网站开发人员在数据库 设计的时候往往会将编码修改为utf8字符集。如果遗忘修改默认的编码，就会出现乱码的问题。从MySQL 8.0开始，数据库的默认编码将改为 utf8mb4 ，从而避免上述乱码的问题
+在MySQL 8.0版本之前，默认字符集为 latin1 ，utf8字符集指向的是 utf8mb3 。网站开发人员在数据库 设计的时候往往会将编码修改为utf8字符集。如果遗忘修改默认的编码，就会出现乱码的问题。从MySQL 8.0开始，数据库的默认编码将改为 utf8mb4 ，从而避免上述乱码的问题；
+
+统一使用utf8mb4( 5.5.3版本以上支持)兼容性更好，统一字符集可以避免由于字符集转换产生的乱码。不同的 字符集 进行比较前需要进行 转换 会造成索引失效。
 
 查看默认的字符集：
 ``` 
@@ -1362,7 +1366,7 @@ EXPLAIN SELECT * FROM s1;
 #s1:驱动表  s2:被驱动表
 EXPLAIN SELECT * FROM s1 INNER JOIN s2;
 
-#2. id：在一个大的查询语句中每个SELECT关键字都对应一个唯一的id，每个select对应一个id
+#2. id：在一个大的查询语句中每个SELECT关键字都对应一个唯一的id，每个select对应一个id，其实更好的理解是把id作为趟
  SELECT * FROM s1 WHERE key1 = 'a';
 
 # 一个id
@@ -1386,13 +1390,136 @@ EXPLAIN SELECT * FROM s1 INNER JOIN s2;
 # 两个id
  EXPLAIN SELECT * FROM s1 WHERE key1 IN (SELECT key1 FROM s2) OR key3 = 'a';
 
-
-
 ```
-
 
 
 1. explain select 语句的返回结果说明
    ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221405251.png)
 
-2. 可以查看是不是走了索引 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221140670.png)
+2. 可以查看是不是走了索引 
+   ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221140670.png)
+
+3. 针对单表查询的type字段： 
+
+CONST,SYSTEM->EQ_REF->REF->RANGE->INDEX->ALL
+
+  - system 最高的o1拿到
+  - CONST 走索引直接拿到的性能也是很好，当我们根据主键或者唯一二级索引列与常数进行等值匹配时，对单表的访问方法就是 const
+``` 
+mysql> explain select * From t_emp where emp_id =1;
++----+-------------+-------+------------+-------+---------------+---------+---------+-------+------+----------+-------+
+| id | select_type | table | partitions | type  | possible_keys | key     | key_len | ref   | rows | filtered | Extra |
++----+-------------+-------+------------+-------+---------------+---------+---------+-------+------+----------+-------+
+|  1 | SIMPLE      | t_emp | NULL       | const | PRIMARY       | PRIMARY | 4       | const |    1 |   100.00 | NULL  |
++----+-------------+-------+------------+-------+---------------+---------+---------+-------+------+----------+-------+
+1 row in set, 1 warning (0.00 sec)
+```
+  - EQ_REF 在连接查询时，如果被驱动表是通过主键或者唯一二级索引列等值匹配的方式进行访问的，对该被驱动表的访问方法就是`eq_ref`
+``` 
+mysql> explain SELECT * FROM s1 INNER JOIN s2 ON s1.id = s2.id;
++----+-------------+-------+------------+--------+---------------+---------+---------+-------------------+------+----------+-------+
+| id | select_type | table | partitions | type   | possible_keys | key     | key_len | ref               | rows | filtered | Extra |
++----+-------------+-------+------------+--------+---------------+---------+---------+-------------------+------+----------+-------+
+|  1 | SIMPLE      | s1    | NULL       | ALL    | PRIMARY       | NULL    | NULL    | NULL              |    1 |   100.00 | NULL  |
+|  1 | SIMPLE      | s2    | NULL       | eq_ref | PRIMARY       | PRIMARY | 4       | mysql_learn.s1.id |    1 |   100.00 | NULL  |
++----+-------------+-------+------------+--------+---------------+---------+---------+-------------------+------+----------+-------+
+2 rows in set, 1 warning (0.03 sec)
+```
+- ref  #当通过普通的二级索引列与常量进行等值匹配时来查询某个表，那么对该表的访问方法就可能是`ref`
+``` 
+mysql>  EXPLAIN SELECT * FROM s1 WHERE key1 = 'a';
++----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+
+| id | select_type | table | partitions | type | possible_keys | key      | key_len | ref   | rows | filtered | Extra |
++----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+
+|  1 | SIMPLE      | s1    | NULL       | ref  | idx_key1      | idx_key1 | 303     | const |    1 |   100.00 | NULL  |
++----+-------------+-------+------------+------+---------------+----------+---------+-------+------+----------+-------+
+1 row in set, 1 warning (0.03 sec)
+```
+- ref_or_null 当对普通二级索引进行等值匹配查询，该索引列的值也可以是`NULL`值时，那么对该表的访问方法
+- range 如果使用索引获取某些`范围区间`的记录，那么就可能使用到`range`访问方法
+- INDEX 索引全扫描，MYSQL遍历整个索引来查找匹配的行。
+- ALL   全表扫描，MYSQL扫描全表来找到匹配的行
+
+### trace 工具 @TODO
+
+### 主键插入顺序和性能的关系
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221531062.png)
+- 所以是可能会引起页分裂
+- 最好把主键设置为 AUTO_INCREMENT 
+- 然后不在指定主键
+- 顺序写入 减少分裂
+
+### 索引失效的情况
+1. 最左匹配原则：
+   如果一个索引有多个字段col1，col2，col3 这样的，查询是时候where col1=2 and col3=4 这种只能使用部分索引col3用不到
+   如果一个索引有多个字段col1，col2，col3 这样的，查询是时候where col1=2 and col2>2 and col3=4 这种只能使用部分索引col3用不到，第二是非等值的
+2. 计算、函数、类型转换(自动或手动)导致索引失效
+``` 
+# 生效 type = range
+EXPLAIN SELECT SQL_NO_CACHE * FROM student WHERE student.name LIKE 'abc%';
+# 失效 type = ALL
+EXPLAIN SELECT SQL_NO_CACHE * FROM student WHERE LEFT(student.name,3) = 'abc';
+
+# 生效 type = ref
+explain select * From XX where graph_id = XXXX
+# 失效 type = ALL
+explain select * From XX where graph_id + 1 = XXX
+
+# 失效 type = ALL
+explain select * From xx where substr(company_name,1,3)='深圳市'
+
+# 失效 type = ALL ddl中定义为char查询没加引号
+explain select * From xx where company_name=123
+# 生效 type = const
+explain select * From xx where company_name='123'
+
+```
+3. 不等于(!= 或者<>)索引失效
+``` 
+# 生效
+select * From xx where graph_id = 41526137
+# 失效
+select * From xx where graph_id <> 41526137
+# 失效
+select * From xx where graph_id != 41526137
+```
+4. is null可以使用索引，is not null无法使用索引
+```
+# 生效
+EXPLAIN SELECT SQL_NO_CACHE * FROM student WHERE age IS NULL;
+# 失效
+EXPLAIN SELECT SQL_NO_CACHE * FROM student WHERE age IS NOT NULL;
+```
+5. like以通配符%开头索引失效，%放在后面的生效；严禁左模糊或者全模糊
+6. OR 前后存在非索引的列，索引失效
+``` 
+# 失效因为classid没有索引
+EXPLAIN SELECT SQL_NO_CACHE * FROM student WHERE age = 10 OR classid = 100;
+```
+
+### 关联查询的sql优化
+join中的驱动表和被驱动表，先了解在join连接时哪个表是驱动表，哪个表是被驱动表：
+1. 当使用left join时，左表是驱动表，右表是被驱动表
+2. 当使用right join时，右表是驱动表，左表是被驱动表
+3. 当使用join时，mysql会选择数据量比较小的表作为驱动表，大表作为被驱动表
+4. join的底层原理：join情况下，驱动表有索引不会使用到索引，被驱动表建立索引会使用到索引，在以小表驱动大表的情况下，再给大表建立索引会大大提高执行速度
+
+- MySQL 表关联的算法是 Nest Loop Join，是通过驱动表的结果集作为循环基础数据，然后一条一条地通过该结果集中的数据作为过滤条件到下一个表中查询数据，然后合并结果。
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221628745.png)
+```
+EXPLAIN SELECT SQL_NO_CACHE FROM type LEFT JOIN book ON type.card = book.card;
+```
+上面写法中type就是驱动表book就是被驱动表，被驱动表一定要有索引否则会引起全表扫描，驱动表一定是会进行全表扫描了
+
+### 子查询的优化
+- 子查询的效率不高，MySQL需要为内层查询语句的查询结果建立一个临时表
+- 子查询的结果可能很大，还没有索引
+- 最好是改为join连接起来
+- 尽量不要使用NOT IN 或者 NOT EXISTS，用LEFT JOIN xxx ON xx WHERE xx IS NULL替代
+
+### 排序优化
+1. 在 WHERE 条件字段上加索引，但是为什么在ORDER BY 字段上还要加索引呢?
+- order by 建索引是为了避免使用FileSort方式排序。
+
+
+
