@@ -1,6 +1,10 @@
 ### 回答问题
 - mysql的逻辑体系结构 3层是哪三层
 - 一条mysql查询语句的执行过程
+- hash 模式和Btree模式的区别和优点缺点
+- B树和B+树的区别
+- B+树是如何支持索引的？从查询到单条结果返回的命中的过程（画图->目录页之间的查找过程->数据页内二分、槽、分组内的二分）
+- 页中的页目录的作用？
 
 
 
@@ -175,6 +179,8 @@ select id,group_concat(name) from aa group by id;
   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302201342127.png)
   - 关于建表语句中的字段长度
     - 基本的字段的长度和存储范围 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302201343380.png)
+    - varchar 和 char 里面指定都是字符数，底层用啥样的编码占用多少字节不一定
+    - varchar(N) 最大写65532，标志变长字段的实际长度用两个字节，null值的标志一个字节
     - Text字段类型的进一步划分： ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302201345750.png)
     - 其他各种字段类型长度：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302201346211.png)
     - datetime和timestamp的区别
@@ -494,8 +500,9 @@ note :更新是向后生效的
 
 ### mysql大小写敏感吗
 - 关键字和函数不区分大小写
-- 数据库名 表名 表别名 都是严格区分大小写的
 - 列名字是不区分大小写的
+- 数据库名 表名 表别名 都是严格区分大小写的
+- 数据内容区分大小写看行格式 COLLATE _ci还是_cs
 
 note：
 1. 关键字和函数名全部大写；
@@ -1056,4 +1063,336 @@ CREATE TABLE index_demo(
   - 增删改上的时间开销包含对于索引的修改
   - 页面分裂，页面回收
 
-### 
+### 关于hash和二叉树的对比，b树和b+树的对比
+- hash模式的话是可以很好的支持点查的，但是对于范围查询不是很友好
+- hash 对于联合索引的话是一起算的hash值，所以不支持最左侧原则
+- 二叉树的话可以很好的支持范围查询
+- b树存储数据的位置在叶子节点和非叶子节点 m叉，效率不稳定，
+- b+树存储数据的位置只在叶子节点，查询效率更稳定，都是在叶子节点命中；比B树更好的支持往大了查找
+- InnoDb 和 MyISAM是不支持hash索引的，只有Memory是支持Hash的
+
+### 面试题：mysql索引树会一次性的加载到内存中吗？
+- 不会
+- 可能很大，只会注意逐一加载
+
+### 面试题： B+树的查询能力如何？大致需要几次io呢？
+- 这个是和层高相关的
+- 单个也节点的能力如果是可以存储1000个目录项的话
+- 三层就是 1000^3 = 1000000000 个数据行记录
+
+### 面试题：b树和b+树的对比？为啥B+树更适合作为索引
+- B+树效率稳定，命中总在叶子节点=>IO次数稳定，查找范围时候也更方便
+- B+磁盘效率更高，因为一个页内存储的记录信息更多，次数就更少
+
+### 面试题：Hash索引和B+树索引的区别？
+- hash的效率高，一般认为是O1的复杂度，但是对于范围查找的支持不是很好
+- hash 不支持最左侧原则，尤其是联合索引
+- hash 索引不支持order by ，不支持 模糊查找
+- B+树的很好支持范围查找，order by，模糊查找
+
+### InnoDb的数据存储结构-页和页的内部结构
+- 页： 数据存储的基本单位；磁盘和内存交互的基本单位；IO操作的基本单位；
+- 常见的页有：数据页（存储数据或者目录项就是BTree中的叶子和飞叶子节点）、系统页、UNDO页、事务数据页等等
+```
+# 查看页的size大小
+show variables like '%innodb_page_size%';
+
+# 设置innodb_page_size的大小
+
+```
+- 页面的内部结构：
+  ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221029885.png)
+  ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221032007.png)
+1. 第一部分文件头：File Header信息，这里记住如下几个比较重要的信息：
+   -  FIL_PAGE_OFFSET：当前页的页号，每个页都有一个唯一编号
+   -  FIL_PAGE_PREV：双向链表中指向当前页的上一个页
+   -  FIL_PAGE_NEXT：双向链表中指向当前页的下一个页
+   -  FIL_PAGE_TYPE：页的类型，索引和数据都是存放在FIL_PAGE_INDEX（0x45BF）这种类型的页中，就是数据页。
+   - 数据页之间组成了双向链表 : ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221037528.png)
+2. 第二部分 表示页内的空闲空间，最大最小记录，用户记录
+3. 第三部分 页目录 页头部
+   - 页目录 是用来支持二分查找的，如果用户数据有1000条，会把数据分组（比如下面的 3 7 9 、、、），页目录对每个组存一个组内的最大或者最小值（下面演示的是存储的最大值），然后查询时候就是在页目录中进行二分查找就可定位到组；定位到组之后在组内也可以进行二分查找，查找到用户数据
+   - 页目录中实际存储是槽slot，是支持二分查找
+   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221021379.png)
+   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221039851.png)
+
+### InnoDb中的行格式
+行格式就是规定底层使用存储行记录时候的格式，实际到底层存储的格式信息
+
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221054681.png)
+``` 
+# 查询默认的行格式 mysql 8 和 mysql 5.7 默认的都是dynamic
+SELECT @@innodb_default_row_format;
+mysql> SELECT @@innodb_default_row_format;
++-----------------------------+
+| @@innodb_default_row_format |
++-----------------------------+
+| dynamic                     |
++-----------------------------+
+1 row in set (0.01 sec)
+
+# 查看某个表的行格式
+show table status like "XXX"\G；
+
+# 修改表的行格式
+alter table XXX row format=compact;
+
+# 创建表时候指定行格式
+ CREATE TABLE record_test_table (
+col1 VARCHAR(8),
+col2 VARCHAR(8) NOT NULL,
+col3 CHAR(8),
+col4 VARCHAR(8)
+) CHARSET=ascii ROW_FORMAT=COMPACT;
+```
+- 行格式的分类
+  - COMPACT
+  - dynamic 
+  - compressed
+- 行溢出
+  - 本来一个行是要放在底层的页内的，但是varchar或者其他字段的最大长度是可以超过一个页的，这种现象就是行溢出
+  - 行溢出的处理：只存一部分，数据被分页存储，指明在哪些页存储
+    - 即：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221106986.png)
+    - COMPACT 下 只存前768个
+    - dynamic 对于BLOB完全的off page 溢出页来存储
+    - compressed 对于BLOB完全的off page 溢出页来存储 并进行压缩，这种行格式存储 BLOB TEXT VARCHAR 的效率比较高
+
+### 页Page 区extent 段segment 表空间Tablespace
+- 页Page 区extent 段segment 表空间Tablespace 关系 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221034510.png)
+- 为啥有区的概念？主要是用来贴合顺序存储，这样的访问速度较快
+- 为啥要有段的概念？主要是为了让目录项的页和非目录项的页分开存储
+- 表空间：
+  - @TODO
+
+### 索引
+1. 索引的分类
+   - 普通索引
+   - 唯一性索引
+   - 主键索引
+   - 单列索引
+   - 多列(组合、联合)索引 
+   - 全文索引：分词
+2. 不同的引擎支持不同的索引
+   - InnoDB：支持 B-tree、Full-text 等索引，不支持 Hash 索引;
+   - MyISAM : 支持 B-tree、Full-text 等索引，不支持 Hash 索引; 
+   - Memory :支持 B-tree、Hash 等 索引，不支持 Full-text 索引; 
+   - NDB :支持 Hash 索引，不支持 B-tree、Full-text 等索引; 
+   - Archive :不支 持 B-tree、Hash、Full-text 等索引;
+3. 创建索引,删除索引
+``` 
+CREATE TABLE table_name [col_name data_type]
+[UNIQUE | FULLTEXT | SPATIAL] [INDEX | KEY] [index_name] (col_name [length]) [ASC |
+DESC]
+
+# eg
+PRIMARY KEY (`id`),
+UNIQUE KEY `uniq_uid_inner_id` (`uid`, `inner_id`),
+KEY `idx_jigou_id` (`jigou_id`),
+FULLTEXT INDEX futxt_idx_info(info),
+SPATIAL INDEX spa_idx_geo(geo)
+ALTER TABLE table_name ADD UNIQUE KEY uniq_title(title)
+ALTER TABLE table_name DROP INDEX index_name;
+```
+
+### mysql8的索引新特性
+- 支持降序索引
+``` 
+CREATE TABLE ts1(a int,b int,index idx_a_b(a,b desc));
+```
+- 隐藏索引  
+  只需要将待删除的索引设置为隐藏索引，使查询优化器不再使用这个索引(即使使用force index(强制使用索引)，优化器也不会使用该索引)， 确认将索引设置为隐藏索引后系统不受任何响应，就可以彻底删除索引。
+  但是在更新数据的时候也是会更新隐藏的索引的
+```
+ #切换成隐藏索引 
+ ALTER TABLE tablename ALTER INDEX index_name INVISIBLE; 
+ 
+ #切换成非隐藏索引
+ ALTER TABLE tablename ALTER INDEX index_name VISIBLE; 
+
+ #修改为优化器可见
+ select @@optimizer_switch \G
+ set session optimizer_switch="use_invisible_indexes=on";
+```
+
+### 索引的设计原则
+- 字段的数值有唯一性的限制
+- 频繁作为 WHERE 查询条件的字段
+- 经常GROUPBY和ORDERBY的列
+- UPDATE、DELETE 的 WHERE 条件列
+- DISTINCT 字段需要创建索引
+- 多表 JOIN 连接操作时，创建索引注意事项
+  - 首先， 连接表的数量尽量不要超过 3 张 ，因为每增加一张表就相当于增加了一次嵌套的循环，数量级增
+    长会非常快，严重影响查询的效率。
+    其次，对 WHERE 条件创建索引，因为WHERE才是对数据条件的过滤。如果在数据量非常大的情况下，
+    没有 WHERE 条件过滤是非常可怕的。
+    最后， 对用于连接的字段创建索引 ，并且该字段在多张表中的 类型必须一致 。比如 course_id 在
+    student_info 表和 course 表中都为 int(11) 类型，而不能一个为 int 另一个为 varchar 类型。
+- 使用最频繁的列放到联合索引的左侧 最左前缀原则
+- 在多个字段都要创建索引的情况下，联合索引优于单值索引
+- 需要避免重复索引，冗余索引
+```
+    # 重复
+    KEY idx_name_birthday_phone_number (name(10), birthday, phone_number),
+    KEY idx_name (name(10))
+    
+    # 冗余
+    UNIQUE uk_idx_c1 (col1),
+    INDEX idx_c1 (col1)
+```
+
+### 查看系统性能参数
+``` 
+# 查询连接MySQL服务器的次数
+show STATUS LIKE 'Connections';
+
+# 查询MySQL服务器的上 线时间
+show STATUS LIKE 'Uptime';
+
+# 查询MySQL服务器的慢查询的次数
+show STATUS LIKE 'Slow_queries';
+
+# 查询Select查询返回的行数
+show STATUS LIKE 'Innodb_rows_read';
+
+# 查询执行INSERT操作插入的行数
+show STATUS LIKE 'Innodb_rows_inserted';
+
+# Innodb_rows_deleted 执行DELETE操作删除的行数
+# Com_update 更新操作 的次数
+# Com_delete 删除操作的次数
+# Com_insert 插入操作的次数
+# Com_select 查询操作的次数
+
+# 最近一次的查询的查询了多少数据页
+SHOW STATUS LIKE 'last_query_cost';
+
+```
+
+### mysql定位执行慢的SQL：慢查询日志
+``` 
+# 开启slow_query_log，开启之后才会记录日志，这也只是临时的，重启mysql失效
+set global slow_query_log='ON';
+
+# 查看是否是开启了慢日志记录和慢日志位置
+mysql> show variables like '%slow_query_log%';
++---------------------+--------------------------------------+
+| Variable_name       | Value                                |
++---------------------+--------------------------------------+
+| slow_query_log      | OFF                                  |
+| slow_query_log_file | /var/lib/mysql/d70a5deda3eb-slow.log |
++---------------------+--------------------------------------+
+
+# 查看并修改long_query_time阈值
+mysql>  show variables like '%long_query_time%';
++-----------------+-----------+
+| Variable_name   | Value     |
++-----------------+-----------+
+| long_query_time | 10.000000 |
++-----------------+-----------+
+
+set global long_query_time = 1;
+
+# 查看慢查询数目
+SHOW GLOBAL STATUS LIKE '%Slow_queries%';
+
+# 查看mysqldumpslow --help的使用情况
+mysqldumpslow --help
+
+#得到返回记录集最多的10个SQL
+mysqldumpslow -s r -t 10 /var/lib/mysql/atguigu-slow.log
+
+#得到访问次数最多的10个SQL
+mysqldumpslow -s c -t 10 /var/lib/mysql/atguigu-slow.log
+
+#得到按照时间排序的前10条里面含有左连接的查询语句
+mysqldumpslow -s t -t 10 -g "left join" /var/lib/mysql/atguigu-slow.log
+
+#另外建议在使用这些命令时结合 | 和more 使用 ，否则有可能出现爆屏情况 
+mysqldumpslow -s r -t 10 /var/lib/mysql/atguigu-slow.log | more
+
+# 永久关闭慢查日志记录功能之后重启mysql
+ [mysqld]
+slow_query_log=OFF
+
+# 临时性方式之后重启mysql
+SET GLOBAL slow_query_log=off;
+
+```
+
+### 查看 SQL 执行成本 profiling
+```
+
+# 查看是否开启profiling
+mysql> show variables like 'profiling';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| profiling     | OFF   |
++---------------+-------+
+
+# 开启profiling
+set profiling = 'ON';
+
+# 查看所有的profiles
+show profiles;
+
+# 查看指定的query的profile
+show profile cpu,block io for query 2;
+
+# show profile的常用查询参数:
+1 ALL:显示所有的开销信息。 
+2 BLOCK IO:显示块IO开销。 
+3 CONTEXT SWITCHES:上下文切换开销。 
+4 CPU:显示CPU开销信息。 
+5 IPC:显示发送和接收开销信息。 
+6 MEMORY:显示内存开销信息。 
+7 PAGE FAULTS:显示页面错误开销信息。 
+8 SOURCE:显示和Source_function，Source_file， Source_line相关的开销信息。 
+9 SWAPS:显示交换次数开销信息。
+```
+
+### 分析查询语句:EXPLAIN
+如果sql的执行成本在executing的时候耗时比较大的话，那就按照EXPLAIN查询执行计划并优化是否走索引
+``` 
+EXPLAIN select * From table where id = 1;
+
+#查询的每一行记录都对应着一个单表
+EXPLAIN SELECT * FROM s1;
+
+#s1:驱动表  s2:被驱动表
+EXPLAIN SELECT * FROM s1 INNER JOIN s2;
+
+#2. id：在一个大的查询语句中每个SELECT关键字都对应一个唯一的id，每个select对应一个id
+ SELECT * FROM s1 WHERE key1 = 'a';
+
+# 一个id
+ SELECT * FROM s1 INNER JOIN s2
+ ON s1.key1 = s2.key1
+ WHERE s1.common_field = 'a';
+
+# 两个id 
+ SELECT * FROM s1 
+ WHERE key1 IN (SELECT key3 FROM s2);
+
+# 两个id
+ SELECT * FROM s1 UNION SELECT * FROM s2;
+
+# 一个id
+ EXPLAIN SELECT * FROM s1 WHERE key1 = 'a';
+ 
+# 一个id 
+ EXPLAIN SELECT * FROM s1 INNER JOIN s2;
+ 
+# 两个id
+ EXPLAIN SELECT * FROM s1 WHERE key1 IN (SELECT key1 FROM s2) OR key3 = 'a';
+
+
+
+```
+
+
+
+1. explain select 语句的返回结果说明
+   ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221405251.png)
+
+2. 可以查看是不是走了索引 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221140670.png)
