@@ -249,30 +249,39 @@ REFERENCES classes (NAME, number) ON DELETE CASCADE);
   事务由单独单元的一个或多个SQL语句组成，在这 个单元中，每个MySQL语句是相互依赖的。而整个单独单 元作为一个不可分割的整体，如果单元中某条SQL语句一 旦执行失败或产生错误，整个单元将会回滚。所有受到影 响的数据将返回到事物开始以前的状态;如果单元中的所 有SQL语句均执行成功，则事物被顺利执行。
 - 事务需要的引擎支持
   常见的现在的引擎是innodb
-- 事务的属性
+- 事务的属性ACID
   - A 原子性(Atomicity)  原子性是指事务是一个不可分割的工作单位，事务中的操作要么都发生，要么都不发生
   - C 一致性(Consistency) 事务必须使数据库从一个一致性状态变换到另外一个一致性状态，一致性的约束都没有被破坏
-  - I 事务的隔离性是指一个事务的执行不能被其他事务干扰，即一个 事务内部的操作及使用的数据对并发的其他事务是隔离的，并发执行的各个事务之间不能互相干扰。 ---并发的事务互不影响
-  - D 持久性是指一个事务一旦被提交，它对数据库中数据的改变就是 永久性的，接下来的其他操作和数据库故障不应该对其有任何影响
-- 脏读，幻读，可重复读
+  - I 事务的隔离性(isolation)是指一个事务的执行不能被其他事务干扰，即一个 事务内部的操作及使用的数据对并发的其他事务是隔离的，并发执行的各个事务之间不能互相干扰。 ---并发的事务互不影响
+  - D 持久性(durability)是指一个事务一旦被提交，它对数据库中数据的改变就是永久性的，接下来的其他操作和数据库故障不应该对其有任何影响
+- 脏读，幻读，可重复读等并发问题
+  - 脏写：对于两个事务 Session A、Session B，如果事务Session A 修改了 另一个 未提交 事务Session B 修改过的数据，那就意味着发生了脏写
   - 脏读：对于两个事务 T1, T2, T1 读取了已经被 T2 更新但还没有被提交的字段. 之后, 若 T2 回滚, T1读取的内容就是临时且无效的.
   - 幻读：对于两个事务T1, T2, T1 从一个表中读取了一个字段, 然后 T2 在该表中插 入了一些新的行. 之后, 如果 T1 再次读取同一个表, 就会多出几行.
   - 可重复读取：对于两个事务T1, T2, T1 读取了一个字段, 然后 T2更新了该字段. 之后, T1再次读取同一个字段, 值就不同了.
 - 事务隔离级别：
   - 未提交读(READ UNCOMMITTED)
   - 提交读(READ COMMITTED) 也叫不可重复读，事务开启前后的读取值可能不一致
-  - 可重复读(REPEATABLE READ)
+  - 可重复读(REPEATABLE READ) 这个是mysql的默认的支持的
   - 可串行(SERIALIZABLE)
+  - 以上四种都是不允许脏写
   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302201425280.png)
 - 设置不同的隔离级别：
   - 每启动一个 mysql 程序, 就会获得一个单独的数据库连接. 每个数据库连接都有一个全局变量 @@tx_isolation, 表示当前的事务隔离级别.
   - 查看当前的隔离级别: SELECT @@tx_isolation;
   - 设置当前 mySQL 连接的隔离级别:  set transaction isolation level read committed;
   - 设置数据库系统的全局的隔离级别: set global transaction isolation level read committed;
+- 事务的状态
+  - 正在执行（active）
+  - 部分提交的(partially committed)
+  - 失败的(failed)
+  - 中止的(aborted)
+  - 提交的(committed)
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302231557267.png)
 
 ### mysql中的sql使用事务
 - 整体流程：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302201431040.png)
-- 开始事务 
+- 开始事务 开启事务
 ```
 set autocommit=0;
 start transaction;
@@ -289,6 +298,14 @@ rollback to 断点
 ``` 
 commit
 ```
+
+```
+# 完整的事务sql例子
+BEGIN;
+INSERT INTO user SELECT '张三'; COMMIT;
+BEGIN;
+INSERT INTO user SELECT '李四'; INSERT INTO user SELECT '李四'; ROLLBACK;
+````
 
 ### jdbc中的事务
 ```
@@ -1789,5 +1806,73 @@ PRIMARY KEY (`id`),
 11. 【建议】事务里包含SQL不超过5个。 因为过长的事务会导致锁数据较久，MySQL内部缓存、连接消耗过多等问题。
 12. 【建议】事务里更新语句尽量基于主键或UNIQUE KEY，如UPDATE... WHERE id=XX;否则会产生间隙锁，内部扩大锁定范围，导致系统性能下降，产生死锁。
 
-### 数据库建模设计工具
+### 数据库建模设计工具 @TODO
 - PDMan
+
+
+### 宏观的mysql调优方向
+出发点：
+  * 用户的反馈(主要)
+  * 日志分析(主要)
+  * 服务器资源使用监控
+  * 数据库内部状况监控
+  * 事务的监控
+  * 锁等待的监控
+主要步骤方向：
+  * 优化表设计
+  * 优化逻辑查询
+  * 优化物理查询：主要是对于索引的正确使用
+  * 使用 Redis 或 Memcached 作为缓存
+  * 库级优化： 读写分离 数据分片
+
+### 优化MySQL服务器（配置mysql的配置文件）
+- 硬件最有效，但是花钱
+- 其他配置参数（区分下生效的引擎）：
+  - innodb_buffer_pool_size
+  - key_buffer_size
+  - table_cache
+  - query_cache_size
+  - sort_buffer_size
+  - wait_timeout
+  - interactive_timeout
+
+### 优化数据库结构
+  - 拆分表:冷热数据分离 比如会员表，不常用字段单独转为member_detail 和 常用 member 两个表
+  - 增加中间表:
+  - 增加冗余字段:反范式化
+  - 优化数据类型
+    - 对整数类型数据进行优化 能不能加UNSIGNED
+    - 既可以使用文本类型也可以使用整数类型的字段，要选择使用整数类型 。
+    - 避免使用TEXT、BLOB数据类型
+    - 避免使用ENUM类型
+    - 使用TIMESTAMP存储时间
+    - 用DECIMAL代替FLOAT和DOUBLE存储精确浮点数
+  - 优化插入速度
+    - 禁用索引
+    - 批量插入
+
+### 分析表
+ANALYZE [LOCAL | NO_WRITE_TO_BINLOG] TABLE tbl_name[,tbl_name]...
+使用 ANALYZE TABLE 分析表的过程中，数据库系统会自动对表加一个 只读锁 。在分析期间，只能读取 表中的记录，不能更新和插入记录。
+ANALYZE TABLE分析后的统计结果会反应到   的值，该值统计了表中某一键所在的列不重复 的值的个数。 该值越接近表中的总行数，则在表连接查询或者索引查询时，就越优先被优化器选择使 用。
+
+### 检查表 @TODO
+
+### 优化表 @TODO
+
+
+### 读写分离&双主双从
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302231534965.png)
+
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302231534660.png)
+
+### 垂直分库 & 垂直分表 & 水平分表
+库中的表分别存在不同服务器上 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302231535196.png)
+
+一个表的不同列放在不同的服务器上 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302231536185.png)
+
+表进行分片
+
+### 事务
+
+  
