@@ -7,8 +7,10 @@
 - 页中的页目录的作用？
 - 索引失效的几个case？
 - join的底层原理？驱动表 被驱动表？
-
-
+- 通过explain判定使用了联合索引中的几个字段的索引？（key_len）
+- 覆盖索引？
+- 索引下推？
+- 范式：第一范式 第二范式 第三范式
 
 
 
@@ -1392,7 +1394,6 @@ EXPLAIN SELECT * FROM s1 INNER JOIN s2;
 
 ```
 
-
 1. explain select 语句的返回结果说明
    ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302221405251.png)
 
@@ -1440,6 +1441,23 @@ mysql>  EXPLAIN SELECT * FROM s1 WHERE key1 = 'a';
 - INDEX 索引全扫描，MYSQL遍历整个索引来查找匹配的行。
 - ALL   全表扫描，MYSQL扫描全表来找到匹配的行
 
+4. 关于explain中的key_len的计算方法：
+- 表示索引中使用的字节数，可通过该列计算查询中使用的索引的长度。在不损失精确性的情况下，长度越短越好；
+- key_len显示的值为索引字段的最大可能长度，并非实际使用长度，即key_len是根据表定义计算而得，不是通过表内检索出的
+- 所以我们可以从key_len来判断使用联合索引时候，索引用到了哪几个字段
+- 计算方法如下：
+  - 注意索引字段的附加信息，下面两种
+    - 可以分为变长和定长数据类型，当索引字段为定长数据类型时，如char、int、datetime，需要有是否为空的标记，这个标记占用1个字节（对于not null的字段来说，则不需要这1个字节）
+    - 对于变长数据类型，比如varchar，除了是否为空的标记之外，还需要有长度信息，需要占用2个字节
+  - char、varchar、blob、text等字符集来说，key_len的长度还和字符集有关
+    - 在latin1字符集中，一个字符占用1个字节 
+    - 在GBK字符集中，一个字符占用2个字节 
+    - 在utf8字符集中，一个字符占用3个字节
+  - 整数类型、浮点数类型、时间类型的索引长度
+    - NOT NULL=字段本身的字段长度
+    - NULL=字段本身的字段长度+1，因为需要有是否为空的标记，这个标记需要占1个字节
+- key_len案例：
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302230927094.png)
 ### trace 工具 @TODO
 
 ### 主键插入顺序和性能的关系
@@ -1520,6 +1538,256 @@ EXPLAIN SELECT SQL_NO_CACHE FROM type LEFT JOIN book ON type.card = book.card;
 ### 排序优化
 1. 在 WHERE 条件字段上加索引，但是为什么在ORDER BY 字段上还要加索引呢?
 - order by 建索引是为了避免使用FileSort方式排序。
+2. 使用哪些索引其实要看数据量和索引情况，按照explain来key_len来分析具体使用了哪几个字段的索引
+3. fileSort两种算法：
+   - 双路排序 (慢)；先读 order by列 ，然后去读实际数据
+   - 单路排序 (快)：直接去取所有的字段的数据
+
+### group by的优化
+- 当无法使用索引列，增大 max_length_for_sort_data 和 sort_buffer_size 参数的设置
+- group by 使用索引的原则几乎跟order by一致 ，group by 即使没有过滤条件用到索引，也可以直接使用索引。
+- group by 先排序再分组，遵照索引建的最佳左前缀法则
+- 包含了order by、group by、distinct这些查询的语句，where条件过滤出来的结果集请保持在1000行 以内，否则SQL会很慢。
+
+### 分页优化
+select * From table limit 20000,10,这种方式是排序前面的20010条数据，然后返回20000~20010条
+1. 优化方式一：
+   EXPLAIN SELECT * FROM student t,(SELECT id FROM student ORDER BY id LIMIT 2000000,10) a  WHERE t.id = a.id;
+2. 优化方式二：不断中间的id
+   SELECT * FROM student WHERE id > 2000000 LIMIT 10;
+
+### 覆盖索引
+一个索引包含了满足查询结果的数据就叫做覆盖索引。
+比如： 如果表中是name,graph_id 是联合索引，那么 
+  select name from table where graph_id = 1；
+  select name, graph_id from table where graph_id = 1； 
+  select name, graph_id, id from table where graph_id = 1；
+这三个都是可以使用到覆盖索引的，简单说就是 索引列+主键 包含 SELECT 到 FROM之间查询的列 。
+可以通过 explain 来区分
+
+1. 覆盖索引的好处：
+   不用再回表，避免Innodb表进行索引的二次查询(回表)
+   可以把随机IO变成顺序IO加快查询效率
+2. 覆盖索引的缺点：
+   索引字段的维护
+
+### 前缀索引
+给字符串加索引的时候，是可以指定给字符串的前面部分字符加索引的
+``` 
+# 默认指定所有的字符
+alter table teacher add index index1(email);
+
+# 指定前面的几个字符
+alter table teacher add index index1(email(6));
+
+```
+
+使用前缀索引，定义好长度，就可以做到既节省空间，又不用额外增加太多的查询成本；
+前缀索引对覆盖索引的影响：使用前缀索引就用不上覆盖索引对查询性能的优化了，这也是你在选择是否使用前缀索引时需要考 虑的一个因素
+
+### 索引下推
+1. 什么是索引下推
+Index Condition Pushdown(ICP)，是一种在存储引擎层使用索引过滤数据的一种优化方式。
+ICP可以减少存储引擎访问基表的次数以及MySQL服务器访问存储引擎的次数。
+
+``` 
+# 案例一：在name有单独索引的情况下
+select * From table where name > 'aaa' and name like '%aaaa就是' 
+
+# 案例二：在zipcode，lastname 为联合索引的情况下
+SELECT *
+FROM people
+WHERE zipcode='000001'
+AND lastname LIKE “%张%”
+AND address LIKE “%北京%”
+```
+
+上面的两个案例都是只能用到部分的索引，
+但是后面的过滤字段可以继续将过滤条件用到索引上：
+- 案例一中：like虽然不能走索引，但是可以在查询时候进行判断，减少回表的数量；
+- 案例二中：lastname 本来用不到索引，但是也可以通过索引下推ICP，在第一次查询就过滤，减少回表量
+
+ICP的 加速效果 取决于在存储引擎内通过 ICP筛选 掉的数据的比例。
+
+2. 索引下推的条件
+- 只能用于二级索引(secondary index)
+- explain显示的执行计划中type值(join 类型)为 range 、 ref 、 eq_ref 或者 ref_or_null 。
+- 并非全部where条件都可以用ICP筛选，如果where条件的字段不在索引列中，还是要读取整表的记录 到server端做where过滤。
+- ICP可以用于MyISAM和InnnoDB存储引擎
+- MySQL 5.6版本的不支持分区表的ICP功能，5.7版本的开始支持。 6 当SQL使用覆盖索引时，不支持ICP优化方法。
+
+3. 索引下推功能的开启和关闭：默认是关闭的
+``` 
+# 关闭索引下推
+SET optimizer_switch ='index-condition_pushdown=off’；
+# 打开索引下推
+SET optimizer_switch ='index_condition_pushdown=on’:
+```
+
+4. 从explain判定是不是使用了索引下推
+explain中的会注明是 using index condition
 
 
+### 索引的其他优化策略
+1. in 和 exists 核心也是小表驱动大表
+2. count(*) 和 count(1)的区别？ --在 innodb中都一样
+3. count(*) 在不同的搜索引擎的区别？ innodb中是O(n)，在MYISAM中是O(1)
+4. count(具体字段) 时候会走二级索引，会走最小的二级索引，这样成本是最低的，尽量不会使用聚簇索引
+5. limit 1 找到一条就停止，唯一索引不用，因为就一条
 
+### 主键的设计原则
+1. 简单自增id的问题
+- 可靠性不高，存在ID回溯问题（mysql 8修复了）
+- 安全性不高，接口中可以去猜比如user_id=5
+- 性能差
+- 局部唯一，只是当前数据库唯一，全局数据不是唯一的
+2. 从业务出发来生成id的问题
+- 手机号？ 不是很好，手机号可以复用
+- 卡号？卡号也存在重复
+- 身份证号？个人隐私，不一定能拿到
+3. 核心业务使用 特殊的uuid，保证存储耗费不大的情况下，唯一且自增
+   非核心业务使用 自增的，这个没啥影响，比如 日志等
+4. 关于uuid：
+其实是有不同的生成版本，mysql这一版本是 时间戳+UUID版本+MAC地址，是全局唯一的 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302231034201.png)
+这里是无序的，不适合做主键-因为有页面分裂问题
+4. 如何正确生成uuid作为业务主键（唯一+自增+压缩）
+- mysql8中 uuid_to_bin(UUID(),TRUE); 这个实现了 存储不高+自增+唯一+压力在客户端
+``` 
+# UUID_TO_BIN 实现对 UUID 字符串进行二进制压缩，32字符-->16bit
+# BIN_TO_UUID 是相应的解压操作，16bit-->32字符
+# IS_UUID 可以帮助我们验证传递过来的参数是否为有效的 UUID，合法的 UUID 是由 32个十六进制字符与几个可选字符（'{', '-', '}'）构成
+   
+# 建表
+CREATE TABLE t (id binary(16) PRIMARY KEY); 
+
+# 插入
+INSERT INTO t VALUES(UUID_TO_BIN(UUID(), true));
+```
+- mysql 5中需要手动赋值字段做主键
+- 总部 MySQL 数据库中，有一个管理信息表，在这个表中添加一个字段，专门用来记录当前会员编号的最大值。
+
+### 为啥需要进行数据库设计
+- 方便使用
+- 降低冗余
+- 保证正确性
+- 规范化约束
+
+### 范式
+在关系型数据库中，关于数据表设计的基本原则、规则就称为范式
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302231048345.png)
+
+1.  键和相关属性的概念
+    这里有两个表:
+    球员表(player) :球员编号 | 姓名 | 身份证号 | 年龄 | 球队编号 球队表(team) :球队编号 | 主教练 | 球队所在地
+    - 超键 :对于球员表来说，超键就是包括球员编号或者身份证号的任意组合，比如(球员编号) (球员编号，姓名)(身份证号，年龄)等。
+    - 候选键 :就是最小的超键，对于球员表来说，候选键就是(球员编号)或者(身份证号)。 主键 :我们自己选定，也就是从候选键中选择一个，比如(球员编号)。
+    - 外键 :球员表中的球队编号。
+    - 主属性 、 非主属性 :在球员表中，主属性是(球员编号)(身份证号)，其他的属性(姓名)(年龄)(球队编号)都是非主属性。
+2. 
+- 第一范式  每个字段不能再继续拆分（其实很主观，比如是地址=省市区）
+- 第二范式  
+  - 每个表必须有主关键字(Primary key)
+  - 其他数据元素与主关键字一一对应
+  - 它的规则是要求数据表里的所有非主属性都要和该数据表的主键有完全依赖关系；就是主键定了则其他字段都定了，然后其他字段也是由主键唯一定义；
+  - 如果有哪些非主属性只和主键的一部份有关的话，它就不符合第二范式；
+  - 比如 表的决定关系是 (球员编号, 比赛编号) → (姓名, 年龄, 比赛时间, 比赛场地，得分)，但是 比赛时间和场地这俩属性可以从比赛编号单独决定，所以不满足第二范式
+  - 需要拆分为 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302231124357.png) 三个表
+  - 否则会产生很大的数据冗余，删除问题，插入问题等
+- 第三范式  
+  - 不存在传递依赖
+- 反范式化：
+  - 范式的话，join比较多
+  - 按照业务来说，最好是冗余些好
+  - 冗余程度自己来控制
+  - 空间换时间
+  - 冗余的数据需要大量的修改
+- 巴斯范式
+  - 若一个关系达到了第三范式，并且它只有一个候选键，或者它的每个候选键都是单属性，则该关系自然达到Bc范式。
+- 第四范式
+- 第五范式
+
+
+### ER模型和数据表
+- ER 模型中有三个要素，分别是实体、属性和关系。实体用矩形表示，属性用椭圆，关系用菱形表示 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302231338135.png)
+- ER模型转为实体表：
+  - (1)一个 实体 通常转换成一个 数据表 ;
+  - (2)一个 多对多的关系 ，通常也转换成一个 数据表 ;
+  - (3)一个 1 对 1 ，或者 1 对多 的关系，往往通过表的 外键 来表达，而不是设计一个新的数据表; 
+  - (4) 属性 转换成表的 字段 。
+
+
+### 数据库的规范
+- 关于库和账号的规范：
+1. 表尽量的少 
+2. 数据表中联合主键的字段个数越少越好 
+3. 库名都是小写，单词按照_区分开来，需要指明字符集并且字符集只能是utf8或者utf8mb4
+``` 
+CREATE DATABASE crm_fund DEFAULT CHARACTER SET 'utf8mb4' ;
+```
+4. 账号创建，对于程序连接数据库账号，遵循权限最小原则 
+5. 临时库以 tmp_ 为前缀，并以日期为后缀 
+6. 备份库以 bak_ 为前缀，并以日期为后缀
+
+
+- 关于表的规范：
+1. 表名、列名一律小写 ，不同单词采用下划线分割
+1. 表名要求有模块名强相关，同一模块的表名尽量使用 统一前缀
+2. 创建表时必须 显式指定字符集 为utf8或utf8mb4。
+3. 表名、列名禁止使用关键字(如type,order等)。
+4. 创建表时必须 显式指定表存储引擎 类型。如无特殊需求，一律为InnoDB。
+5. 字段命名应尽可能使用表达实际含义的英文单词或 缩写 。如:公司 ID，不要使用 corporation_id, 而用corp_id 即可。
+6. 布尔值类型的字段命名为 is_描述 。如member表上表示是否为enabled的会员的字段命 名为 is_enabled。
+7. 禁止在数据库中存储图片、文件等大的二进制数据，存储放在obs oss等外接存储介质url地址
+8. 建表时关于主键: 
+  - 表必须有主键 (1)强制要求主键为id，类型为int或bigint，且为 auto_increment 建议使用unsigned无符号型。 
+  - (2)标识表里每一行主体的字段不要设为主键，建议设为其他字段如user_id，order_id等，并建立unique key索引。
+  - 因为如果设为主键且主键值为随机 插入，则会导致innodb内部页分裂和大量随机I/O，性能下降
+9. 核心表(如用户表)必须有行数据的 创建时间字段 (create_time)和 最后更新时间字段 (update_time)，便于查问题。
+10. 所有存储相同数据的 列名和列类型必须一致 (一般作为关联列，如果查询时关联列类型 不一致会自动进行数据类型隐式转换，会造成列上的索引失效，导致查询效率降低)。
+11. 中间表 tmp_ 开头
+``` sql
+CREATE TABLE user_info (
+`id` int unsigned NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+`user_id` bigint(11) NOT NULL COMMENT '用户id',
+`username` varchar(45) NOT NULL COMMENT '真实姓名',
+`email` varchar(30) NOT NULL COMMENT '用户邮箱',
+`nickname` varchar(45) NOT NULL COMMENT '昵称',
+`birthday` date NOT NULL COMMENT '生日',
+`sex` tinyint(4) DEFAULT '0' COMMENT '性别',
+`short_introduce` varchar(150) DEFAULT NULL COMMENT '一句话介绍自己，最多50个汉字', `user_resume` varchar(300) NOT NULL COMMENT '用户提交的简历存放地址', `user_register_ip` int NOT NULL COMMENT '用户注册时的源ip',
+`create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间', `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE
+CURRENT_TIMESTAMP COMMENT '修改时间',
+`user_review_status` tinyint NOT NULL COMMENT '用户资料审核状态，1为通过，2为审核中，3为未通过，4为还未提交审核',
+PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_user_id` (`user_id`),
+  KEY `idx_username`(`username`),
+  KEY `idx_create_time_status`(`create_time`,`user_review_status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='网站用户基本信息'
+```
+
+- 关于索引的规范：
+1. 【强制】InnoDB表必须主键为id int/bigint auto_increment，且主键值 禁止被更新 ，核心表用改进的uuid。
+2. 【强制】InnoDB和MyISAM存储引擎表，索引类型必须为 BTREE 。
+3. 【建议】主键的名称以 pk_ 开头，唯一键以 uni_ 或 uk_ 开头，普通索引以 idx_ 开头，一律使用小写格式，以字段的名称或缩写作为后缀。
+4. 【建议】多单词组成的columnname，取前几个单词首字母，加末单词组成column_name。如:sample 表 member_id 上的索引:idx_sample_mid。
+5. 【建议】单个表上的索引个数 。
+6. 【建议】在建立索引时，多考虑建立   ，并把区分度最高的字段放在最前面。
+7. 【建议】在多表 JOIN 的SQL里，保证被驱动表的连接列上有索引，这样JOIN 执行效率最高。
+8. 【建议】建表或加索引时，保证表里互相不存在 冗余索引 。 比如:如果表里已经存在key(a,b)，则key(a)为冗余索引，需要删除。
+
+- 关于SQL编写：
+1. 【强制】程序端SELECT语句必须指定具体字段名称，禁止写成 *。
+2. 【建议】程序端insert语句指定具体字段名称，不要写成INSERT INTO t1 VALUES(...)。
+3. 【建议】除静态表或小表(100行以内)，DML语句必须有WHERE条件，且使用索引查找。
+4. 【建议】INSERT INTO...VALUES(XX),(XX),(XX).. 这里XX的值不要超过5000个。 值过多虽然上线很 快，但会引起主从同步延迟。
+5. 【建议】SELECT语句不要使用UNION，推荐使用UNION ALL，并且UNION子句个数限制在5个以 内。
+6. 【建议】线上环境，多表 JOIN 不要超过5个表。
+7. 【建议】减少使用ORDER BY，和业务沟通能不排序就不排序，或将排序放到程序端去做。ORDER BY、GROUP BY、DISTINCT 这些语句较为耗费CPU，数据库的CPU资源是极其宝贵的。
+8. 【建议】包含了ORDER BY、GROUP BY、DISTINCT 这些查询的语句，WHERE 条件过滤出来的结果集请保持在1000行以内，否则SQL会很慢。
+9. 【建议】对单表的多次alter操作必须合并为一次，对于超过100W行的大表进行alter table，必须经过DBA审核，并在业务低峰期执行，多个alter需整 合在一起。 因为alter table会产生 表锁 ，期间阻塞对于该表的所有写入，对于业务可能会产生极 大影响。
+10. 【建议】批量操作数据时，需要控制事务处理间隔时间，进行必要的sleep。
+11. 【建议】事务里包含SQL不超过5个。 因为过长的事务会导致锁数据较久，MySQL内部缓存、连接消耗过多等问题。
+12. 【建议】事务里更新语句尽量基于主键或UNIQUE KEY，如UPDATE... WHERE id=XX;否则会产生间隙锁，内部扩大锁定范围，导致系统性能下降，产生死锁。
+
+### 数据库建模设计工具
+- PDMan
