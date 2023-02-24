@@ -1904,8 +1904,61 @@ mysql> show variables like '%innodb_log_buffer_size%';
 2. Undo日志：@TODO
 
 
-### mysql
+###  MySQL并发事务访问相同记录的问题
+如果两个事务对于同一个数据的操作是这样的：
+1. 读-读 两个都是读取相同的数据，不需要锁来介入
+2. 写-写 每个事务产生描述这个事务的锁，在锁结构中表征是否有可操作记录的权限表示是不是等待
+   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302240926320.png)
+   - is_waiting字段标志 true作为等待标志
+3. 读-写
+   - 脏读 read uncommited
+   - 不可重复读取 两次读不一致
+   - 幻读 前面条数和后面的条数不一样
+   - 关于读写事务的上述问题呢？
+     - 方案一：读操作采用mvcc，写操作采用锁机制
+     - 方案二：读和写都采用锁机制
+     - 读写都是锁的话会有排队执行，效率没有mvcc读和加锁的写效率的方案高
 
+### mvcc是如何解决读过程中的脏读，不可重复读呢？读-mvcc
+- mvcc下每个select操作都生成一个ReadView，当然这个ReadView是只有针对已经COMMITED的记录才会生成，否则不会生成，读也读不到，即
+  本身ReadView存在就说明是读取的是已经提交的了，这个存在就保证了 READ COMMITTED 隔离级别 这个隔离级别的实现
+- 进一步的，在上面的基础上的，对于REPEATABLE READ 隔离级别 ，这个级别的实现原理是：每个首次select的数据都存储到ReadView，这个ReadView中的数据服务于后面的select，那么
+  除了首次的select，后面的select都是复用ReadView，所以无论如何重复读都是这个数，这也就实现了可重复读
 
+### mysql的锁的分类
+1. 对数据的操作类型划分：
+  - 共享锁/读锁  S锁 事务不必等着前面
+  - 排它锁/写锁  X锁 事务需要排队，如果前面的X或者S事务都没有结束，那么就会卡住或者（ERROR 1205 (HY000): Lock wait timeout exceeded; try restarting transaction）
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302241013579.png)
+  - 如何实现排他读，共享读，即对读操作上锁：
+    - select * From table FOR UPDATE; -x锁
+    - select * From table FOR SHARE; - s锁
+    - select * From table LOCK IN SHARE MODE; - s锁
+    - 排它锁的排他性体现：
+      - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302241035464.png)
+      - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302241036426.png)
+      - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302241037769.png)
+      - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302241037452.png)
+  - 平常的UPDATE DELETE INSERT是如何加锁的？
+    - 一定会加X锁的操作 UPDATE DELETE 一定有
+    - INSERT呢因为本来没有这条数据没法加锁
+2. 锁粒度：
+  - 表锁之 S锁 X锁，粒度比较大的
+    - 对整个表都加锁，开销小，但是并发性不高
+    - MYISAM只支持到表锁，InnoDB的话是可以支持更细的粒度的
+    - 主要发生在DDL和其他的DML语句
+    - 在对某个表执行一些诸如 ALTER TABLE 、 DROP TABLE 这类的 DDL 语句时，其他事务对这个表并发执行诸如SELECT、INSERT、DELETE、UPDATE的语句会发生阻塞。
+    - 同理，某个事务 中对某个表执行SELECT、INSERT、DELETE、UPDATE语句时，在其他会话中对这个表执行 DDL 语句也会 发生阻塞。这个过程其实是通过在 server层 使用一种称之为 元数据锁
+    - 手动获取表t 的 S锁 或者 X锁 可以这么写:
+      - LOCK tables t READ :InnoDB存储引擎会对表 t 加表级别的 S锁
+      - LOCK tables t WRITE :InnoDB存储引擎会对表 t 加表级别的 X锁
+      - show open tables where in_use>0;  查看表锁
+    - 行锁
+  - 页锁
+3. 对待锁的态度：
+  - 悲观锁
+  - 乐观锁
+4. 加锁方式：
+   - 显示加锁
+   - 隐式加锁
 
-  
