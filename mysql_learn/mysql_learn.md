@@ -13,6 +13,8 @@
 - 事务中隔离级别？幻读着重看下
 - 范式：第一范式 第二范式 第三范式
 - Redo/Undo log 如何保证ACD？
+- mysql是如何实现可重复读的？--mvcc
+
 
 
 
@@ -1943,7 +1945,8 @@ mysql> show variables like '%innodb_log_buffer_size%';
     - 一定会加X锁的操作 UPDATE DELETE 一定有
     - INSERT呢因为本来没有这条数据没法加锁
 2. 锁粒度：
-  - 表锁之 S锁 X锁，粒度比较大的
+  - 表锁之：S锁 X锁，粒度比较大的
+    1. 普通的表锁 S锁 X锁
     - 对整个表都加锁，开销小，但是并发性不高
     - MYISAM只支持到表锁，InnoDB的话是可以支持更细的粒度的
     - 主要发生在DDL和其他的DML语句
@@ -1953,12 +1956,152 @@ mysql> show variables like '%innodb_log_buffer_size%';
       - LOCK tables t READ :InnoDB存储引擎会对表 t 加表级别的 S锁
       - LOCK tables t WRITE :InnoDB存储引擎会对表 t 加表级别的 X锁
       - show open tables where in_use>0;  查看表锁
-    - 行锁
+    2. 表锁之-意向锁
+      - 意向锁本身是一种表锁
+      - 是一种由行锁引起的表锁
+      - 场景就是： 行上加锁了，然后表上也要加锁的时候不用再一行一行的遍历是不是存在行锁
+      - 存在意向共享锁，意向排它锁
+    3. 表锁之-自增锁 （AUTO-INC锁)
+      - 这个锁在Auto INCREMENT 的主键插入数据时候会用到，每条insert申请一次
+      - innodb_autoinc_lock_mode = 0(“传统”锁定模式)
+      - innodb_autoinc_lock_mode = 1(“连续”锁定模式) 简单插入模式不用，批量的话需要申请锁
+      - innodb_autoinc_lock_mode = 2(“交错”锁定模式) 这种不保证是不是连续的
+    4. 表锁-元数据锁(MDL锁)
+      - 增删改查 + 改DDL结构 的这两个操作
+      - 当对一个表做增删改查操作的时候，加 MDL读锁;
+      - 当要对表做结构变更操作的时候，加 MDL 写 锁。
+  - 行锁
+    - 在存储引擎层实现的，开销大，但是并发高
+    1. 记录锁：X记录锁 S记录锁 
+    2. 间隙锁：避免一个在读另外一个写入满足条件的更多的记录，实际就是说，如果我想查询id =5的那条不存在的数据的话，
+       其实是给最近的（2，8） 这个间隙上了个锁，此时如果事务往id=6插入是卡住的
+    3. 临键锁(Next-Key Locks)
+       有时候我们既想  锁住某条记录，又想阻止其他事务在该记录前边的插入
+    4. 插入意向锁(Insert Intention Locks)
   - 页锁
-3. 对待锁的态度：
-  - 悲观锁
-  - 乐观锁
+    - 介于行锁和表锁之间
+3. 对待锁的态度： 是一种思想
+  - 悲观锁 直接使用表锁 页锁 行锁，并发低
+    悲观锁总是假设最坏的情况，每次去拿数据的时候都认为别人会修改，所以每次在拿数据的时候都会上 锁，这样别人想拿这个数据就会 阻塞 直到它拿到锁(共享资源每次只给一个线程使用，其它线程阻塞， 用完后再把资源转让给其它线程 )。比如行锁，表锁等，读锁，写锁等，都是在做操作之前先上锁，当 其他线程想要访问数据时，都需要阻塞挂起。Java中 synchronized 和 ReentrantLock 等独占锁就是 悲观锁思想的实现。
+    比如在秒杀场景下使用悲观锁，select * From FOR UPDATE;
+  - 乐观锁 程序来实现，并发高
+    乐观锁认为对同一数据的并发操作不会总发生，属于小概率事件，不用每次都对数据上锁，但是在更新 的时候会判断一下在此期间别人有没有去更新这个数据，也就是 不采用数据库自身的锁机制，而是通过 程序来实现 。在程序上，我们可以采用 版本号控制  或者 CAS机制  实现。
+    乐观锁可以通过版本号来实现，秒杀时候查询version版本号，写回去的时候也是查询版本号是还是和自己开始时候的一样；
+    乐观锁页可以通过数时间戳来实现，同上。
+    
 4. 加锁方式：
-   - 显示加锁
-   - 隐式加锁
+   - 显示加锁：通过明确的sql来加锁
+   - 隐式加锁：@TODO
 
+
+### mysql的全局锁和死锁
+- 全局锁 ：全部备份时候的
+- 死锁：两个时候等待对方释放锁，但是都不释放自己的锁，![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302241434258.png)
+  - 当出现死锁以后，有 两种策略 :
+    1. innodb_lock_wait_timeout 来设置等待时间；
+    2. 另一种策略是，发起死锁检测，发现死锁后，主动回滚死锁链条中的某一个事务(将持有最少行级 排他锁的事务进行回滚)，让其他事务得以继续执行。将参数 innodb_deadlock_detect 设置为 on ，表示开启这个逻辑。
+  - mysql中如何避免和解除死锁：
+    - 如果你能确保这个业务一定不会出现死锁，可以临时把死锁检测关掉
+    - 控制并发度
+
+### 锁结构
+结构如图：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302241438343.png)
+1. 锁监控：
+```
+# 查看分析系统上的行锁的争夺情况
+mysql> show status like 'innodb_row_lock%';
++-------------------------------+--------+
+| Variable_name                 | Value  |
++-------------------------------+--------+
+| Innodb_row_lock_current_waits | 0      | # Innodb_row_lock_current_waits:当前正在等待锁定的数量;
+| Innodb_row_lock_time          | 109549 | # Innodb_row_lock_time:从系统启动到现在锁定总时间长度;(等待总时长)
+| Innodb_row_lock_time_avg      | 36516  | # 每次等待所花平均时间;(等待平均时长)
+| Innodb_row_lock_time_max      | 50127  | # Innodb_row_lock_time_max:从系统启动到现在等待最常的一次所花的时间;
+| Innodb_row_lock_waits         | 3      | # 系统启动后到现在总共等待的次数;(等待总次数)
++-------------------------------+--------+
+5 rows in set (0.04 sec)
+```
+2. 与事务和锁相关的几个表：
+事务表 锁表 等待表 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302241501976.png)
+```
+# 查看事务
+select * From  information_schema.INNODB_TRX;
+mysql> select * From  information_schema.INNODB_TRX\G;
+*************************** 1. row ***************************
+                    trx_id: 562947782847704
+                 trx_state: RUNNING # 事务状态  LOCK WAIT；RUNNIG
+               trx_started: 2023-02-24 07:04:22
+     trx_requested_lock_id: NULL
+          trx_wait_started: NULL
+                trx_weight: 2
+       trx_mysql_thread_id: 8
+                 trx_query: trx_query: select * From t_emp where emp_id =1 for update #  实际WATI的 sql
+       trx_operation_state: NULL
+         trx_tables_in_use: 0
+         trx_tables_locked: 1
+          trx_lock_structs: 2
+     trx_lock_memory_bytes: 1128
+           trx_rows_locked: 6
+         trx_rows_modified: 0
+   trx_concurrency_tickets: 0
+       trx_isolation_level: REPEATABLE READ # 事务隔离级别
+         trx_unique_checks: 1
+    trx_foreign_key_checks: 1
+trx_last_foreign_key_error: NULL
+ trx_adaptive_hash_latched: 0
+ trx_adaptive_hash_timeout: 0
+          trx_is_read_only: 0
+trx_autocommit_non_locking: 0
+       trx_schedule_weight: NULL
+1 row in set (0.00 sec)
+
+mysql 5.7：
+# 查看事务的锁情况，只能看到阻塞的
+information_schema.INNODB_LOCKS
+# 等待锁的情况
+information_schema.INNODB_LOCK_WAITS
+
+mysql 8：
+# 查看事务锁的情况，阻塞和非阻塞的都可以看到
+performance_schema.data_locks 
+mysql> SELECT * from performance_schema.data_locks\G;
+*************************** 1. row ***************************
+               ENGINE: INNODB
+       ENGINE_LOCK_ID: 281472806138664:1075:281472695075616
+ENGINE_TRANSACTION_ID: 3862
+            THREAD_ID: 51
+             EVENT_ID: 15
+        OBJECT_SCHEMA: ssm
+          OBJECT_NAME: t_emp
+       PARTITION_NAME: NULL
+    SUBPARTITION_NAME: NULL
+           INDEX_NAME: NULL
+OBJECT_INSTANCE_BEGIN: 281472695075616
+            LOCK_TYPE: TABLE
+            LOCK_MODE: IX
+          LOCK_STATUS: GRANTED
+            LOCK_DATA: NULL
+
+# 等待锁的情况
+performance_schema.data_lock_waits 
+mysql> SELECT * FROM performance_schema.data_lock_waits\G;
+*************************** 1. row ***************************
+                          ENGINE: INNODB
+       REQUESTING_ENGINE_LOCK_ID: 281472806138664:10:4:11:281472695072704
+REQUESTING_ENGINE_TRANSACTION_ID: 3863 # 被阻塞的TRX_ID
+            REQUESTING_THREAD_ID: 51
+             REQUESTING_EVENT_ID: 19
+REQUESTING_OBJECT_INSTANCE_BEGIN: 281472695072704
+         BLOCKING_ENGINE_LOCK_ID: 281472806137048:10:4:11:281472695060480
+  BLOCKING_ENGINE_TRANSACTION_ID: 562947782847704 # 正在执行的事务ID，也就是那个事务阻塞了当前的事务
+              BLOCKING_THREAD_ID: 49
+               BLOCKING_EVENT_ID: 38
+  BLOCKING_OBJECT_INSTANCE_BEGIN: 281472695060480
+1 row in set (0.01 sec)
+```
+
+### MVCC (Multi version Concurrency Control)
+- 加锁来控制读-写安全性问题的话，因为都是排队，效率不是很高
+- mvcc 可以更好的实现读写并发，效率更高，空间换时间，和加锁是两个方式
+- 核心是 Undo Log 和 Read View
+- 快照读和当前读
