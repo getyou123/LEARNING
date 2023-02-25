@@ -1903,7 +1903,11 @@ mysql> show variables like '%innodb_log_buffer_size%';
     - 设置为0 :表示每次事务提交时不进行刷盘操作。(系统默认master thread每隔1s进行一次重做日 志的同步)
     - 设置为1 :表示每次事务提交时都将进行同步，刷盘操作(默认值) ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302231756141.png)
     - 设置为2 :表示每次事务提交时都只把 redo log buffer 内容写入 page cache，不进行同步。由os自己决定什么时候同步到磁盘文件。
-2. Undo日志：@TODO
+2. Undo日志：
+   - 其实就是对于事务对于数据的操作记录
+   - 会构成一个版本链
+   - update & insert
+   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302252120122.png)
 
 
 ###  MySQL并发事务访问相同记录的问题
@@ -2104,4 +2108,269 @@ REQUESTING_OBJECT_INSTANCE_BEGIN: 281472695072704
 - 加锁来控制读-写安全性问题的话，因为都是排队，效率不是很高
 - mvcc 可以更好的实现读写并发，效率更高，空间换时间，和加锁是两个方式
 - 核心是 Undo Log 和 Read View
-- 快照读和当前读
+- 快照读和当前读，这两个概念和undo 日志 对应下
+- mvcc主要是解决 使用 READ COMMITTED 和 REPEATABLE READ 隔离级别的事务，MVCC只能在这两个隔离级别下工作，下面是如何工作的
+  - UNDO LOG 是记录了数据的变化的链，然后以此来支持快照读和当前读，事务会生成对应的REDA VIEW，然后按照是去快照读还是当前读
+  - READ  VIEW 针对每个select生成
+  - trx_ids 记录目前活跃的事务id，up_limit_id 为最大事务id，low_limit_id最小的事务id，creator_trx_id 为创建的事务id
+  - 然后根据事务隔离级别，去读取undo log 链，选择指定的版本
+  - READ COMMITTED 级别下：READ VIEW 只能读已经提交的数据才会生成
+  - REPEATABLE READ：READ VIEW 的可重复读的隔离级别实现是只在首次读取才会生成，后续都是是有第一次的READ VIEW
+- mvcc 如何解决幻读：
+  - 也是根据当前事务id，和 活跃事务id比较
+  - 不读取比当前事务id更大的事务id就可实现不幻读
+
+### 通用查询日志(所有的查询日志)-文本的vi可看
+1. 查看通用查询日志状态
+``` 
+mysql> SHOW VARIABLES LIKE '%general%';
++------------------+---------------------------------+
+| Variable_name    | Value                           |
++------------------+---------------------------------+
+| general_log      | OFF                             |
+| general_log_file | /var/lib/mysql/2cf944a72e26.log |
++------------------+---------------------------------+
+2 rows in set (0.02 sec)
+```
+
+2. 开启通用查询日志
+``` 
+# 在配置文件中永久开启
+[mysqld]
+general_log=ON
+general_log_file=[path[filename]]
+
+# 或者临时开启
+SET GLOBAL general_log=on; # 开启通用查询日志 
+SET GLOBAL general_log_file=’path/filename’; # 设置日志文件保存位置
+SET GLOBAL general_log=off; # 关闭通用查询日志
+SHOW VARIABLES LIKE 'general_log%';
+```
+3. 通用日志内容：
+``` 
+/usr/sbin/mysqld, Version: 8.0.30 (MySQL Community Server - GPL). started with:
+Tcp port: 3306  Unix socket: /var/run/mysqld/mysqld.sock
+Time                 Id Command    Argument
+2023-02-25T15:20:25.116516Z	   11 Query	select * From t_emp where emp_id =1
+2023-02-25T15:20:37.022286Z	   11 Query	select * From t_emp
+```
+
+### 错误日志
+``` 
+mysql> SHOW VARIABLES LIKE 'log_err%';
++----------------------------+----------------------------------------+
+| Variable_name              | Value                                  |
++----------------------------+----------------------------------------+
+| log_error                  |  /var/log/mysqld.log                   |
+| log_error_services         | log_filter_internal; log_sink_internal |
+| log_error_suppression_list |                                        |
+| log_error_verbosity        | 2                                      |
++----------------------------+----------------------------------------+
+4 rows in set (0.05 sec)
+```
+
+### 二进制文件
+1. binlog包括的是DML和DDL，主要用于数据恢复和数据同步 
+2. 二进制的，事件性质,binlog日志位置
+``` 
+show variables like '%log_bin%';
+mysql> show variables like '%log_bin%';
++---------------------------------+-----------------------------+
+| Variable_name                   | Value                       |
++---------------------------------+-----------------------------+
+| log_bin                         | ON                          | # binlog的日志位置
+| log_bin_basename                | /var/lib/mysql/binlog       |
+| log_bin_index                   | /var/lib/mysql/binlog.index | # 也建立了index
+| log_bin_trust_function_creators | OFF                         | # 不同步函数，因为比如说now()
+| log_bin_use_v1_row_events       | OFF                         |
+| sql_log_bin                     | ON                          |
++---------------------------------+-----------------------------+
+6 rows in set (0.07 sec)
+```
+3. binlog的配置-数据日志和数据库文件最好不要放在一个路径上
+```
+############### 永久性的
+[mysqld]
+#启用二进制日志 
+log-bin=mysql-bin  # 日志名称
+binlog_expire_logs_seconds=600 # 存留时间单位s，默认2592000 30天；14400 4小时；86400 1天；259200 3天；
+max_binlog_size=100M # 日志文件大小，单个日志文件的大小， 最大和默认值是1GB
+# 需要重启mysql服务
+
+################ session级别的
+# global 级别
+mysql> set global sql_log_bin=0;
+ERROR 1228 (HY000): Variable 'sql_log_bin' is a SESSION variable and can`t be used with SET GLOBAL
+# session级别
+mysql> SET sql_log_bin=0;
+Query OK, 0 rows affected (0.01 秒)
+```
+4. 查看binlog日志：
+重启一次就会写一个新的日志文件；日志大小到了指定的也会产出一个新的日志文件
+``` 
+SHOW BINARY LOGS; 
+mysql> SHOW BINARY LOGS;
++---------------+-----------+-----------+
+| Log_name      | File_size | Encrypted |
++---------------+-----------+-----------+
+| binlog.000003 |       580 | No        |
+| binlog.000004 |     15980 | No        |
+| binlog.000005 |     14955 | No        |
+| binlog.000006 |       157 | No        |
++---------------+-----------+-----------+
+4 rows in set (0.07 sec)
+
+# 查看具体的日志情况
+mysqlbinlog -v "binlog.000006"
+
+# 从mysql交互端查看
+mysql> show binlog events in "binlog.000006" from 4;
++---------------+-----+----------------+-----------+-------------+--------------------------------------+
+| Log_name      | Pos | Event_type     | Server_id | End_log_pos | Info                                 |
++---------------+-----+----------------+-----------+-------------+--------------------------------------+
+| binlog.000006 |   4 | Format_desc    |         1 |         126 | Server ver: 8.0.30, Binlog ver: 4    |
+| binlog.000006 | 126 | Previous_gtids |         1 |         157 |                                      |
+| binlog.000006 | 157 | Anonymous_Gtid |         1 |         236 | SET @@SESSION.GTID_NEXT= 'ANONYMOUS' |
+| binlog.000006 | 236 | Query          |         1 |         319 | BEGIN                                |
+| binlog.000006 | 319 | Table_map      |         1 |         381 | table_id: 93 (ssm.t_emp)             |
+| binlog.000006 | 381 | Update_rows    |         1 |         459 | table_id: 93 flags: STMT_END_F       |
+| binlog.000006 | 459 | Xid            |         1 |         490 | COMMIT /* xid=96 */                  |
++---------------+-----+----------------+-----------+-------------+--------------------------------------+
+
+# binlog的格式
+mysql> show variables like 'binlog_format';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| binlog_format | ROW   | # Statement-记录sql而非数据  Row-row level 的日志内容会非常清楚的记录下每一行数据修改的细节 Mixed-实际上就是Statement与Row的结合
++---------------+-------+
+1 row in set (0.04 sec)
+
+# 使用binlog实现数据恢复 @TODO
+指定使用pos进行恢复
+指定按照时间进行恢复
+
+# 删除binlog日志
+PURGE {MASTER | BINARY} LOGS TO ‘指定日志文件名’;  这个是按照名字删除
+  mysql> show binary log;
+  ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'log' at line 1
+  mysql> show binary logs;
+  +---------------+-----------+-----------+
+  | Log_name      | File_size | Encrypted |
+  +---------------+-----------+-----------+
+  | binlog.000003 |       580 | No        |
+  | binlog.000004 |     15980 | No        |
+  | binlog.000005 |     14955 | No        |
+  | binlog.000006 |       490 | No        |
+  +---------------+-----------+-----------+
+  4 rows in set (0.03 sec)
+  
+  mysql> PURGE master LOGS To 'binlog.000004';
+  Query OK, 0 rows affected (0.07 sec)
+  
+  mysql> show binary logs;
+  +---------------+-----------+-----------+
+  | Log_name      | File_size | Encrypted |
+  +---------------+-----------+-----------+
+  | binlog.000004 |     15980 | No        |
+  | binlog.000005 |     14955 | No        |
+  | binlog.000006 |       490 | No        |
+  +---------------+-----------+-----------+
+  3 rows in set (0.03 sec)
+
+PURGE {MASTER | BINARY} LOGS BEFORE ‘指定日期’ 按照时间来进行删除
+```
+5. binlog 和 redo 日志对比
+- binlog用于恢复，主从
+- redo log 用于崩溃恢复
+- redo log 开始和commit中间加上了binlog的日志成功写入，这样保证了主从数据一致性
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302260007002.png)
+
+### 中继日志
+- 只在从服务器上
+- 位置
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302260008049.png)
+
+### 主从复制
+- 用于提升数据库的并发能力
+  - 实现读写分离：一台作为写，其他同步
+   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302260014054.png)
+   - 主从同步中的三个线程:
+     - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302260019581.png)
+  - 实现数据热备
+  - 实现HA
+1. 主从复制的配置：
+``` 
+###### 主机配置
+#主服务器唯一ID 
+server-id=1
+#启用二进制日志,指名路径。比如:自己本地的路径/log/mysqlbin 
+log-bin=mysql-bin
+#[可选] 0(默认)表示读写(主机)，1表示只读(从机) 
+read-only=0
+#设置日志文件保留的时长，单位是秒 
+binlog_expire_logs_seconds=6000
+#控制单个二进制日志大小。此参数的最大和默认值是1GB 
+max_binlog_size=200M
+#[可选]设置不要复制的数据库 
+binlog-ignore-db=test
+#[可选]设置需要复制的数据库,默认全部记录。比如:binlog-do-db=ssm 
+binlog-do-db=需要复制的主数据库名字
+#[可选]设置binlog格式 
+binlog_format=STATEMENT
+
+###### 从机配置
+#[必须]从服务器唯一ID
+server-id=2
+#[可选]启用中继日志 
+relay-log=mysql-relay
+
+##### 主机:建立账户并授权
+#5.5,5.7的话
+GRANT REPLICATION SLAVE ON *.* TO 'slave1'@'从机器数据库IP' IDENTIFIED BY 'abc123'; 
+
+#8.0的话
+CREATE USER 'slave1'@'%' IDENTIFIED BY '123456';
+GRANT REPLICATION SLAVE ON *.* TO 'slave1'@'%';
+#此语句必须执行。否则见下面。
+ALTER USER 'slave1'@'%' IDENTIFIED WITH mysql_native_password BY '123456';
+flush privileges;
+# 查询master的状态 记录下File和Position的值。
+show master status;
+
+##### 从机
+# 从机上复制主机的命令
+mysql> CHANGE MASTER TO
+MASTER_HOST='192.168.1.150',MASTER_USER='slave1',MASTER_PASSWORD='123456',MASTER_LOG_FILE='mysql-bin.000007',MASTER_LOG_POS=154;
+# 启动slave同步 
+START SLAVE;
+# SHOW SLAVE STATUS\G;
+Slave IO Running: Yes
+Slave SQL Running: Yes
+则为成功
+```
+2. binlog的format格式：
+- Statement-记录sql而非数据  
+- Row-row level 的日志内容会非常清楚的记录下每一行数据修改的细节 
+- Mixed-实际上就是Statement与Row的结合，在Mixed模式下，一般的语句修改使用Statement格式保存binlog。如一些函数，statement无法完成主从复制的操作，则采用row格式保存binlog。
+  - 会根据具体的sql选择使用Statement 还是 Row 选择一个
+
+### 主从同步的数据一致性问题
+- 异步复制
+  - 主响应，从不管
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302260038658.png)
+- 半同步复制
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302260038885.png) 
+  - 指定一个从同步完成后返回
+- 组复制
+
+### mysqldump 的使用
+
+
+### 分库分表
+
+
+### 读写分离
+
+
+
