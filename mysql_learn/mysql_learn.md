@@ -1568,6 +1568,7 @@ EXPLAIN SELECT SQL_NO_CACHE FROM type LEFT JOIN book ON type.card = book.card;
 - group by 使用索引的原则几乎跟order by一致 ，group by 即使没有过滤条件用到索引，也可以直接使用索引。
 - group by 先排序再分组，遵照索引建的最佳左前缀法则
 - 包含了order by、group by、distinct这些查询的语句，where条件过滤出来的结果集请保持在1000行 以内，否则SQL会很慢。
+- group by没有过滤条件，也可以用上索引。Order By 必须有过滤条件才能使用上索引
 
 ### 分页优化
 select * From table limit 20000,10,这种方式是排序前面的20010条数据，然后返回20000~20010条
