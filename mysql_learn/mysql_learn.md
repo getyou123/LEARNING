@@ -14,6 +14,7 @@
 - 范式：第一范式 第二范式 第三范式
 - Redo/Undo log 如何保证ACD？
 - mysql是如何实现可重复读的？--mvcc
+- 通过一条update 串起来 redo log ,undo log , 事务 ， mvcc 
 
 ----
 ### mysql5.7 和 mysql8
