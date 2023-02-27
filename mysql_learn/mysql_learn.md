@@ -1,6 +1,6 @@
 ### 回答问题
 - mysql的逻辑体系结构 3层是哪三层
-- 一条mysql查询语句的执行过程（上面的三层结构）
+- 一条mysql查询语句的执行过程（基于上面的三层结构）
 - hash 模式和Btree模式的区别和优点缺点
 - B树和B+树的区别？
 - B+树是如何支持索引的？从查询到单条结果返回的命中的过程（画图->目录页之间的查找过程->数据页内二分、槽、分组内的二分）
@@ -15,9 +15,7 @@
 - Redo/Undo log 如何保证ACD？
 - mysql是如何实现可重复读的？--mvcc
 
-
-
-
+----
 ### mysql5.7 和 mysql8
 - 驱动类不同 
   - 5.7 com.mysql.jdbc.Driver
@@ -176,14 +174,14 @@ select id,group_concat(name) from aa group by id;
 
 ### mysql常见的增删改查询
 - 插入
-  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302201341225.png)
-  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302201341550.png)
+  - insert into emp (emp_id,first_name) values(11,'admin');
+  - insert into emp select id,name from table2;
 - 更新
-  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302201341687.png)
+  - update table_name set col1=12 where id = 1;
 - 删除
-  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302201342068.png)
+  - delete from table_name where id = 1;
 - 创建表
-  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302201342127.png)
+  - create table table_name();
   - 关于建表语句中的字段长度
     - 基本的字段的长度和存储范围 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302201343380.png)
     - varchar 和 char 里面指定都是字符数，底层用啥样的编码占用多少字节不一定
@@ -725,6 +723,7 @@ SET DEFAULT ROLE ALL TO 'kangshifu'@'localhost';
 - 执行器：按照执行计划下放到存储引擎去执行
 - 是否需要写到缓存
 - 返回结果集
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302271342847.png)
 
 
 ### mysql分析指定语句的执行耗时
