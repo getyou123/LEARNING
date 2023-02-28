@@ -2,6 +2,7 @@ package org.example.mapper;
 
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.example.pojo.User;
 
 import java.util.List;
@@ -131,9 +132,9 @@ public interface UserMapper {
      */
     List<User> getUserList(@Param("tableName") String tableName);
 
-
     /**
      * 插入了数据之后获取主键id
+     *
      * @param user 数据
      * @return id
      */
