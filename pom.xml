@@ -128,6 +128,7 @@
     <module>Spring_Learn/spring_basic</module>
     <module>Design_pattern_learn</module>
       <module>tool_learn/markdown_learn</module>
+      <module>tool_learn/ansible_learn</module>
   </modules>
 
   <!--dependencyManagement 标签用于控制子模块的依赖版本等信息 -->
