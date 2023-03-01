@@ -15,6 +15,8 @@ public class System_Learn {
         System.out.println("user.name:" + System.getProperty("user.name"));
         System.out.println("user.home:" + System.getProperty("user.home"));
         System.out.println("user.dir:" + System.getProperty("user.dir"));
+        System.out.println("自定义的变量:" + System.getProperty("SELF_DEF"));
+
 
         // 试图启动full gc
         System.gc();
