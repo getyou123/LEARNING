@@ -1,6 +1,9 @@
 package org.example;
 
 
+import org.junit.Test;
+
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -19,8 +22,40 @@ import java.util.TreeSet;
 //        void removeAll(Collection c)从集合中删除c集合中也有的元素
 //        void retainAll(Collection c)从集合中删除集合c中不包含的元素 差集
 
-//set 接口 两种实现一种那是hashset 一种是treeset
+//set 接口 两种实现一种那是hashset和其子类LinkedHashSet 一种是treeSet
 public class SetLearn {
+
+    @Test
+    public void testTreeSet(){
+
+        // 一个使用自然序的排序，这里不指定TreeSet的别的参数，就是使用对象的comparable接口
+        TreeSet<String> strings = new TreeSet<>();
+        strings.add("A1");
+        strings.add("CC");
+        strings.add("BB");
+        Iterator<String> iterator = strings.iterator();
+        while(iterator.hasNext()){
+            System.out.println(iterator.next());
+        }
+
+        // 使用自定义顺序
+        TreeSet<Integer> integers = new TreeSet<>(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return o2 - o1;
+            }
+        });
+
+        integers.add(1);
+        integers.add(3);
+        integers.add(2);
+
+        Iterator<Integer> iterator1 = integers.iterator();
+        while(iterator1.hasNext()){
+            System.out.println(iterator1.next());
+        }
+
+    }
     public static void main(String[] args) {
 
         HashSet<Integer> hashSet = new HashSet<Integer>();

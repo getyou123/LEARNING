@@ -10,8 +10,7 @@ System.out.println(new Object());
 
 基于hotspot jvm来看是按照
 ```
-product(intx, hashCode, 5,                                  
-         "(Unstable) select hashCode generation algorithm" ) 
+product(intx, hashCode, 5, "(Unstable) select hashCode generation algorithm" ) 
 ```
 定义的hashcode值来定义的hashcode生成策略 共计五种算法，不过需要注意的是jvm不保证对应的hashcode是绝对的不一致的
 
@@ -51,7 +50,7 @@ public class Test {
 
 底层实际上是 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302081148839.png)
 
-必须要重新hashcode方法：
+必须要重写hashcode方法：
 ```
 @Override
  public int hashCode() {
@@ -61,4 +60,8 @@ public class Test {
 这样他们的hashcode值就是一样的![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302081149961.png)
 System.out.println(scores.get(s2));就能获取到正常的数据
 
-3. 
+3.  重写 hashCode() 方法的基本原则
+- 在程序运行时，同一个对象多次调用 hashCode() 方法应该返回相同的值。
+- 当两个对象的 equals() 方法比较返回 true 时，这两个对象的 hashCode() 方法的返回值也应相等。
+- 对象中用作 equals() 方法比较的 Field，都应该用来计算 hashCode 值。
+
