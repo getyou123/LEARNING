@@ -630,6 +630,8 @@ alter table emppart tblproperties('EXTERNAL'='TRUE');注意是大写，否则不
 ``` 
 hive加载数据到表中
 load数据时候需要加上load data local inpath '/data/test.txt' into table emppart partition(date="20200504")
+注意csv文件导入hdfs并映射为为hive表的ddl写法
+row format delimited fields terminated by ','
 ```
 
 ``` 
