@@ -31,6 +31,12 @@ public class ArrayLearn {
         Arrays.sort(arr2);
         System.out.println("数组排序：" + Arrays.toString(arr2));
 
+        // 对于已经排序数组的二分查找
+        // 如果查到了就返回数组下标，否则就返回负的插入点位置
+        int[] arr5 = new int[]{1, 2, 3, 4, 7};
+        System.out.println("数组二分查找 元素 4 的 index为：" + Arrays.binarySearch(arr4, 4));
+        System.out.println("数组二分查找 元素 6 的 index为：" + Arrays.binarySearch(arr4, 6));
+
     }
 
 
