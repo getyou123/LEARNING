@@ -154,17 +154,21 @@ hive> select coalesce(null,'100','50') ;
 语法: case when a then b [when c then d]* [else e] end
 返回值: T
 说明：如果 a 为 TRUE,则返回 b；如果 c 为 TRUE，则返回 d；否则返回 e
-hive> select case when 1=2 then 'tom' when 2=2 then 'mary' else 'tim' end from tabl
-eName;
-mary
+hive> select case when 1=2 then 'tom' when 2=2 then 'mary' else 'tim' end from tableName;
+
 
 条件判断函数：case when (两种写法，其二)
 语法: case a when b then c [when d then e]* [else f] end
 返回值: T
 说明：如果 a 等于 b，那么返回 c；如果 a 等于 d，那么返回 e；否则返回 f
-hive> Select case 100 when 50 then 'tom' when 100 then 'mary' else 'tim' end from t
-ableName;
-mary
+hive> Select case 100 when 50 then 'tom' when 100 then 'mary' else 'tim' end from tableName;
+
+hive> select 	case t_company_index.company_type
+	when '1' then '1'
+	when '2' then '3'
+	when '3' then '3'
+	end as company_type
+from tableName;
 ```
 
 ### 日期函数

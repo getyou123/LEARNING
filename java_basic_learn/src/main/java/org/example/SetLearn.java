@@ -3,10 +3,7 @@ package org.example;
 
 import org.junit.Test;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.*;
 
 //collection主要方法:
 //
@@ -54,7 +51,20 @@ public class SetLearn {
         while(iterator1.hasNext()){
             System.out.println(iterator1.next());
         }
+    }
 
+
+    @Test
+    public void testLinkedHashSet(){
+        LinkedHashSet<Integer> integers = new LinkedHashSet<>();
+        integers.add(1);
+        integers.add(3);
+        integers.add(2);
+
+        Iterator<Integer> iterator = integers.iterator();
+        while(iterator.hasNext()){
+            System.out.println(iterator.next());
+        }
     }
     public static void main(String[] args) {
 

@@ -65,3 +65,17 @@ System.out.println(scores.get(s2));就能获取到正常的数据
 - 当两个对象的 equals() 方法比较返回 true 时，这两个对象的 hashCode() 方法的返回值也应相等。
 - 对象中用作 equals() 方法比较的 Field，都应该用来计算 hashCode 值。
 
+
+4. 面试题：Hashtable和HashMap的区别
+
+```
+HashMap:底层是一个哈希表（jdk7:数组+链表;jdk8:数组+链表+红黑树）,是一个线程不安全的集合,执行效率高
+Hashtable:底层也是一个哈希表（数组+链表）,是一个线程安全的集合,执行效率低
+
+HashMap集合:可以存储null的键、null的值
+Hashtable集合,不能存储null的键、null的值
+
+Hashtable的子类Properties（配置文件）依然活跃在历史舞台
+Properties集合是一个唯一和IO流相结合的集合
+```
+
