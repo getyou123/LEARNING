@@ -1,6 +1,40 @@
 package org.example;
 
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Comparator;
+
 public class ArrayLearn {
+
+    @Test
+    public void testArrays() {
+        // 实现数组对比
+        int[] arr1 = new int[]{1, 2, 3, 4};
+        int[] arr2 = new int[]{1, 3, 2, 4};
+        boolean isEquals = Arrays.equals(arr1, arr2);
+        System.out.println(isEquals);
+
+        int[] arr3 = new int[]{1, 2, 3, 4};
+        int[] arr4 = new int[]{1, 2, 3, 4};
+        boolean isEquals1 = Arrays.equals(arr3, arr4);
+        System.out.println(isEquals1);
+
+        // 输出数组信息
+        System.out.println("数组信息：" + Arrays.toString(arr1));
+
+        // 填充数组元素
+        int[] ints = new int[5];
+        Arrays.fill(ints, 10);
+        System.out.println("数组信息：" + Arrays.toString(ints));
+
+        // 数组排序
+        Arrays.sort(arr2);
+        System.out.println("数组排序：" + Arrays.toString(arr2));
+
+    }
+
+
     public static void main(String[] args) {
         // 包含初始化的-静态的
         int[] arr = new int[]{1, 2, 3};
