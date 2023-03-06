@@ -1,8 +1,14 @@
 package org.example;
 
+import org.junit.Test;
+
 import java.io.*;
 
 public class BufferedStreamLearn {
+
+
+    @Test
+    // BufferedInputStream 和 BufferedOutputStream 实现的文件复制
     public void test1() {
         FileInputStream fis = null;
         FileOutputStream fos = null;
@@ -39,4 +45,22 @@ public class BufferedStreamLearn {
             }
         }
     }
+
+
+    // 定义单行读取的
+    @Test
+    public void testReadLine()throws IOException {
+        // 创建流对象
+        BufferedReader br = new BufferedReader(new FileReader("/Users/XXX/IdeaProjects/LEARNING/java_basic_learn/src/main/java/org/example/App.java"));
+        // 定义字符串,保存读取的一行文字
+        String line;
+        // 循环读取,读取到最后返回null
+        while ((line = br.readLine())!=null) {
+            System.out.println(line);
+        }
+        // 释放资源
+        br.close();
+    }
+
+    //
 }
