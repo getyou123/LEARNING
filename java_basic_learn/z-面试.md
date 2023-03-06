@@ -79,3 +79,42 @@ Hashtable的子类Properties（配置文件）依然活跃在历史舞台
 Properties集合是一个唯一和IO流相结合的集合
 ```
 
+--- 
+5. ArrayList与Vector的区别
+它们的底层物理结构都是数组，我们称为动态数组。
+* ArrayList是新版的动态数组，线程不安全，效率高，Vector是旧版的动态数组，线程安全，效率低。
+* 动态数组的扩容机制不同，ArrayList默认扩容为原来的1.5倍，Vector默认扩容增加为原来的2倍。
+--- 
+
+6. Entry中的hash属性为什么不直接使用key的hashCode()返回值呢？
+JDK1.7和JDK1.8关于hash()的实现代码不一样，
+但是不管怎么样都是为了提高hash code值与 (table.length-1)的按位与完的结果，尽量的均匀分布。
+所以核心就是为了减少碰撞；
+因为一个HashMap的table数组一般不会特别大，至少在不断扩容之前，那么table.length-1的大部分高位都是0，直接用hashCode和table.length-1进行&运算的话，就会导致总是只有最低的几位是有效的，那么就算你的hashCode()实现的再好也难以避免发生碰撞，这时让高位参与进来的意义就体现出来了。它对hashcode的低位添加了随机性并且混合了高位的部分特征，显著减少了碰撞冲突的发生。
+
+7. HashMap是如何决定某个key-value存在哪个桶的呢？
+①hash 值 % table.length会得到一个[0,table.length-1]范围的值，正好是下标范围，但是用%运算效率没有位运算符&高。
+②hash 值 & (table.length-1)，任何数 & (table.length-1)的结果也一定在[0, table.length-1]范围。
+
+8. HashMap解决[index]冲突问题
+- JDK1.8之间使用：数组+链表的结构。
+- JDK1.8之后使用：数组+链表/红黑树的结构。
+
+9. HashMap 什么时候树化？什么时候反树化？
+- 哈希表的链表树化成红黑树有 两个条件（且的关系）：
+   static final int TREEIFY_THRESHOLD = 8;//树化阈值 链表长度
+   static final int MIN_TREEIFY_CAPACITY = 64;//最小树化容量 数组长度
+- 反树化：
+  static final int UNTREEIFY_THRESHOLD = 6;//反树化阈值
+
+10. JDK1.7中HashMap的循环链表是怎么回事？如何解决？
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303031553589.png)
+避免HashMap发生死循环的常用解决方案：
+
+- 多线程环境下，使用线程安全的ConcurrentHashMap替代HashMap，推荐
+- 多线程环境下，使用synchronized或Lock加锁，但会影响性能，不推荐
+- 多线程环境下，使用线程安全的Hashtable替代，性能低，不推荐
+
+HashMap死循环只会发生在JDK1.7版本中，主要原因：头插法+链表+多线程并发+扩容。
+
+在JDK1.8中，HashMap改用尾插法，解决了链表死循环的问题。
