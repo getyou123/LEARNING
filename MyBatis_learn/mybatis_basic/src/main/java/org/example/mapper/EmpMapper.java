@@ -1,15 +1,14 @@
 package org.example.mapper;
 
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.example.pojo.Emp;
 import org.example.pojo.User;
 
 import java.util.List;
 import java.util.Map;
 
+
+@Mapper
 public interface EmpMapper {
     /**
      * 通过empId获取emp
@@ -91,7 +90,7 @@ public interface EmpMapper {
 
 
     /**
-     * 注解-实现插入操作z
+     * 注解-实现插入操作
      *
      * @param emp user
      * @return row_num
@@ -116,5 +115,52 @@ public interface EmpMapper {
      */
     @Select("select * from t_emp where emp_id = 1")
     Map<String, Object> getAMapFromTable();
+
+
+
+    /**
+     * 注解实现-关联查询,这里指明了各个字段的对应关系
+     * @return emp
+     */
+    @Select("select emp_id,emp_name,sex,t_dept.dept_id,t_dept.dept_name  from t_emp join t_dept on t_dept.dept_id = t_emp.dept_id " +
+            "where emp_id = #{id}")
+    @Results(id = "EmpDeptJoinMapper",value = {
+            @Result(column = "emp_id", property = "empId"),
+            @Result(column = "emp_name", property = "empName"),
+            @Result(column = "sex", property = "sex", javaType = String.class),
+            @Result(column = "dept_id", property = "dept.deptId"),
+            @Result(column = "dept_name", property = "dept.deptName")
+    })
+    Emp getAEmpFromTableBYId(@Param("id") int id);
+
+
+    /**
+     * 注解实现-分布查询
+     * @return emp
+     * @param id id
+     * @return emp
+     */
+
+    @Select("select emp_id,emp_name,sex,dept_id from t_emp where emp_id = #{id}")
+    @Results(id =  "getAEmpFromTableBYIdSecond",value = {
+            @Result(column = "emp_id", property = "empId"),
+            @Result(column = "emp_name", property = "empName"),
+            @Result(column = "sex", property = "sex", javaType = String.class),
+            @Result(column = "dept_id",property = "dept", one = @One(select = "org.example.mapper.DeptMapper.getDeptAndAllEmpByDeptIdAll"))
+    })
+    Emp getAEmpFromTableBYIdSecond(@Param("id") int id);
+
+
+    /**
+     * 注解实现- resultType
+     */
+
+    @Select("select emp_id,emp_name,sex,null as dept  from t_emp " +
+            "where emp_id = #{id}")
+    @ResultType(Emp.class)
+    Emp getAEmpFromTableBYId2(@Param("id") int id);
+
+
+
 
 }

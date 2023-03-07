@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="hellospring" class="org.getyou123.pojo.HelloSpring"></bean>
+
+    <bean id="studentOne" class="org.getyou123.pojo.Student">
+        <!-- property标签:通过组件类的setXxx()方法给组件对象设置属性 -->
+        <!-- name属性:指定属性名(这个属性名是getXxx()、setXxx()方法定义的，和成员变量无关)
+        -->
+        <!-- value属性:指定属性值 -->
+        <property name="id" value="1001"></property>
+        <property name="name" value="张三"></property>
+        <property name="age" value="23"></property>
+        <property name="sex" value="男"></property>
+    </bean>
+
+
+    <bean id="studentTwo" class="org.getyou123.pojo.Student">
+        <constructor-arg value="1002"></constructor-arg>
+        <!-- 指定属性的对应关系 -->
+        <constructor-arg value="李四" name="name"></constructor-arg>
+        <constructor-arg value="33"></constructor-arg>
+        <constructor-arg value="女"></constructor-arg>
+    </bean>
+</beans>

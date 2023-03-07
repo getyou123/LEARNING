@@ -354,9 +354,7 @@ public class EmpTest {
         // 获取Mapper代理实现类对象
         EmpMapper EmpMapper = sqlSession.getMapper(EmpMapper.class);
         int[] ints = {5, 6};
-
         EmpMapper.deleteMultiEmps(ints);
-
     }
 
 

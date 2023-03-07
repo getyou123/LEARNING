@@ -472,6 +472,44 @@ mapper.xml中配置：
 ```
 
 
+### 一对多和多对一使用mybatis注解方式
+1. 多对一：按照员工id，查询员工Emp，Emp类中包含一个Dept对象（级联方式）：
+```
+    @Select("select emp_id,emp_name,sex,t_dept.dept_id,t_dept.dept_name  from t_emp join t_dept on t_dept.dept_id = t_emp.dept_id " +
+            "where emp_id = #{id}")
+    @Results(id = "EmpDeptJoinMapper",value = {
+            @Result(column = "emp_id", property = "empId"),
+            @Result(column = "emp_name", property = "empName"),
+            @Result(column = "sex", property = "sex", javaType = String.class),
+            @Result(column = "dept_id", property = "dept.deptId"),
+            @Result(column = "dept_name", property = "dept.deptName")
+    })
+    Emp getAEmpFromTableBYId(@Param("id") int id);
+```
+2. 多对一： 不采用级联的方式，按照员工id，查询员工Emp，Emp类中包含一个Dept对象：
+``` 
+    @Select("select emp_id,emp_name,sex,dept_id from t_emp where emp_id = #{id}")
+    @Results(id =  "getAEmpFromTableBYIdSecond",value = {
+            @Result(column = "emp_id", property = "empId"),
+            @Result(column = "emp_name", property = "empName"),
+            @Result(column = "sex", property = "sex", javaType = String.class),
+            @Result(column = "dept_id",property = "dept", one = @One(select = "org.example.mapper.DeptMapper.getDeptAndAllEmpByDeptIdAll"))
+    })
+    Emp getAEmpFromTableBYIdSecond(@Param("id") int id);
+```
+3. 一对多： 按照deptid 查出Dept对象，其中包含所有的emps,
+```
+    @Select("select dept_id, dept_name From t_dept where dept_id =#{dept_id}")
+    @Results(id="DeptMapper",value = {
+            @Result(column = "dept_id",property = "deptId"),
+            @Result(column = "dept_name",property = "deptName"),
+            @Result(column = "dept_id",property = "emps",many = @Many(select = "org.example.mapper.EmpMapper.getEmpListByStep")),
+    })
+    Dept getDeptAndAllEmpByDeptIdAll(@Param("dept_id") Integer deptId);
+```
+前提是 `org.example.mapper.EmpMapper.getEmpListByStep` 已经实现了哈
+
+
 ### 动态sql
 Mybatis框架的动态SQL技术是一种根据特定条件动态拼装SQL语句的功能，它存在的意义是为了解决拼接SQL语句字符串时的痛点问题
 - 比如页面上的多个筛选条件
@@ -751,6 +789,30 @@ xsi:noNamespaceSchemaLocation="../config/ehcache.xsd">
          navigatepageNums:导航分页的页码，[1,2,3,4,5]
          */
 ```
+
+
+### 通过注解的方式使用mybatis
+- @Select 注解
+- @Select + Results 指明映射方式（含有对象域）
+- @Insert 注解
+  - 插入并获取主键
+``` 
+    /**
+     * 注解方式插入数据并获取主键
+     * @param user
+     * @return
+     */
+
+    @Insert("insert into t_user (username, password, age, sex, email) values (#{username}, #{password}, #{age}, #{sex}, #{email})")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
+    int insertUser(User user);
+```
+- @Para("id") 指明参数别名
+- @Delete 注解
+- @Update：注解
+- 注解实现多对一和一对多  注意不要循环调用 OOM
+- 注解可以使用动态sql
+
 
 
 

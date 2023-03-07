@@ -23,6 +23,7 @@
 * Testing 提供了对 junit 或 TestNG 测试框架的整合。
 * Data Access/Integration 提供了对数据访问/集成的功能
 * Spring MVC 提供了面向Web应用程序的集成功能
+* ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303071432332.png)
 
 ### Spring Framework特性
 - 非侵入式:使用 Spring Framework 开发应用程序时，Spring 对应用程序本身的结构影响非常小。对领域模型可以做到零污染;对功能性组件也只需要使用几个简单的注解进行标记，完全不会 破坏原有结构，反而能将组件结构进一步简化。这就使得基于 Spring Framework 开发应用程序 时结构清晰、简洁优雅。
@@ -69,5 +70,73 @@ class Player{
 - 如何在spring中获取IOC容器
   - BeanFactory： 内部接口不对开发者开放
   - ApplicationContext：BeanFactory 的子接口，提供了更多高级特性。面向 Spring 的使用者，几乎所有场合都使用 ApplicationContext 而不是底层的 BeanFactory。
-  - ApplicationContext 实现类：
-    - 
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303071451715.png)
+
+### 如何把Bean交给IOC容器来管理：
+- 通过xml中的bean标签来配置  
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303071457853.png)
+  - 注意id唯一
+- 通过注解来配置
+
+
+### 如何获取IOC容器&如何从IOC容器中获取Bean
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303071506428.png)
+```
+public class HelloSpringTest {
+    @Test
+    public void test(){
+        ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("applicationContext.xml");
+        HelloSpring helloSpring = (HelloSpring) ac.getBean("hellospring");
+        helloSpring.sayHello();
+    }
+}
+```
+
+- IOC容器中默认是单例，需要提供是类的无参构造函数
+- 获取Bean的方式中有多种方式
+  - 通过id获取 `HelloSpring helloSpring = (HelloSpring) ac.getBean("hellospring");`
+  - 通过类型获取 `HelloWorld bean = ac.getBean(HelloWorld.class);`
+  - 通过根据id和类型获取 `HelloWorld bean = ac.getBean("helloworld", HelloWorld.class);`
+  
+- 如果组件类实现了接口，根据接口类型可以获取 bean 吗?
+> 可以，前提是bean唯一
+- 如果一个接口有多个实现类，这些实现类都配置了 bean，根据接口类型可以获取 bean 吗? 
+> 不行，因为bean不唯一
+
+
+### 依赖注入的实现
+- 通过xml通过Setter方法注入到对象中 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303071516778.png)
+  - xml 配置
+```
+    <bean id="studentOne" class="org.getyou123.pojo.Student">
+        <!-- property标签:通过组件类的setXxx()方法给组件对象设置属性 -->
+        <!-- name属性:指定属性名(这个属性名是getXxx()、setXxx()方法定义的，和成员变量无关)
+        -->
+        <!-- value属性:指定属性值 -->
+        <property name="id" value="1001"></property>
+        <property name="name" value="张三"></property>
+        <property name="age" value="23"></property>
+        <property name="sex" value="男"></property>
+    </bean>
+```
+
+- 构造器注入
+  - xml 配置
+```
+    <bean id="studentTwo" class="org.getyou123.pojo.Student">
+        <constructor-arg value="1002"></constructor-arg>
+        <constructor-arg value="李四"></constructor-arg>
+        <constructor-arg value="33"></constructor-arg>
+        <constructor-arg value="女"></constructor-arg>
+    </bean>
+    
+constructor-arg标签还有两个属性可以进一步描述构造器参数:
+  index属性:指定参数所在位置的索引(从0开始) 
+  name属性:指定参数名
+```
+- 一些特殊值的处理
+  - 字面量直接写 `<property name="name" value="张三"/>`
+  - null值 `<property name="name"> <null /> </property>`
+  - xml实体 `<property name="expression" value="a &lt; b"/>`
+  - CDATA节
+  - 为类类型属性赋值

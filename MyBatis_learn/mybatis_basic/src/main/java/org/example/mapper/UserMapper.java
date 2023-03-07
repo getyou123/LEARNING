@@ -1,8 +1,6 @@
 package org.example.mapper;
 
-import org.apache.ibatis.annotations.MapKey;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.example.pojo.User;
 
 import java.util.List;
@@ -139,4 +137,15 @@ public interface UserMapper {
      * @return id
      */
     int getIdAfterInsert(User user);
+
+
+    /**
+     * 注解方式插入数据并获取主键
+     * @param user
+     * @return
+     */
+
+    @Insert("insert into t_user (username, password, age, sex, email) values (#{username}, #{password}, #{age}, #{sex}, #{email})")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
+    int insertUserAndGetPrismKey(User user);
 }
