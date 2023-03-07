@@ -21,6 +21,11 @@ class ReflectLearnUse {
         this.j = j;
     }
 
+    public ReflectLearnUse(int i) {
+        this.i = i;
+        this.j = 0;
+    }
+
     public int add(int sum) {
         this.i = this.i + sum;
         return this.i;
