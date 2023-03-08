@@ -296,7 +296,7 @@ docker run --name elasticsearch -p 9200:9200  -p 9300:9300 \                    
 
 - 搭建kibana
   1. 拉取镜像 ``` docker pull --platform linux/x86_64 kibana:7.8.0  ```
-  2. 启动一个container ```docker run -it -d -e ELASTICSEARCH_URL=http://127.0.0.1:9200 --name kibana --network=host kibana:7.8.0``` 其中的ip 使用docker ps 获取es实例的ip
+  2. 启动一个container `docker run -it -d -p 5601:5601 -e ELASTICSEARCH_URL=http://127.0.0.1:9200 --name kibana --network=host kibana:7.8.0` 其中的ip 使用docker ps 获取es实例的ip
   3. 进入kibana容器中，修改 config/kibana.yml ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302071733057.png)
   4. 重启容器，这个会耗时很久注意等待
   5. 最终可以在kibana中使用dev tool ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302071734954.png)
