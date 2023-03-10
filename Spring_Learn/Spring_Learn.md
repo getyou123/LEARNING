@@ -140,3 +140,11 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
   - xml实体 `<property name="expression" value="a &lt; b"/>`
   - CDATA节
   - 为类类型属性赋值
+
+- 引用的注入方式
+  - 
+
+### 生命周期
+- 实例化
+- 依赖注入
+- 
