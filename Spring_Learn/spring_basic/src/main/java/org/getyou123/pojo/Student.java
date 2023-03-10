@@ -1,10 +1,40 @@
 package org.getyou123.pojo;
 
+import java.util.Arrays;
+import java.util.Map;
+
 public class Student {
     private Integer id;
     private String name;
     private Integer age;
     private String sex;
+    private Clazz clazz;
+    private String[] hobbies;
+    private Map<String, Teacher> teacherMap;
+
+    public Map<String, Teacher> getTeacherMap() {
+        return teacherMap;
+    }
+
+    public void setTeacherMap(Map<String, Teacher> teacherMap) {
+        this.teacherMap = teacherMap;
+    }
+
+    public String[] getHobbies() {
+        return hobbies;
+    }
+
+    public void setHobbies(String[] hobbies) {
+        this.hobbies = hobbies;
+    }
+
+    public Clazz getClazz() {
+        return clazz;
+    }
+
+    public void setClazz(Clazz clazz) {
+        this.clazz = clazz;
+    }
 
     public Student() {
     }
@@ -48,6 +78,9 @@ public class Student {
                 ", name='" + name + '\'' +
                 ", age=" + age +
                 ", sex='" + sex + '\'' +
+                ", clazz=" + clazz +
+                ", hobbies=" + Arrays.toString(hobbies) +
+                ", teacherMap=" + teacherMap +
                 '}';
     }
 
