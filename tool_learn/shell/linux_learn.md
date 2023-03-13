@@ -415,6 +415,11 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.235.22
 note: 如果存在相应的公钥可以直接发送，所以还是先去home目录下找下是否已经生成了公钥；实际是把公钥上传到远程，然后每次通信使用自己的私钥
 
 
+### awk
+```
+# 按照切分的字段从第二个位置开始打印
+cat 1.txt| awk -F '`' '{print $3}' |awk -F 'COMMENT ' '{print $1}' | awk '{for (i=2; i<=NF; i++) printf "%s ", $i; printf "\n"}'
+```
 
 
 
