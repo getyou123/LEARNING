@@ -3,11 +3,11 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="StudentController" class="org.getyou123.controller.StudentController">
-        <property name="studentService" ref="studentService"></property>
+    <bean id="StudentController" class="org.getyou123.controller.StudentController" autowire="byName">
+<!--        <property name="studentService" ref="studentService"></property>-->
     </bean>
-    <bean id="studentService" class="org.getyou123.service.impl.StudentServiceImpl">
-        <property name="studentDao" ref="studentDao"></property>
+    <bean id="studentService" class="org.getyou123.service.impl.StudentServiceImpl" autowire="byName">
+<!--        <property name="studentDao" ref="studentDao"></property>-->
     </bean>
-    <bean id="studentDao" class="org.getyou123.dao.impl.StudentImpl"></bean>
+    <bean id="studentDao" class="org.getyou123.dao.impl.StudentDaoImpl"></bean>
 </beans>

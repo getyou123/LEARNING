@@ -414,7 +414,8 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
     - 主要是要实现getObject 方法
     - 也支持 InitializingBean方法
     - DisposableBean 方法
-- FactoryBean 中getObject返回的bean，就可以交给IOC容器来管理了 
+- FactoryBean 中getObject返回的bean，就可以交给IOC容器来管理了
+
 ```
 把 FactoryBean 配置到 配置文件中
   <bean id="studentNine" class="org.getyou123.factory.StudentFactoryBean"></bean>
@@ -422,8 +423,101 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
 但是实际是其中返回的student对象被放到了IOC容器来管理，是FactoryBean中的getObject方法的返回值给到了IOC容器来管理
 ```
 
+### 基于XML中的自动装配
 
-### 基于XML中的自动装配 
 - 自动装配（autowiring）机制
 - 可以无需手动将依赖注入到类中，而是通过配置Spring容器，让Spring自动完成依赖注入
-- 这里按照service调用dao，
+- 这里controller持有service，service持有dao
+- 都是认为能且只能找到一个bean的，如果容器中有多个的话，会报错不是唯一的bean结果
+- 自动装配: 其实是指定了策略，然后实现注入
+    - byName 按照名字去匹配
+    - byType 按照type去匹配
+    - no
+    - default
+-
+
+示例程序 [AutoWireTest.java](spring_basic%2Fsrc%2Ftest%2Fjava%2Forg%2Fgetyou123%2FAutoWireTest.java) + [spring-autowire.xml](spring_basic%2Fsrc%2Fmain%2Fresources%2Fspring-autowire.xml)
+
+1. 如果不使用自动装配的话
+
+```
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="StudentController" class="org.getyou123.controller.StudentController">
+        <property name="studentService" ref="studentService"></property>
+    </bean>
+    <bean id="studentService" class="org.getyou123.service.impl.StudentServiceImpl">
+        <property name="studentDao" ref="studentDao"></property>
+    </bean>
+    <bean id="studentDao" class="org.getyou123.dao.impl.StudentImpl"></bean>
+</beans>
+```
+
+2. 使用自动装配采用byType-能匹配到就匹配到，匹配不到就是null这个默认值，
+
+``` 
+    <bean id="StudentController" class="org.getyou123.controller.StudentController" autowire="byType">
+<!--        <property name="studentService" ref="studentService"></property>-->
+    </bean>
+    <bean id="studentService" class="org.getyou123.service.impl.StudentServiceImpl" autowire="byType">
+<!--        <property name="studentDao" ref="studentDao"></property>-->
+    </bean>
+    <bean id="studentDao" class="org.getyou123.dao.impl.StudentImpl"></bean>
+</beans>
+```
+
+3. 使用自动装配采用byName-很少用到，也是能用到就用到然后用不上的话就用默认值
+   bean 的id 和 当前的属性名字一致，那么就可以在当前类上使用byName
+
+``` 
+    <bean id="StudentController" class="org.getyou123.controller.StudentController" autowire="byName">
+<!--        <property name="studentService" ref="studentService"></property>-->
+    </bean>
+    <bean id="studentService" class="org.getyou123.service.impl.StudentServiceImpl" autowire="byName">
+<!--        <property name="studentDao" ref="studentDao"></property>-->
+    </bean>
+    <bean id="studentDao" class="org.getyou123.dao.impl.StudentImpl"></bean>
+</beans>
+
+```
+
+### 使用注解控制IOC容器中的Bean
+
+扫描 + 注解 才能生效； 并不是所有的类对象都要交给IOC来管理
+
+1. 常见的组件的注解 其实都是从Component 演变来的，都是一样的，这些注解只能加载实现类上不能加在接口上
+   @Component:将类标识为普通组件
+   @Controller:将类标识为控制层组件
+   @Service:将类标 识为业务层组件
+   @Repository:将类标识为持久层组件
+2. 配置扫描：
+
+- 基本的扫描 `<context:component-scan base-package="org.getyou123"></context:component-scan>`
+- 排除某个注解 这里是Controller这个注解
+
+```
+    <context:component-scan base-package="org.getyou123">
+        <!-- 实现按照注解进行过滤 -->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <!-- 实现按照类型进行过滤 -->
+        <context:exclude-filter type="assignable" expression="com.getyou123.controller.StudentController"/>
+    </context:component-scan>
+```
+
+3. 配置注解过过程中的id
+
+- id 默认是类的小驼峰名字，StudentController->studentController,交给IOC管理的是StudentDaoImpl->studentDaoImpl
+- 自定义id @Controller("studentDaoImpl") 在这里进行配置id
+
+### 基于注解实现自动装配
+
+- @Autowired 可以标志属性，这个是不依赖类的setter方法上
+- 也可以在setter方法上
+- 也可以在构造函数上的参数上
+
+### 啥时用xml，啥时用注解来管理bean呢
+
+- 能拿到源码的话使用注解方便，且精确
+- 不能拿到源码的，第三方的就用xml
