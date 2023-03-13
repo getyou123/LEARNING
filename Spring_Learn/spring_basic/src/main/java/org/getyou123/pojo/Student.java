@@ -84,6 +84,11 @@ public class Student {
                 '}';
     }
 
+
+    public void inited() {
+        System.out.println("初始化");
+    }
+
     public Student(Integer id, String name, Integer age, String sex) {
         this.id = id;
         this.name = name;

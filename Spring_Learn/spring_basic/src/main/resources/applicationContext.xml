@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 引入jdbc 配置文件 -->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
 
     <bean id="hellospring" class="org.getyou123.pojo.HelloSpring"></bean>
 
@@ -144,21 +148,21 @@
     </bean>
 
 
-    <bean id="studentEight" class="org.getyou123.pojo.Student">
-    <property name="id" value="1004"></property>
-    <property name="name" value="赵六"></property>
-    <property name="age" value="26"></property>
-    <property name="sex" value="女"></property>
-    <!-- ref属性:引用IOC容器中某个bean的id，将所对应的bean为属性赋值 -->
-    <property name="clazz" ref="clazzOne"></property>
-    <!-- 未数组进行赋值 -->
-    <property name="hobbies">
-        <array>
-            <value>抽烟</value>
-            <value>喝酒</value>
-            <value>烫头</value>
-        </array>
-    </property>
+    <bean id="studentEight" class="org.getyou123.pojo.Student" scope="prototype" init-method="inited">
+        <property name="id" value="1004"></property>
+        <property name="name" value="赵六"></property>
+        <property name="age" value="26"></property>
+        <property name="sex" value="女"></property>
+        <!-- ref属性:引用IOC容器中某个bean的id，将所对应的bean为属性赋值 -->
+        <property name="clazz" ref="clazzOne"></property>
+        <!-- 未数组进行赋值 -->
+        <property name="hobbies">
+            <array>
+                <value>抽烟</value>
+                <value>喝酒</value>
+                <value>烫头</value>
+            </array>
+        </property>
         <property name="teacherMap">
             <map>
                 <entry key="10010" value-ref="teacherTwo"></entry>
@@ -166,5 +170,15 @@
             </map>
         </property>
     </bean>
+
+    <!-- 配置datasource -->
+    <bean id="druidDataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="url" value="${jdbc.url}"/>
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="username" value="${jdbc.user}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <bean id="studentNine" class="org.getyou123.factory.StudentFactoryBean"></bean>
 
 </beans>

@@ -260,6 +260,7 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
 ```
 
 第二种：为map集合赋值：学生有多个老师,下面两个都可
+
 ``` 
 <bean id="studentSeven" class="org.getyou123.pojo.Student">
         <property name="id" value="1004"></property>
@@ -320,6 +321,7 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
 ```
 
 第三： 可以先声明 map 和 list集合作为bean，然后对象直接使用ref指向
+
 ``` 
 <!--list集合类型的bean--> <util:list id="students">
     <ref bean="studentOne"></ref>
@@ -360,9 +362,68 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
 </bean>
 ```
 
+### 创建外部属性文件
 
-### 生命周期
+<!-- 引入外部属性文件 -->
+<context:property-placeholder location="classpath:jdbc.properties"/>
+
+配置文件：
+
+``` 
+<bean id="druidDataSource" class="com.alibaba.druid.pool.DruidDataSource">
+<property name="url" value="${jdbc.url}"/>
+<property name="driverClassName" value="${jdbc.driver}"/>
+<property name="username" value="${jdbc.user}"/>
+<property name="password" value="${jdbc.password}"/>
+</bean>
+```
+
+测试代码：
+
+``` 
+ @Test
+    public void testDataSource() throws SQLException {
+        ApplicationContext ac = new ClassPathXmlApplicationContext("applicationContext.xml");
+        DataSource dataSource = ac.getBean(DataSource.class);
+        Connection connection = dataSource.getConnection();
+        System.out.println(connection);
+    }
+}
+```
+
+### bean的作用域
+
+- 通过在配置文件中配置scope来判定
+- 默认是单例 singleton 整个容器中就一个bean，在构建IOC容器时候初始化
+- 多例 prototype ，容器中多个示例，在获取bean时候创建，而不是在获取IOC容器时候就执行，同时这个对象的销毁也不是有IOC容器来管理的了
+
+### bean的生命周期
 
 - 实例化
 - 依赖注入
-- 
+- 初始化
+  初始化时候可以指定调用的方法  `<bean id="studentEight" class="org.getyou123.pojo.Student" scope="singleton" init-method="inited">`
+    - 其实这也是bean的作用域有关的 如果是多例的话，在获取的时候才会初始化
+- 关闭销毁： 多例的话ioc容器不管销毁
+
+### FactoryBean-工厂Bean
+
+- FactoryBean是Spring提供的一种整合第三方框架的常用机制
+- 作为一个从Spring容器中获取bean的工具类
+- FactoryBean是Spring框架中的一个接口
+    - 主要是要实现getObject 方法
+    - 也支持 InitializingBean方法
+    - DisposableBean 方法
+- FactoryBean 中getObject返回的bean，就可以交给IOC容器来管理了 
+```
+把 FactoryBean 配置到 配置文件中
+  <bean id="studentNine" class="org.getyou123.factory.StudentFactoryBean"></bean>
+ 
+但是实际是其中返回的student对象被放到了IOC容器来管理，是FactoryBean中的getObject方法的返回值给到了IOC容器来管理
+```
+
+
+### 基于XML中的自动装配 
+- 自动装配（autowiring）机制
+- 可以无需手动将依赖注入到类中，而是通过配置Spring容器，让Spring自动完成依赖注入
+- 这里按照service调用dao，

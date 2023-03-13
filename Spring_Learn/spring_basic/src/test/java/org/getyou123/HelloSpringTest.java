@@ -1,14 +1,22 @@
 package org.getyou123;
 
 import org.getyou123.pojo.HelloSpring;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class HelloSpringTest {
     @Test
-    public void test(){
-        ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("applicationContext.xml");
-        HelloSpring helloSpring = (HelloSpring) ac.getBean("hellospring");
-        helloSpring.sayHello();
+    public void testDataSource() throws SQLException {
+        ApplicationContext ac = new ClassPathXmlApplicationContext("applicationContext.xml");
+        DataSource dataSource = ac.getBean(DataSource.class);
+        Connection connection = dataSource.getConnection();
+        System.out.println(connection);
     }
+
+
 }

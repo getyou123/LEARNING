@@ -78,6 +78,15 @@ public class StudentTest {
         System.out.println(studentEight);
     }
 
+    @Test
+    public void testGetStudentBeanByStudentFactoryBean() {
+        // setter进行注入
+        ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("applicationContext.xml");
+        Student studentNine = (Student) ac.getBean("studentNine");
+        System.out.println(studentNine);
+    }
+
+
 
 
 
