@@ -125,10 +125,11 @@
     <module>mysql_learn</module>
     <module>MyBatis_learn/mybatis_basic</module>
     <module>Spring_Learn</module>
-    <module>Spring_Learn/spring_basic</module>
+    <module>Spring_Learn/spring_basic_ioc</module>
     <module>Design_pattern_learn</module>
       <module>tool_learn/markdown_learn</module>
       <module>tool_learn/ansible_learn</module>
+    <module>Spring_Learn/spring_basic_aop</module>
   </modules>
 
   <!--dependencyManagement 标签用于控制子模块的依赖版本等信息 -->

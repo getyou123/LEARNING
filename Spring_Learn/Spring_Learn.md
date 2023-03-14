@@ -436,7 +436,7 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
     - default
 -
 
-示例程序 [AutoWireTest.java](spring_basic%2Fsrc%2Ftest%2Fjava%2Forg%2Fgetyou123%2FAutoWireTest.java) + [spring-autowire.xml](spring_basic%2Fsrc%2Fmain%2Fresources%2Fspring-autowire.xml)
+示例程序 [AutoWireTest.java](spring_basic_ioc%2Fsrc%2Ftest%2Fjava%2Forg%2Fgetyou123%2FAutoWireTest.java) + [spring-autowire.xml](spring_basic%2Fsrc%2Fmain%2Fresources%2Fspring-autowire.xml)
 
 1. 如果不使用自动装配的话
 
@@ -516,8 +516,29 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
 - @Autowired 可以标志属性，这个是不依赖类的setter方法上
 - 也可以在setter方法上
 - 也可以在构造函数上的参数上
+- 默认是通过byType的方式进行注入，byType不能确定的话就会按照byName方式，如果不能的话就是byType报错多个非唯一（注意下这个情况）
+  - @Qualifier("studentDaoImpl")可以在byType失效的情况下，指定bean的id 
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303131851932.png)
 
 ### 啥时用xml，啥时用注解来管理bean呢
 
 - 能拿到源码的话使用注解方便，且精确
 - 不能拿到源码的，第三方的就用xml
+
+### 代理对象
+- 其实服务于对象的功能增强，对目标对象的访问转为访问代理对象
+- 被代理对象的代码没有发生变化
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303131958180.png)
+- 把核心功能作为被代理对象，把非核心功能作为包围在外层作为一个代理对象
+1. 静态代理
+2. 动态代理
+   - jdk
+   - cglib
+
+### AOP的思想
+- 切入点
+- 通知方法
+- 切面 （通知方法的集合）
+- 连接点
+- 连接点
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303140932266.png)
