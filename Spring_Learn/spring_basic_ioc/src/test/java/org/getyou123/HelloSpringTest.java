@@ -1,7 +1,7 @@
 package org.getyou123;
 
-import org.getyou123.pojo.HelloSpring;
-import org.junit.jupiter.api.Test;
+
+import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

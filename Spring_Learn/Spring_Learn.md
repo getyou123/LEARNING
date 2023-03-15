@@ -524,7 +524,9 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
 
 - 两个都是用来完成，依赖注入的，但是Autowired是spring提供的注解，Resource是JDK中的提供的注解
 -
+
 作用对象不同：@Autowired注解可以对类的成员变量、方法、构造函数进行标注，标注在字段上表示自动注入该类型的对象，标注在方法或构造函数上表示该方法或构造函数需要注入这个类型的对象；而@Resource注解主要是标注在字段上面，用于注入指定名称的Bean。
+
 - 装配的策略不同： Autowired 是默认按照类型，之后才按照name进行装配，Resource则是先按照name来先进行装配的
 
 ### 啥时用xml，啥时用注解来管理bean呢
@@ -538,8 +540,25 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
 - 通过@ComponentScan注解指定要扫描的包或类路径；
 - @ImportResource("classpath:applicationContext.xml") // 引入其他配置文件
 - @Value("${jdbc.url}") 在属性上配置配置文件中的数值
-- @Bean 将方法的返回值作为Bean交给IOC容器
+- @Bean 将方法的返回值作为Bean交给IOC容器，每个bean对应一个Java方法，使用@Bean注解标注方法即可。每个bean的属性使用Java代码进行设置。
 - 所以一个配置xml文件和spring的一个配置类是等效的
+
+### 手写IOC @TODO
+
+1. 实现的模拟的场景
+
+- 模拟实现@Bean和@DI两个注解，搭配自己实现的IOC
+- 创建容器接口实现其中的BeanFactory 或者是 其对应的子接口，实现返回Bean，扫描Bean
+
+2. 实施
+
+-
+
+先构造两个注解 [Bean.java](spring_basic_ioc%2Fsrc%2Fmain%2Fjava%2Forg%2Fgetyou123%2FAnno%2FBean.java)[DI.java](spring_basic_ioc%2Fsrc%2Fmain%2Fjava%2Forg%2Fgetyou123%2FAnno%2FDI.java)
+
+- @Target 注解指定了注解可以应用的元素类型，例如 ElementType.TYPE 表示可以应用于类、接口和枚举类型上，
+  ElementType.METHOD 表示可以应用于方法上。
+  @Retention 注解指定了注解的生命周期，例如 RetentionPolicy.RUNTIME 表示注解将在运行时保留，可以通过反射访问。
 
 ### 代理对象
 
@@ -561,6 +580,11 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
 - 连接点
 - 连接点
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303140932266.png)
+- 切入点和连接点的区别：
+  连接点指在应用程序执行期间能够插入AOP增强的所有点，例如方法执行前、执行后、抛出异常时等。连接点是一个程序执行期间可以插入切面的任何点。
+  切入点是连接点的一个子集，它是程序中一组连接点的集合，用来定义哪些方法需要被拦截，从而被增强。也就是说，切入点是一组连接点的匹配规则，当一个连接点符合这个匹配规则时，它就是一个切入点。切入点用来定义切面的“切入”位置。
+
+---
 
 ### 基于注解实现AOP
 
@@ -584,6 +608,8 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
 通知的顺序：
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303141726443.png)
 
+---
+
 ### 切入点重用
 
 ```  
@@ -606,3 +632,45 @@ String args = Arrays.toString(joinPoint.getArgs()); System.out.println("Logger--
 }
 ```
 
+### 切面的优先级
+
+- 作用于同一个切入点的各个通知方法，在执行到这个方法的时候都是会执行通知方法，那么如何判定各个通知方法的优先级呢
+- @Order(12)作用到切面上，指定优先级，如果不指定的话使用的Integer的最大值
+- 优先级是数据越小优先级越高
+
+### JdbcTemplate
+
+- spring对jdbc进行了封装，使用 JdbcTemplate 方便实现对数据库操作
+
+### spring整合Junit
+
+- 前面使用@Test注解都是需要单独的获取IOC容器
+
+``` 
+ @Test
+    public void testAutoWireByXml() {
+        ApplicationContext ac = new ClassPathXmlApplicationContext("spring-autowire.xml");
+        StudentController studentController = (StudentController) ac.getBean("StudentController");
+        studentController.saveUser();
+    }
+```
+
+- 整合之后直接使用 先配置pom文件
+``` 
+<dependency>
+   <groupId>junit</groupId>
+   <artifactId>junit</artifactId>
+   <version>4.12</version>
+   <scope>test</scope>
+</dependency>
+
+<dependency>
+   <groupId>org.springframework</groupId>
+   <artifactId>spring-test</artifactId>
+   <version>5.3.9</version>
+   <scope>test</scope>
+</dependency>
+
+```
+- 之后新建测试类进行测试[SpringJunitTest.java](spring_basic_ioc%2Fsrc%2Ftest%2Fjava%2Forg%2Fgetyou123%2FSpringJunitTest.java)
+- 注意版本问题 
