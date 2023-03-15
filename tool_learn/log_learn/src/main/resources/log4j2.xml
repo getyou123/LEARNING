@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 顶层定义了最基本的级别，不超过这个级别就是不被收集，优先级最高，比Logger中的高，一般设置为debug -->
+<!-- 顶层定义了最基本的级别，不超过这个级别就是不被收集，优先级最高，比Logger中的高，一般设置为debug ，然后在上线时候在提高日志级别-->
 <Configuration status="WARN" name="defaultLogConfig"
                packages="">
     <!-- 定义下面使用的property -->
@@ -44,7 +44,7 @@
     <Loggers>
         <!-- 这里引用上面定义的输出端，需要指明输出的Appender的名字。 -->
         <!-- 配置指定的类的收集的日志级别 -->
-        <AsyncLogger name="org.example.App1" level="${LOG_LEVEL}" additivity="false" >
+        <AsyncLogger name="org.example.App1" level="${LOG_LEVEL}" additivity="false">
             <AppenderRef ref="RollingFile"/>
         </AsyncLogger>
 
