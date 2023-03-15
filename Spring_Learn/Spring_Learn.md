@@ -435,7 +435,6 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
     - no
     - default
 -
-
 示例程序 [AutoWireTest.java](spring_basic_ioc%2Fsrc%2Ftest%2Fjava%2Forg%2Fgetyou123%2FAutoWireTest.java) + [spring-autowire.xml](spring_basic%2Fsrc%2Fmain%2Fresources%2Fspring-autowire.xml)
 
 1. 如果不使用自动装配的话
@@ -553,7 +552,6 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
 2. 实施
 
 -
-
 先构造两个注解 [Bean.java](spring_basic_ioc%2Fsrc%2Fmain%2Fjava%2Forg%2Fgetyou123%2FAnno%2FBean.java)[DI.java](spring_basic_ioc%2Fsrc%2Fmain%2Fjava%2Forg%2Fgetyou123%2FAnno%2FDI.java)
 
 - @Target 注解指定了注解可以应用的元素类型，例如 ElementType.TYPE 表示可以应用于类、接口和枚举类型上，
@@ -641,6 +639,9 @@ String args = Arrays.toString(joinPoint.getArgs()); System.out.println("Logger--
 ### JdbcTemplate
 
 - spring对jdbc进行了封装，使用 JdbcTemplate 方便实现对数据库操作
+- 配置文件 [spring-jdbc-template.xml](spring_basic_ioc%2Fsrc%2Fmain%2Fresources%2Fspring-jdbc-template.xml)
+-
+测试类 [SpringJdbcTemplateTest.java](spring_basic_ioc%2Fsrc%2Ftest%2Fjava%2Forg%2Fgetyou123%2FSpringJdbcTemplateTest.java)
 
 ### spring整合Junit
 
@@ -656,6 +657,7 @@ String args = Arrays.toString(joinPoint.getArgs()); System.out.println("Logger--
 ```
 
 - 整合之后直接使用 先配置pom文件
+
 ``` 
 <dependency>
    <groupId>junit</groupId>
@@ -672,5 +674,107 @@ String args = Arrays.toString(joinPoint.getArgs()); System.out.println("Logger--
 </dependency>
 
 ```
-- 之后新建测试类进行测试[SpringJunitTest.java](spring_basic_ioc%2Fsrc%2Ftest%2Fjava%2Forg%2Fgetyou123%2FSpringJunitTest.java)
-- 注意版本问题 
+
+-
+之后新建测试类进行测试[SpringJunitTest.java](spring_basic_ioc%2Fsrc%2Ftest%2Fjava%2Forg%2Fgetyou123%2FSpringJunitTest.java)
+
+- 注意版本问题
+
+### 声明式事务
+
+- 之前的函数式事务 编程式事务
+
+``` 
+    Connection conn = ...;
+    try {
+        // 开启事务:关闭事务的自动提交 
+        conn.setAutoCommit(false);
+        // 核心操作 /
+        / 提交事务
+        conn.commit();
+    }catch(Exception e){
+        // 回滚事务 
+        conn.rollBack();
+    }finally{
+        // 释放数据库连接 
+        conn.close();
+    }
+```
+
+- 这种固定的模式就是非常适合作为AOP
+- 下面的演示场景是 在shop数据库中，用户买书，但是user的余额是要求非空的，插入会导致报错
+
+``` 
+ use shop;
+CREATE TABLE `t_book` (
+`book_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+`book_name` varchar(20) DEFAULT NULL COMMENT '图书名称',
+`price` int(11) DEFAULT NULL COMMENT '价格',
+`stock` int(10) unsigned DEFAULT NULL COMMENT '库存(无符号)',
+PRIMARY KEY (`book_id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8;
+
+insert into `t_book`(`book_id`,`book_name`,`price`,`stock`) values (1,'斗破苍 穹',80,100),(2,'斗罗大陆',50,100);
+
+CREATE TABLE `t_user` (
+`user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+`username` varchar(20) DEFAULT NULL COMMENT '用户名',
+`balance` int(10) unsigned DEFAULT NULL COMMENT '余额(无符号)',
+PRIMARY KEY (`user_id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8;
+
+insert  into `t_user`(`user_id`,`username`,`balance`) values (1,'admin',50);
+
+```
+
+- mysql默认是按照一个sql一个事务，自动提交，如果无事务的话，图书的库存更新了，但是用户的余额没有更新
+- 加上合理的事务之后应该是书的库存和用户余额都是不更新的
+- 示例程序文件：
+- [BookController.java](spring_basic_ioc%2Fsrc%2Fmain%2Fjava%2Forg%2Fgetyou123%2Fcontroller%2FBookController.java)
+- [BookService.java](spring_basic_ioc%2Fsrc%2Fmain%2Fjava%2Forg%2Fgetyou123%2Fservice%2FBookService.java)
+- [BookServiceImpl.java](spring_basic_ioc%2Fsrc%2Fmain%2Fjava%2Forg%2Fgetyou123%2Fservice%2Fimpl%2FBookServiceImpl.java)
+- [BookDao.java](spring_basic_ioc%2Fsrc%2Fmain%2Fjava%2Forg%2Fgetyou123%2Fdao%2FBookDao.java)
+- [BookDaoImpl.java](spring_basic_ioc%2Fsrc%2Fmain%2Fjava%2Forg%2Fgetyou123%2Fdao%2Fimpl%2FBookDaoImpl.java)
+- [BookTest.java](spring_basic_ioc%2Fsrc%2Ftest%2Fjava%2Forg%2Fgetyou123%2FBookTest.java)
+
+
+1. 基于注解实现声明式事务
+
+```
+    <!-- 事务管理器 -->
+    <bean id="transactionManager"
+    class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    
+    <!-- 开启事务注解，关联上transactionManager -->
+    <tx:annotation-driven transaction-manager="transactionManager" />
+```
+
+通过注解@Transactional所标识的方法或标识的类中所有的方法，都会被事务管理器管理事务；
+切面和连接点都不是我们来写了，直接使用这个注解就可
+
+2. @Transactional的重要属性
+- 只读，事务中都是查询功能的时候 `@Transactional(readOnly = true)` 默认是false，否则报错 `Caused by: java.sql.SQLException: Connection is read-only. Queries leading to data modification are not allowed`
+- 超时，防止自己的程序在事务中拿着资源不释放，超时则强制回滚抛出异常 `@Transactional(timeout = 3)` 默认是-1，一直等；单位是秒 `org.springframework.transaction.TransactionTimedOutException: Transaction timed out:`
+- 设置针对哪些异常回滚，哪些异常不会滚 `@Transactional(noRollbackFor = ArithmeticException.class)` 数学运算异常(ArithmeticException)
+  - rollbackFor属性:需要设置一个Class类型的对象 
+  - rollbackForClassName属性:需要设置一个字符串类型的全类名 
+  - noRollbackFor属性:需要设置一个Class类型的对象 
+  - rollbackFor属性:需要设置一个字符串类型的全类名
+- 隔离级别设置：
+  @Transactional(isolation = Isolation.DEFAULT)//使用数据库默认的隔离级别 
+  @Transactional(isolation = Isolation.READ_UNCOMMITTED)//读未提交 
+  @Transactional(isolation = Isolation.READ_COMMITTED)//读已提交 
+  @Transactional(isolation = Isolation.REPEATABLE_READ)//可重复读 
+  @Transactional(isolation = Isolation.SERIALIZABLE)//串行化
+- 传播行为
+  - A有事务，调用了B，B本身也是有事务的，事务关系是如何的
+  - 当事务方法被另一个事务方法调用时，必须指定事务应该如何传播。例如:方法可能继续在现有事务中运行，也可能开启一个新事务，并在自己的事务中运行。
+  - `@Transactional(propagation = Propagation.REQUIRED)` 默认情况,买两本书的时候用的是买两本书的事务,如果当前没有事务，就新建一个事务；如果当前存在事务，就加入该事务。当A事务中嵌套了B事务时，B事务也不会是单独的，也会加入到A事务中。如果A事务失败，回滚；如果A事务中，B事务开始前的前置操作执行成功，事务不会提交，继续执行B事务；如果B事务失败，因为B事务是加入了当前事务（上下文中的事务，A事务），连同A事务一起回滚。
+  - `@Transactional(propagation = Propagation.REQUIRES_NEW)` 使用单独买书的动作的事务，存在买一本成功的情况;每次执行都会创建新事务，并同时将上下文中的事务挂起，执行完当前线程后再恢复上下文中事务。如果A事务中嵌套了B事务，B事务会是单独执行的，此过程中A事务会暂时挂起。如果B事务执行成功，B事务提交，A事务恢复，如果B事务执行失败，B事务回滚，A事务恢复。B对于A来说是单独的，B事务的失败不会造成A事务的失败，当然是在有try-catch的情况下
+  - `@Transactional(propagation = Propagation.NESTED)` 如果当前存在事务，则在嵌套事务内执行；如果当前没有事务，则新建一个事务。在A事务中嵌套了B事务时，B事务是A事务的子事务，如果B事务失败，只会回滚B事务，而不会影响到A事务。
+
+3. 基于xml实现声明式事务 不是很常用 
+
+
