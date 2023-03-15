@@ -523,7 +523,8 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
 ### Autowired 和 Resource注解的区别
 
 - 两个都是用来完成，依赖注入的，但是Autowired是spring提供的注解，Resource是JDK中的提供的注解
-- 作用对象不同：@Autowired注解可以对类的成员变量、方法、构造函数进行标注，标注在字段上表示自动注入该类型的对象，标注在方法或构造函数上表示该方法或构造函数需要注入这个类型的对象；而@Resource注解主要是标注在字段上面，用于注入指定名称的Bean。
+-
+作用对象不同：@Autowired注解可以对类的成员变量、方法、构造函数进行标注，标注在字段上表示自动注入该类型的对象，标注在方法或构造函数上表示该方法或构造函数需要注入这个类型的对象；而@Resource注解主要是标注在字段上面，用于注入指定名称的Bean。
 - 装配的策略不同： Autowired 是默认按照类型，之后才按照name进行装配，Resource则是先按照name来先进行装配的
 
 ### 啥时用xml，啥时用注解来管理bean呢
@@ -532,8 +533,13 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
 - 不能拿到源码的，第三方的就用xml
 
 ### 使用配置类来代替xml文件配置
+
 - 通过@Configuration注解表示这是一个配置类
 - 通过@ComponentScan注解指定要扫描的包或类路径；
+- @ImportResource("classpath:applicationContext.xml") // 引入其他配置文件
+- @Value("${jdbc.url}") 在属性上配置配置文件中的数值
+- @Bean 将方法的返回值作为Bean交给IOC容器
+- 所以一个配置xml文件和spring的一个配置类是等效的
 
 ### 代理对象
 
