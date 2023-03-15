@@ -517,7 +517,7 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
 - 也可以在setter方法上
 - 也可以在构造函数上的参数上
 - 默认是通过byType的方式进行注入，byType不能确定的话就会按照byName方式，如果不能的话就是byType报错多个非唯一（注意下这个情况）
-  - @Qualifier("studentDaoImpl")可以在byType失效的情况下，指定bean的id 
+    - @Qualifier("studentDaoImpl")可以在byType失效的情况下，指定bean的id
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303131851932.png)
 
 ### 啥时用xml，啥时用注解来管理bean呢
@@ -526,19 +526,67 @@ constructor-arg标签还有两个属性可以进一步描述构造器参数:
 - 不能拿到源码的，第三方的就用xml
 
 ### 代理对象
+
 - 其实服务于对象的功能增强，对目标对象的访问转为访问代理对象
 - 被代理对象的代码没有发生变化
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303131958180.png)
 - 把核心功能作为被代理对象，把非核心功能作为包围在外层作为一个代理对象
+
 1. 静态代理
 2. 动态代理
-   - jdk
-   - cglib
+    - jdk
+    - cglib
 
 ### AOP的思想
+
 - 切入点
 - 通知方法
 - 切面 （通知方法的集合）
 - 连接点
 - 连接点
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303140932266.png)
+
+### 基于注解实现AOP
+
+- 给[Calculator.java](spring_basic_aop%2Fsrc%2Fmain%2Fjava%2Forg%2Fgetyou123%2FCalculator.java)
+  的实现类 [CalculatorImpl.java](spring_basic_aop%2Fsrc%2Fmain%2Fjava%2Forg%2Fgetyou123%2FCalculatorImpl.java)
+  加上相应的日志打印功能
+- 切面类和目标类都要交给IOC容器：切面类加上 @Aspect注解标注
+- 开启基于注解的aop功能 [spring-anno-aop.xml](spring_basic_aop%2Fsrc%2Fmain%2Fresources%2Fspring-anno-aop.xml)
+  中的 `<aop:aspectj-autoproxy/>`
+- 编写切面类 ： [LogAspect.java](spring_basic_aop%2Fsrc%2Fmain%2Fjava%2Forg%2Fgetyou123%2FLogAspect.java)
+    - `@Before("execution(public int org.getyou123.CalculatorImpl.* (..))") ` 通知访问是Before，需要配置 切入表达式
+
+### 关于通知方法的执行位置
+
+前置通知:使用@Before注解标识，在被代理的目标方法前执行
+返回通知:使用@AfterReturning注解标识，在被代理的目标方法成功结束后执行(寿终正寝) ，能回去到返回值
+异常通知:使用@AfterThrowing注解标识，在被代理的目标方法异常结束后执行(死于非命)
+后置通知:使用@After注解标识，在被代理的目标方法最终结束后执行(盖棺定论)，无论正常结束还是异常结束都是会执行
+环绕通知:使用@Around注解标识，使用try...catch...finally结构围绕整个被代理的目标方法，包 括上面四种通知对应的所有位置
+
+通知的顺序：
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303141726443.png)
+
+### 切入点重用
+
+```  
+# 声明一个切入点表达式
+@Pointcut("execution(* com.xxx.aop.annotation.*.*(..))")
+    public void pointCut(){}
+
+# 在同一个切面中使用
+@Before("pointCut()")
+public void beforeMethod(JoinPoint joinPoint){
+String methodName = joinPoint.getSignature().getName();
+String args = Arrays.toString(joinPoint.getArgs()); System.out.println("Logger-->前置通知，方法名:"+methodName+"，参数:"+args);
+}
+
+# 不同的切面中使用
+@Before("com.xxx.aop.CommonPointCut.pointCut()")
+public void beforeMethod(JoinPoint joinPoint){
+String methodName = joinPoint.getSignature().getName();
+String args = Arrays.toString(joinPoint.getArgs()); System.out.println("Logger-->前置通知，方法名:"+methodName+"，参数:"+args);
+}
+```
+

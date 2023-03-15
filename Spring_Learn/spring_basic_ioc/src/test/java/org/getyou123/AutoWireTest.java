@@ -14,14 +14,17 @@ public class AutoWireTest {
      * 测试基于xml管理bean
      */
     @Test
-    public void testAutoWireByXml(){
+    public void testAutoWireByXml() {
         ApplicationContext ac = new ClassPathXmlApplicationContext("spring-autowire.xml");
         StudentController studentController = (StudentController) ac.getBean("StudentController");
         studentController.saveUser();
     }
 
+    /**
+     * 通过注解实现自动装配
+     */
     @Test
-    public void testAutoWireByAnno(){
+    public void testAutoWireByAnno() {
         ApplicationContext ac = new ClassPathXmlApplicationContext("spring-autowire-anno.xml");
         StudentController studentController = ac.getBean(StudentController.class);
         System.out.println(studentController);
