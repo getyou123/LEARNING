@@ -312,3 +312,13 @@ docker exec -it mongo mongo admin
 # 创建用户和授权
  db.createUser({ user:'root',pwd:'123456',roles:[ { role:'userAdminAnyDatabase', db: 'admin'},'readWriteAnyDatabase']});
 ```
+
+
+### docker 安装tomcat作为spring mvc容器使用：
+- 编写Dockerfile文件[Dockerfile](..%2FSpring_Learn%2Fspring_mvc_learn%2FDockerfile)
+- 编写执行的脚本代替原来的启动脚本 [start-docker.sh](..%2FSpring_Learn%2Fspring_mvc_learn%2Fstart-docker.sh)
+- 通过Dockerfile构造镜像  `docker build -t mvc_use .`
+- 启动容器 `docker run --name mvc_learn -p 9090:8080 -v /Users/haoguowang/IdeaProjects/LEARNING/Spring_Learn/spring_mvc_learn/target/spring_mvc_learn.war:/usr/local/tomcat/webapps/spring_mvc_learn.war -d mvc_use`
+- 更新代码之后idea中进行maven clean && mvn package ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303161354057.png)
+- 之后再idea中直接重启 容器即可 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303161355982.png)
+- 访问 `http://localhost:9090/spring_mvc_learn/`
