@@ -41,8 +41,55 @@ mvc本身是一种思想，模型（数据模型），视图，控制器
 - @RequestMapping注解:处理请求和控制器方法之间的映射关系
 - @RequestMapping注解的value属性可以通过请求地址匹配请求，/表示的当前工程的上下文路径
 - 如果作用在了类上，那么就是整个类的都是有一个基础的前缀，然后方法中的都是这个前缀+方法的匹配org.getyou123.RequestMappingLearn.hello
-- 配置Method方法：@RequestMapping注解的method属性是一个RequestMethod类型的数组，表示该请求映射能够匹配 多种请求方式的请求 `405:Request method 'POST' not supported`
-  - 默认是get，只有表单 几个特殊的为post
-  - ``
+- 配置Method方法：@RequestMapping注解的method属性是一个RequestMethod类型的数组，表示该请求映射能够匹配
+  多种请求方式的请求 `405:Request method 'POST' not supported`
+    - 默认是get，只有表单 几个特殊的为post
+    - 组合注解： GetMapping = @RequestMapping 中设置method为Get
+    - 处理post请求的映射-->@PostMapping
+    - 处理put请求的映射-->@PutMapping
+    - 处理delete请求的映射-->@DeleteMapping
+- @RequestMapping注解的params属性，请求方法时候的参数
 
+```
+     @RequestMapping(
+     value = {"/testRequestMapping", "/test"}
+     ,method = {RequestMethod.GET, RequestMethod.POST}
+     ,params = {"username","password!=123456"}
+     )
+```
+
+- 这里的params之间是且的关系
+- "param=value":要求请求映射所匹配的请求必须携带param请求参数且param=value
+- "param!=value":要求请求映射所匹配的请求必须携带param请求参数但是param!=value
+- 不满足的话会报错 400 `:Parameter conditions "username, password!=123456" not met for actual request parameters`
+
+### SpringMVC支持ant风格的路径
+
+``` 
+  ?:表示任意的单个字符 
+  *:表示任意的0个或多个字符 
+  **:表示任意层数的任意目录 
+  注意:在使用**时，只能使用/**/xxx的方式
+```
+
+### spring mvc中的占位符
+
+SpringMVC路径中的占位符常用于RESTful风格中，当请求路径中将某些数据通过路径的方式传输到服务器中，
+就可以在相应的@RequestMapping注解的value属性中通过占位符{xxx}表示传输的数据，在通过@PathVariable注解，
+将占位符所表示的数据赋值给控制器方法的形参
+
+``` 
+  原始方式:/deleteUser?id=1 
+  rest方式:/user/delete/1
+```
+
+### spring mvc获取请求参数
+
+1. 通过ServletAPI获取参数 org.getyou123.RequestMappingLearn.testGetParaByServlet
+2. 通过控制器方法的形参获取请求参数 org.getyou123.RequestMappingLearn.testGetParaBYController
+3. 实现请求参数和方法的形参关系对应，配置对是否是必须参数，默认值等 org.getyou123.RequestMappingLearn.testGe
+4. 请求头信息和方法的形参绑定注解 @RequestHeader
+5. 从cookie中获取参数绑定到方法的形参的 @CookieValue
+6. 通过pojo获取参数，即方法的形参是个类对象
+一般来说让方法的形参和传输的参数是一致的
 

@@ -201,7 +201,7 @@ select id,group_concat(name) from aa group by id;
   - 加一个列： alter table dept add jpb_id varchar(19) COMMENT "jod id";
   - 修改一个列： alter table dept modify (job_id varchar(1000))  注意这个修改只对后面的数据生效
   - 删除一个列： alter table dept drop  column job_id;
-  - 重命名一个列： alter table change column job_id job_id varchar(10);
+  - 重命名一个列： alter table dept change column job_id job_id varchar(10);
 - 删除一个表
   - drop table dept；
   - drop table 不能回滚

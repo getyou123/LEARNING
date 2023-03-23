@@ -6,5 +6,24 @@
 <body><h1>首页</h1>
 <a th:href="@{/hello}">HelloWorld（这个是相对路径）</a><br/>
 <a href="/hello">HelloWorld（这个是绝对路径）</a><br/>
+
+<a th:href="@{/RequestMappingLearn/testRestfulApi/1/admin}">测试路径中的占位符-->/RequestMappingLearn/testRestfulApi</a><br>
+<a th:href="@{/RequestMappingLearn/testGetParaBYController(username='admin',password=123456)}">测试获取请求参数--
+    >/RequestMappingLearn/testGetParaBYController</a><br>
+<a th:href="@{/RequestMappingLearn/testGetParaBYControllerRequestParam(username='admin')}">测试获取请求参数,这里不传输password--
+    >/RequestMappingLearn/testGetParaBYControllerRequestParam</a><br>
+<a th:href="@{/RequestMappingLearn/testGetParaBYControllerRequestParam(username='admin')}">测试获取请求参数,这里不传输password
+    传输参数和转化为函数的形参-- >/RequestMappingLearn/testGetParaBYControllerRequestParam</a><br>
+<a th:href="@{/RequestMappingLearn/testGetParaBYControllerRequestParam(username1='admin')}">测试获取请求参数,不传输必选参数进行报错--
+    >/RequestMappingLearn/testGetParaBYControllerRequestParam</a><br>
+<form th:action="@{/RequestMappingLearn/testGetParaBYPojo}" method="post">
+    用户名:<input type="text" name="username"><br>
+    密码:<input type="password" name="password"><br>
+    性别:<input type="radio" name="sex" value="男">男<input type="radio"
+                                                            name="sex" value="女">女<br>
+    年龄:<input type="text" name="age"><br> 邮箱:<input type="text" name="email"><br> <input type="submit">
+</form>
+
+
 </body>
 </html>

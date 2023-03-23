@@ -1,7 +1,9 @@
 # 这里记录学习docker的过程和命令集合
 
 ### docker中的三个基本概念
-- 镜像（Image）：Docker 镜像（Image），就相当于是一个 root 文件系统。比如官方镜像 ubuntu:16.04 就包含了完整的一套 Ubuntu16.04 最小系统的 root 文件系统。
+
+- 镜像（Image）：Docker 镜像（Image），就相当于是一个 root 文件系统。比如官方镜像 ubuntu:16.04 就包含了完整的一套 Ubuntu16.04
+  最小系统的 root 文件系统。
 - 容器（Container）：镜像（Image）和容器（Container）的关系，就像是面向对象程序设计中的类和实例一样，镜像是静态的定义，容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。
 - 仓库（Repository）：仓库可看成一个代码控制中心，用来保存镜像
 
@@ -12,9 +14,11 @@
 ---
 
 --- 
+
 # docker配置加速器
 
 ### docker的基础命令
+
 ```shell
 docker version #查看docker的版本信息 docker -v
 docker info #查看docker的系统信息,包括镜像和容器的数量
@@ -27,6 +31,7 @@ systemctl enable docker #设置开机自启动
 ```
 
 ### docker的镜像命令
+
 ```shell
 docker images  #查看本地的docker镜像 
 docker images -a #列出本地所有的镜像
@@ -44,6 +49,7 @@ docker rmi -f $(docker images -p) #通过docker images -p查询到的镜像ID来
 ```
 
 ---
+
 ### docker 容器命令
 
 ```shell
@@ -105,23 +111,31 @@ docker exec 容器ID   进入容器内: docker exec -it XXX /bin/bash
 docker cp 4b1a0fe53315:/etc/mysql/ /mydata/mysql/conf # 把容器中数据导出到宿主机器
 ```
 
-
 ### dockerfile：
+
 dockerfile是用来构建docker的image的
 其中的命令主要包括
 
 - FROM：指定基础镜像
-- RUN：用于在镜像构造过程中的执行命令，比如安装某个应用程序 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061411925.png)
-- CMD：指定容器中的默认命令，docker run中没有指定其他命令时候就运行这个![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061411804.png)
-- ENTRYPOINT： 这个是和docker run一起配置使用的，ENTRYPOINT 的 Exec 格式用于设置容器启动时要执行的命令及其参数 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061414959.png)
-- WORKDIR：主要用于指定工作路径，推荐需要使用的是绝对的路径，没有的话会创建 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061407083.png)
+-
+
+RUN：用于在镜像构造过程中的执行命令，比如安装某个应用程序 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061411925.png)
+
+- CMD：指定容器中的默认命令，docker
+  run中没有指定其他命令时候就运行这个![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061411804.png)
+- ENTRYPOINT： 这个是和docker run一起配置使用的，ENTRYPOINT 的 Exec
+  格式用于设置容器启动时要执行的命令及其参数 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061414959.png)
+-
+
+WORKDIR：主要用于指定工作路径，推荐需要使用的是绝对的路径，没有的话会创建 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061407083.png)
+
 - COPY： 将本机的路径文件拷贝到镜像中，容器中自然也会有 例如： COPY test.txt relativeDir/
 - ADD：将宿主机目录下的文件拷贝进镜像且ADD命令会自动处理URL和解压tar压缩包
 - VOLUME：容器数据卷，用于数据保存和持久化工作
-- 
-
+-
 
 #### dockerfile中的命令的一些区别
+
 ***区别 RUN-CMD-ENTRYPOINT***：
 ENTRYPOINT中的参数始终会被使用，而CMD的额外参数可以在容器启动时动态替换掉
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061416615.png)
@@ -135,9 +149,10 @@ ENTRYPOINT中的参数始终会被使用，而CMD的额外参数可以在容器�
 
 #### dockerfile常见例子：
 
-
 ### docker build 产出镜像文件：
+
 docker build的工作主要是：产出相应的image,然后再通过image构造相应的容器
+
 ```shell
 docker build [OPTIONS] PATH | URL | -
 
@@ -165,17 +180,19 @@ OPTIONS说明：
 • --tag, -t: 镜像的名字及标签，通常 name:tag 或者 name 格式；可以在一次构建中为一个镜像设置多个标签。
 --network: 默认 default。在构建期间设置RUN指令的网络模式
 ```
+
 docker build -t name:v1.0 .
 需要在有dockerfile的文件夹中执行
 也可使用 -f显示指定构建镜像的 Dockerfile 文件（Dockerfile可不在当前路径下）
 
 常见的例子：
-docker build -t spark-for-seatunnel:v1.0 --build-arg SPARK_VERSION=2.4.0  --build-arg HADOOP_VERSION=2.7  --no-cache .
+docker build -t spark-for-seatunnel:v1.0 --build-arg SPARK_VERSION=2.4.0 --build-arg HADOOP_VERSION=2.7 --no-cache .
 这里指定了ARG的声明的参数的值
 
-
 ### 例子命令总结：
+
 启动一个容器
+
 ```shell
 docker run --name ubuntu_bash --rm -i -t ubuntu bash 启动一个
 ```
@@ -183,29 +200,33 @@ docker run --name ubuntu_bash --rm -i -t ubuntu bash 启动一个
 查看本地的docker的image: docker images
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061439097.png)
 
-
 搜索远程仓库的某个镜像：docker search [OPTIONS] 镜像名字
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061440298.png)
 
 从远程仓库下载某个镜像：docker pull 镜像名字[:TAG] 如果不写TAG就是最新的版本
 例如拉取 mysql5.7:docker pull --platform linux/x86_64 mysql:5.7
 
-
-
 ### 构建一个centos的镜像：
+
 拉取：docker pull centos
 新建&启动容器： docker run -it centos /bin/bash
-查看正在运行的docker容器： docker ps ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061459937.png)
-停止容器 docker kill  2aa6d3f122ee ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061501719.png)
-删除容器 docker rm  2aa6d3f122ee ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061506584.png)
-删除镜像 docker rmi e6a0117ec169 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061507247.png)
-
+查看正在运行的docker容器： docker
+ps ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061459937.png)
+停止容器 docker kill
+2aa6d3f122ee ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061501719.png)
+删除容器 docker rm
+2aa6d3f122ee ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061506584.png)
+删除镜像 docker rmi
+e6a0117ec169 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061507247.png)
 
 ### 启动mysql的docker镜像
+
 ```shell
 docker run --name mysql5.7 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -d  -v /Users/haoguowang/Documents/Docker_use/mysql57/data:/var/lib/mysql -v /Users/haoguowang/Documents/Docker_use/mysql57/conf:/etc/mysql -v /Users/haoguowang/Documents/Docker_use/mysql57/logs:/var/log/mysql mysql:5.7
 ```
+
 主要是需要三个进行映射
+
 - 宿主机创建数据存放目录映射到容器
 - 宿主机创建配置文件目录映射到容器
 - 宿主机创建日志目录映射到容器
@@ -214,25 +235,29 @@ docker run --name mysql5.7 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -d  -v /Us
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061835701.png)
 主要是因为配置文件不在，宿主机的...../mysql/conf是空的，所以找不到/etc/mysql/conf.d中conf.d这个目录，导致容器创建失败，去指定的路径下建立文件夹和指定的文件
 
-从官网的信息可以看到 https://hub.docker.com/_/mysql 
+从官网的信息可以看到 https://hub.docker.com/_/mysql
+
 - 容器的配置文件是：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301071036476.png)
 - 容器的数据存储为：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301071037839.png)
-- 一般可以不配置log，而是通过docker logs 来查看相应的容器日志 
+- 一般可以不配置log，而是通过docker logs 来查看相应的容器日志
 
 进入到容器中：docker exec -it d70a5deda3eb /bin/bash
-然后登录mysql中：mysql -uroot  -p
+然后登录mysql中：mysql -uroot -p
 可以看到数据已经加载到容器中了：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301070023731.png)
 当我们配置了数据卷的对应关系：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301070033786.png)
 
 ### docker中进行编译doris
 
-
 ### docker中部署tomcat
 
 #### servlet学习使用[servlet_learn](..%2Fservlet_learn)
+
 - 首先拉取tomcat镜像，`docker pull tomcat:8.5.85-jre8-temurin-jammy`
 - 在idea中编译产出war包 放在宿主机的卷
-- 启动容器 ``` docker run --name tomcat_for_servlet_learn -p 8080:8080 -v /Users/XXX/Documents/Docker_use/servlet_learn/:/usr/local/tomcat/webapps/ -d tomcat:8.5.85-jre8-temurin-jammy ```，注意下这里的卷
+-
+
+启动容器 ``` docker run --name tomcat_for_servlet_learn -p 8080:8080 -v /Users/XXX/Documents/Docker_use/servlet_learn/:/usr/local/tomcat/webapps/ -d tomcat:8.5.85-jre8-temurin-jammy ```
+，注意下这里的卷
 
 即idea mvn package 产出的war包，是docker 中的 tomcat 所指向的加载的war包
 
@@ -241,7 +266,7 @@ tomcat出现404的解决方式：
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301201415827.png)
 
 进入容器进行修复 docker exec -it XXX /bin/bash
-然后移动文件 cp -r webapps.dist/* webapps/  这里注意是把里面的内容放在webapps/ 下
+然后移动文件 cp -r webapps.dist/* webapps/ 这里注意是把里面的内容放在webapps/ 下
 重启容器docker restart XXX
 
 ```shell
@@ -256,14 +281,16 @@ docs  examples  host-manager  manager  ROOT  servlet_learn_1  servlet_learn_1.wa
 docker中获取tomcat的运行日志情况： 日志位置 /usr/local/tomcat/logs
 
 #### javaweb_learn学习使用[javaweb_learn](..%2Fjavaweb_learn)
+
 ```shell
 docker run --name tomcat_for_javaweb_learn -p 8081:8080 -v /Users/haoguowang/Documents/Docker_use/javaweb_learn/:/usr/local/tomcat/webapps/ -d tomcat:8.5.85-jre8-temurin-jammy、
 docker tomcat中访问 docker mysql容器，首先获取docker msyql的ip 地址，docker inspect 然后获取之后更新 jdbc.property localhost=> msyql的ip
 ```
 
-
 #### es_learn学习
+
 - 搭建单机的版本的es
+
 ```shell
  ~/Documents/Docker_use/es_learn  mkdir config                                                                                                                              ok  base py
  ~/Documents/Docker_use/es_learn  mkdir data                                                                                                                                ok  base py
@@ -295,13 +322,18 @@ docker run --name elasticsearch -p 9200:9200  -p 9300:9300 \                    
 访问9200之后出现相应的信息：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302061750782.png)
 
 - 搭建kibana
-  1. 拉取镜像 ``` docker pull --platform linux/x86_64 kibana:7.8.0  ```
-  2. 启动一个container `docker run -it -d -p 5601:5601 -e ELASTICSEARCH_URL=http://127.0.0.1:9200 --name kibana kibana:7.8.0` 其中的ip 使用docker ps 获取es实例的ip
-  3. 进入kibana容器中，修改 config/kibana.yml ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302071733057.png)
-  4. 重启容器，这个会耗时很久注意等待
-  5. 最终可以在kibana中使用dev tool ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302071734954.png)
+    1. 拉取镜像 ``` docker pull --platform linux/x86_64 kibana:7.8.0  ```
+    2.
+  启动一个container `docker run -it -d -p 5601:5601 -e ELASTICSEARCH_URL=http://127.0.0.1:9200 --name kibana kibana:7.8.0`
+  其中的ip 使用docker ps 获取es实例的ip
+    3. 进入kibana容器中，修改
+       config/kibana.yml ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302071733057.png)
+    4. 重启容器，这个会耗时很久注意等待
+    5. 最终可以在kibana中使用dev
+       tool ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302071734954.png)
 
 ### docker安装mongo db
+
 ```shell
 # 拉取镜像
 docker pull mongo:4.4
@@ -313,12 +345,15 @@ docker exec -it mongo mongo admin
  db.createUser({ user:'root',pwd:'123456',roles:[ { role:'userAdminAnyDatabase', db: 'admin'},'readWriteAnyDatabase']});
 ```
 
-
 ### docker 安装tomcat作为spring mvc容器使用：
+
 - 编写Dockerfile文件[Dockerfile](..%2FSpring_Learn%2Fspring_mvc_learn%2FDockerfile)
 - 编写执行的脚本代替原来的启动脚本 [start-docker.sh](..%2FSpring_Learn%2Fspring_mvc_learn%2Fstart-docker.sh)
 - 通过Dockerfile构造镜像  `docker build -t mvc_use .`
-- 启动容器 `docker run --name mvc_learn -p 9090:8080 -v /Users/haoguowang/IdeaProjects/LEARNING/Spring_Learn/spring_mvc_learn/target/spring_mvc_learn.war:/usr/local/tomcat/webapps/spring_mvc_learn.war -d mvc_use`
-- 更新代码之后idea中进行maven clean && mvn package ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303161354057.png)
-- 之后再idea中直接重启 容器即可 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303161355982.png)
+- 启动容器
+  `docker run --name mvc_learn -p 9090:8080 -v /Users/haoguowang/IdeaProjects/LEARNING/Spring_Learn/spring_mvc_learn/target/spring_mvc_learn.war:/usr/local/tomcat/webapps/spring_mvc_learn.war -d mvc_use`
+- 更新代码之后idea中进行maven clean && mvn
+  package ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303161354057.png)
+- 之后再idea中直接重启
+  容器即可 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303161355982.png) -- 这一步其实不执行也可以刷新
 - 访问 `http://localhost:9090/spring_mvc_learn/`
