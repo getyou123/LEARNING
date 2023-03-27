@@ -47,4 +47,6 @@
             </bean>
         </mvc:message-converters>
     </mvc:annotation-driven>
+
+    <mvc:view-controller path="/" view-name="index"/>
 </beans>

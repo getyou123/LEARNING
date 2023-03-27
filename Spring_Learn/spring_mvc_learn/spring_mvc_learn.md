@@ -91,5 +91,153 @@ SpringMVC路径中的占位符常用于RESTful风格中，当请求路径中将�
 4. 请求头信息和方法的形参绑定注解 @RequestHeader
 5. 从cookie中获取参数绑定到方法的形参的 @CookieValue
 6. 通过pojo获取参数，即方法的形参是个类对象
-一般来说让方法的形参和传输的参数是一致的
+   一般来说让方法的形参和传输的参数是一致的
 
+### 解决spring mvc中的请求参数的乱码问题
+
+``` 
+<filter>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+        <param-name>encoding</param-name>
+        <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+        <param-name>forceEncoding</param-name>
+        <param-value>true</param-value>
+    </init-param>
+</filter>
+<filter-mapping>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>
+```
+
+note:SpringMVC中处理编码的过滤器一定要配置到其他过滤器之前，否则无效
+
+### 如何理解域对象呢？
+
+用于处理共享数据：
+
+1. request域（一次请求）：用于将数据存储在当前请求中，在请求处理期间共享数据。
+   可以通过HttpServletRequest对象的setAttribute()方法将数据存储在request域中，-- 这个很少使用了
+   也可以通过ModelAndView对象的addObject()方法将数据添加到request域中。 -- 最好是使用这个
+
+```
+    @RequestMapping("/testServletAPI")
+    public String testServletAPI(HttpServletRequest request){  // 这里演示了获取HttpServletRequest的方式
+        request.setAttribute("testScope", "hello,servletAPI");
+        return "success";
+    }
+
+
+    @RequestMapping("/testModelAndView")
+    public ModelAndView testModelAndView() {
+        /**
+         * ModelAndView有Model和View的功能
+         * Model主要用于向请求域共享数据
+         * View主要用于设置视图，实现页面跳转
+         */
+        ModelAndView mav = new ModelAndView(); //向请求域共享数据
+        mav.addObject("testScope", "hello,ModelAndView"); //设置视图，实现页面跳转
+        mav.setViewName("successFromModelAndView");
+        return mav;
+    }
+    <P th:text="${testScope}"></p>
+```
+
+2. session域（一个会话）：用于将数据存储在当前会话中，在会话期间共享数据。可以通过HttpSession对象的setAttribute()
+   方法将数据存储在session域中。
+
+3.
+
+application域（整个应用）：用于将数据存储在全局上下文中，在应用程序期间共享数据。可以通过ServletContext对象的setAttribute()
+方法将数据存储在application域中。
+通过使用这些域对象，可以在请求处理期间将数据从一个控制器传递到另一个控制器，或者在多个请求之间共享数据。例如，在用户登录后，可以将用户信息存储在session域中，在整个会话期间共享数据，以便在多个请求中访问该信息。又如，可以将查询结果存储在request域中，在JSP页面中显示查询结果。
+总之，域对象是Spring MVC框架中的重要机制，可以方便地在请求处理期间共享数据，使得程序开发更加方便和灵活。
+
+### ModelAndView
+
+Model主要用于向请求域共享数据
+View主要用于设置视图，实现页面跳转
+
+### SpringMVC的视图
+
+1.
+
+ThymeleafView：当控制器方法中所设置的视图名称没有任何前缀时，此时的视图名称会被SpringMVC配置文件中所配置的视图解析器解析，视图名称拼接视图前缀和视图在配置文件中配置了前缀和后缀的，就直接是使用ThymeleafView进行解析；
+
+``` 
+@RequestMapping("/testHello")
+public String testHello(){
+    return "hello";
+}
+```
+
+2. 转发视图 SpringMVC中默认的转发视图是InternalResourceView，forward前缀的不会被ThymeleafView解析
+
+``` 
+@RequestMapping("/testForward")
+public String testForward(){
+    return "forward:/testHello";
+}
+```
+
+3. 重定向视图：RedirectView redirect作为前缀
+
+```
+@RequestMapping("/testRedirect")
+public String testRedirect(){
+    return "redirect:/testHello";
+}
+```
+
+### 视图控制器view-controller
+
+不再写controller 直接写配置文件来实现跳转
+
+``` 
+<!--
+path:设置处理的请求地址 
+view-name:设置请求地址所对应的视图名称
+-->
+<mvc:view-controller path="/testView" view-name="success"></mvc:view-controller>
+```
+
+### RESTful风格
+
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303241751762.png)
+
+1. 代码中如何区分各种请求方式呢？
+
+``` 
+@RequestMapping(value = "/employee", method = RequestMethod.GET)
+public String getEmployeeList(Model model){
+    Collection<Employee> employeeList = employeeDao.getAll();
+    model.addAttribute("employeeList", employeeList);
+    return "employee_list";
+}
+
+或者是GetMapping PostMapping PutMapping  DelteMapping
+```
+
+2. 浏览器中只支持 post 和 get两个方法如何发送DELETE 和 PUT呢
+   通过 HiddenHttpMethodFilter 进行转化
+   HiddenHttpMethodFilter 处理put和delete请求的条件:
+   a>当前请求的请求方式必须为post
+   b>当前请求必须传输请求参数_method
+``` 
+<filter>
+    <filter-name>HiddenHttpMethodFilter</filter-name>
+    <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-
+class>
+</filter>
+<filter-mapping>
+    <filter-name>HiddenHttpMethodFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>
+
+```
+
+3. 开发一个CURD的场景
