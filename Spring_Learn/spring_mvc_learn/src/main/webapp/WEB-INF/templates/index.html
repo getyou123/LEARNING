@@ -30,8 +30,20 @@
 <a th:href="@{/testSession}">展示使用Session域内的数据共享</a><br>
 <a th:href="@{/testApplication}">展示使用Application域内的数据共享</a><br>
 
+<a th:href="@{/employee}">访问员工信息</a><br>
+<a th:href="@{/testResponseBody}">测试ResponseBody</a><br>
+<a th:href="@{/test/ResponseBodyList/json}">测试ResponseBodyList响应json</a><br>
+<a th:href="@{/test/ResponseBodyMap/json}">测试ResponseBodyMap响应json</a><br>
+<a th:href="@{/test/ResponseBodyUser/json}">测试ResponseBodyUser响应json</a><br>
 
-<a th:href="@{/employee}">访问员工信息</a>
+<a th:href="@{/testDown}">测试文件下载</a><br>
+
+<form th:action="@{/testUp}" method="post" enctype="multipart/form-data">
+    上传图片
+    <input type="file" name="photo"><br>
+    <input type="submit" name="上传"><br>
+</form>
+
 
 </body>
 </html>

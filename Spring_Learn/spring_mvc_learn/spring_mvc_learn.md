@@ -227,6 +227,7 @@ public String getEmployeeList(Model model){
    HiddenHttpMethodFilter 处理put和delete请求的条件:
    a>当前请求的请求方式必须为post
    b>当前请求必须传输请求参数_method
+
 ``` 
 <filter>
     <filter-name>HiddenHttpMethodFilter</filter-name>
@@ -241,3 +242,71 @@ class>
 ```
 
 3. 开发一个CURD的场景
+   [EmployeeController.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FEmployeeController.java)
+   [EmployeeDao.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FEmployeeDao.java)
+   [Employee.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FEmployee.java)
+
+### @RequestBody获取json格式的请求参数 @TODO
+
+### @ResponseBody注解
+
+- [ResponseBodyLearn.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FResponseBodyLearn.java)
+  这个注解用于标识一个控制器方法，可以将该方法的返回值直接作为响应报文的响应体响应到浏览器
+
+```
+@RequestMapping("/testResponseBody")
+public String testResponseBody(){
+//此时会跳转到逻辑视图success所对应的页面
+    return "success";
+}
+
+@RequestMapping("/testResponseBody")
+@ResponseBody
+public String testResponseBody(){
+//此时响应浏览器数据success
+    return "success";
+}
+```
+
+### @RestController注解
+
+@RestController注解是springMVC提供的一个复合注解，标识在控制器的类上，就相当于为类添加了
+@Controller注解，并且为其中的每个方法添加了@ResponseBody注解
+
+### 指定需要返回的类型（实现文件下载）
+
+- 通过实现文件的下载来指定返回值是byte[]类型
+  [PicDownController.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FPicDownController.java)
+
+### 实现文件上传
+
+- pom
+- mvc 配置文件
+
+``` 
+<!--必须通过文件解析器的解析才能将文件转换为MultipartFile对象-->
+<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> </bean>
+```
+
+- html
+
+``` 
+<form th:action="@{/testUp}" method="post" enctype="multipart/form-data">
+    上传图片
+    <input type="file" name="photo"><br>
+    <input type="submit" name="上传"><br>
+</form>
+```
+- [PicUpController.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FPicUpController.java)
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303271708185.png)
+
+
+### spring mvc的拦截器 @TODO
+
+### spring mvc的异常处理 @TODO
+
+### spring mvc的配置类
+- 代替web.xml
+- 代替spring mvc 的配置文件
+
+### spring mvc的执行过程
