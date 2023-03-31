@@ -13,7 +13,6 @@
     <modules>
         <module>spring_basic_ioc</module>
         <module>spring_basic_aop</module>
-        <module>spring_mvc_learn</module>
     </modules>
 
     <name>Spring_Learn</name>
