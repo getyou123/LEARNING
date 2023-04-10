@@ -121,7 +121,7 @@ INSERT INTO ssm.t_dept (dept_id,dept_name) VALUES
 
 1. 单个参数的情况
 - mapper接口中写[UserMapper.java](mybatis_basic%2Fsrc%2Fmain%2Fjava%2Forg%2Fexample%2Fmapper%2FUserMapper.java)  ```   User getUserByName(String username); ```
-- 使用${}获取变量 在maper.xml中写啥名字都可，但是最好是见名知意
+- 使用${}获取变量 在mapper.xml中写啥名字都可，但是最好是见名知意
 - ```#{}```  和 ```${}``` 的区别：
   - ```#{}```  实际是占位符？+''，变量替换的是 ？一些特殊的比如in (#{val})的话会出现错误
   - ```${}```  实际是直接的拼接到，所以in的话不会出错

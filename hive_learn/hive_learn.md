@@ -693,3 +693,36 @@ select a.id,a.name from
 ### beeline执行sql
 beeline -u "jdbc:hive2://XXX3:2181,10.XXX.XXX.86:2181/ods;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2" -n "username" -e "";
 beeline -u "jdbc:hive2://1XXX3:2181,XXX:2181/ods;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2" -n "username" -f dwd_XXX_di_tmp.sql
+
+
+
+### hive udf注册
+```
+ADD JAR hdfs:///user/XXX/jars/StaffPositionClean.jar;
+DROP FUNCTION if  exists default.StaffPositionClean;
+CREATE FUNCTION default.StaffPositionClean AS 'com.bigdata.udf.StaffPositionClean' USING JAR 'hdfs:///user/xxx/jars/StaffPositionClean.jar';
+```
+note ： 更新jar逻辑之后需要关闭cli，然后重新drop和注册
+
+
+### hive行转列
+
+```
+user_id  browsing_history
+-------  --------------------------
+1        ["www.google.com", "www.yahoo.com"]
+2        ["www.facebook.com", "www.amazon.com", "www.netflix.com"]
+    
+SELECT user_id, website
+FROM user_activity 
+LATERAL VIEW EXPLODE(browsing_history) browsing AS website;
+
+user_id website
+------- ----------------
+1       www.google.com
+1       www.yahoo.com
+2       www.facebook.com
+2       www.amazon.com
+2       www.netflix.com
+
+```

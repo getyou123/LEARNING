@@ -98,6 +98,7 @@
     <auto-service.version>1.0.1</auto-service.version>
     <jmockdata.version>4.3.0</jmockdata.version>
     <snappy-java.version>1.1.8.3</snappy-java.version>
+    <spring-boot.version>2.3.4.RELEASE</spring-boot.version>
   </properties>
 
   <!--  这里配置父项目的子模块 -->
@@ -133,12 +134,20 @@
     <module>Spring_Learn/spring_basic_aop</module>
     <module>Spring_Learn/spring_mvc_learn</module>
     <module>Spring_Learn/SSM_learn</module>
+    <module>springboot_learn</module>
   </modules>
 
   <!--dependencyManagement 标签用于控制子模块的依赖版本等信息 -->
   <!-- 该标签只用来控制版本，不能将依赖引入 -->
   <dependencyManagement>
+    <!-- spring -->
       <dependencies>
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-web</artifactId>
+          <version>${spring-boot.version}</version>
+        </dependency>
+
         <dependency>
           <groupId>org.apache.seatunnel</groupId>
           <artifactId>seatunnel-config-shade</artifactId>
