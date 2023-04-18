@@ -128,6 +128,7 @@
         <module>spark_learn</module>
         <module>elasticsearch_learn</module>
         <module>hbase_learn</module>
+        <module>flink_learn</module>
 
         <!-- DevOps 和工具 -->
         <module>maven_learn</module>
