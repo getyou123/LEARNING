@@ -17,7 +17,12 @@ public class calcTest {
     public void testAspectDivZero(){
         ApplicationContext ac = new ClassPathXmlApplicationContext("spring-anno-aop.xml");
         Calculator calculatorPure = ac.getBean(Calculator.class);
-        int add = calculatorPure.div(1, 0);
+        int add = 0;
+        try {
+            add = calculatorPure.div(1, 0);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
         System.out.println(add);
     }
 }

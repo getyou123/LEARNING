@@ -1,6 +1,5 @@
 package org.example;
 
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLService;
 import org.junit.Test;
 
 import java.io.File;

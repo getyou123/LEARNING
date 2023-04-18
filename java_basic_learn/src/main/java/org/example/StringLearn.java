@@ -1,7 +1,7 @@
 package org.example;
 
 import org.junit.Test;
-import scala.Int;
+
 
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;

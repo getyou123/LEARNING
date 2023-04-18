@@ -25,7 +25,7 @@ public class AutoWireTest {
      */
     @Test
     public void testAutoWireByAnno() {
-        ApplicationContext ac = new ClassPathXmlApplicationContext("spring-autowire-anno.xml");
+        ApplicationContext ac = new ClassPathXmlApplicationContext("spring-autowire.xml");
         StudentController studentController = ac.getBean(StudentController.class);
         System.out.println(studentController);
         StudentService studentService = ac.getBean(StudentService.class);

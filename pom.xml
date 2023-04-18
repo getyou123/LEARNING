@@ -103,39 +103,51 @@
 
   <!--  这里配置父项目的子模块 -->
   <modules>
-    <module>javaweb_learn</module>
-    <module>tool_learn</module>
-    <module>tool_learn/shell</module>
-    <module>docker_learn</module>
-    <module>jdbc_learn</module>
-    <module>tool_learn/git</module>
-    <module>hadoop_learn</module>
-    <module>hive_learn</module>
-    <module>tool_learn/jenkins</module>
-    <module>servlet_learn</module>
-    <module>Book_Note</module>
-    <module>tool_learn/other</module>
-    <module>maven_learn</module>
-    <module>elasticsearch_learn</module>
-    <module>tool_learn/lombok_learn</module>
-    <module>java_basic_learn</module>
-    <module>tool_learn/log_learn</module>
-    <module>tool_learn/hexo_learn</module>
-    <module>spark_learn</module>
-    <module>MyBatis_learn</module>
-    <module>mysql_learn</module>
-    <module>MyBatis_learn/mybatis_basic</module>
-    <module>Spring_Learn</module>
-    <module>Spring_Learn/spring_basic_ioc</module>
-    <module>Design_pattern_learn</module>
+      <!-- Java 基础 -->
+      <module>java_basic_learn</module>
+      <module>juc_learn</module>
+
+      <!-- Web 开发 -->
+      <module>javaweb_learn</module>
+      <module>servlet_learn</module>
+      <module>Spring_Learn/spring_basic_ioc</module>
+      <module>Spring_Learn/spring_basic_aop</module>
+      <module>Spring_Learn/spring_mvc_learn</module>
+      <module>Spring_Learn/SSM_learn</module>
+      <module>springboot_learn/springboot_basic</module>
+
+      <!-- 数据库和 ORM -->
+      <module>jdbc_learn</module>
+      <module>mysql_learn</module>
+      <module>MyBatis_learn/mybatis_basic</module>
+      <module>MyBatis_learn/mybatis_reverse_engineer_simple</module>
+
+      <!-- 大数据和分布式计算 -->
+      <module>hadoop_learn</module>
+      <module>hive_learn</module>
+      <module>spark_learn</module>
+      <module>elasticsearch_learn</module>
+
+      <!-- DevOps 和工具 -->
+      <module>maven_learn</module>
+      <module>docker_learn</module>
+      <module>tool_learn</module>
+      <module>tool_learn/shell</module>
+      <module>tool_learn/git</module>
+      <module>tool_learn/jenkins</module>
+      <module>tool_learn/lombok_learn</module>
+      <module>tool_learn/log_learn</module>
+      <module>tool_learn/hexo_learn</module>
       <module>tool_learn/markdown_learn</module>
       <module>tool_learn/ansible_learn</module>
-    <module>Spring_Learn/spring_basic_ioc</module>
-    <module>Spring_Learn/spring_basic_aop</module>
-    <module>Spring_Learn/spring_mvc_learn</module>
-    <module>Spring_Learn/SSM_learn</module>
-    <module>springboot_learn</module>
-  </modules>
+
+      <!-- 设计模式和软件架构 -->
+      <module>Design_pattern_learn</module>
+
+      <!-- 读书笔记 -->
+      <module>Book_Note</module>
+    </modules>
+
 
   <!--dependencyManagement 标签用于控制子模块的依赖版本等信息 -->
   <!-- 该标签只用来控制版本，不能将依赖引入 -->

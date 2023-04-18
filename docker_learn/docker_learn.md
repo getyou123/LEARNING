@@ -357,3 +357,5 @@ docker exec -it mongo mongo admin
 - 之后再idea中直接重启
   容器即可 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202303161355982.png) -- 这一步其实不执行也可以刷新
 - 访问 `http://localhost:9090/spring_mvc_learn/`
+
+### docker 安装 jira
