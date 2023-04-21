@@ -1,5 +1,7 @@
+
 https://github.com/flink-china/flink-training-course/tree/master
 
+----
 ## talk1 https://files.alicdn.com/tpsservice/53de65050b468fc6d338fbaff799828a.pdf
 
 ### flink 简介
@@ -47,6 +49,8 @@ https://github.com/flink-china/flink-training-course/tree/master
 - Data Analytics
   数据分析，离线的or实时的 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304171650528.png)
 - Data Driven 数据驱动型的，例如风控等场景
+
+--- 
 
 ## talk2 https://files.alicdn.com/tpsservice/b55f732fbc32522ca5394544f3834530.pdf
 
@@ -96,9 +100,26 @@ https://github.com/flink-china/flink-training-course/tree/master
 ### 计算引擎如何判断这个 bucket可以出发计算了呢
 - watermark的是一种特殊事件
 - 常见的场景是：知道一个数据流中的最大的乱序程度，然后按照source中的当前的已经收到的最大的时间戳+最大的delay时间作为watermark，插入到数据流中
+- 可以周期性的生成，也可以基于指定的事件来生成
+  - [WaterMarkLearn01.java](src%2Fmain%2Fjava%2Forg%2Fexample%2Fhelloworld%2FWaterMarkLearn%2FWaterMarkLearn01.java)
+  - [WaterMarkLearn02.java](src%2Fmain%2Fjava%2Forg%2Fexample%2Fhelloworld%2FWaterMarkLearn%2FWaterMarkLearn02.java)
+  - [WaterMarkLearn03.java](src%2Fmain%2Fjava%2Forg%2Fexample%2Fhelloworld%2FWaterMarkLearn%2FWaterMarkLearn03.java)
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304171825207.png)
 - 上面图演示了无乱序的行为和乱序行为下的watermark生成（周期性的插入目前最大的时间戳+delay时间长度 作为 watermark）
 - 下游算子接收到这个watermark之后就认定bucket可以触发计算了
+- 最好来使用 WatermarkStrategy 
+``` 
+KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
+    .setBootstrapServers(brokers)
+    .setTopics("my-topic")
+    .setGroupId("my-group")
+    .setStartingOffsets(OffsetsInitializer.earliest())
+    .setValueOnlyDeserializer(new SimpleStringSchema())
+    .build();
+
+DataStream<String> stream = env.fromSource(
+    kafkaSource, WatermarkStrategy.forBoundedOutOfOrderness(Duration.ofSeconds(20)), "mySource");
+```
 
 
 ### flink中的savepoint
@@ -106,6 +127,7 @@ https://github.com/flink-china/flink-training-course/tree/master
 - 也是记录状态然后用于修bug，进行重新消费等
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304171829609.png)
 
+---
 
 ## talk3 https://files.alicdn.com/tpsservice/4824447b829149c86bedd19424d05915.pdf
 ### flink开发环境和部署
@@ -115,7 +137,7 @@ https://github.com/flink-china/flink-training-course/tree/master
 
 
 ### 开发环境搭建
-- git 地址 https://github.com/apache/flink.git
+
 ```
 # 删除已有的 build，编译 flink binary
 mvn clean package -DskipTests
@@ -126,7 +148,6 @@ mvn clean package -DskipTests -Dfast
 mvn clean install -DskipTests -Dhadoop.version=2.6.1
 # 或者
 mvn clean package -DskipTests -Dhadoop.version=2.6.1
-
 # 最好使用自带的mvn编译
 ./mvnw clean package -DskipTests 
 ```
@@ -158,5 +179,14 @@ mvn clean package -DskipTests -Dhadoop.version=2.6.1
 - sink
 - 执行
 
+---
 ### DataStream 的转化
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304181734452.png)
+- 如何理解 KeyedStream : ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304182004619.png)
+  - 其实就是分区,主要是需要 key的数据远大于分区数
+
+### 关于物理分组
+- 就是按照DAG上的节点对应的实例是多个的，如何定义实例发数据到下游的哪些个实例呢？
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304182014485.png)
+
+### 类型系统
