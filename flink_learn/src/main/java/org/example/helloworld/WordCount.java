@@ -1,6 +1,8 @@
 package org.example.helloworld;
 
-public class WordCount {
+import java.io.Serializable;
+
+public class WordCount implements Serializable {
     public String word;
     public int count;
 

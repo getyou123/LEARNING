@@ -18,6 +18,25 @@ public  class SomeStaticTool {
                 1L, true, Instant.EPOCH, startLon, startLat, endLon, endLat, (short) 1, 0, 0);
     }
 
+    public static TaxiRide startRide(long rideId, Instant startTime) {
+        return testRide(rideId, true, startTime);
+    }
+
+    private static TaxiRide testRide(long rideId, Boolean isStart, Instant eventTime) {
+
+        return new TaxiRide(
+                rideId,
+                isStart,
+                eventTime,
+                -73.9947F,
+                40.750626F,
+                -73.9947F,
+                40.750626F,
+                (short) 1,
+                0,
+                0);
+    }
+
 
     public static TaxiRide testRide(long rideId) {
         return new TaxiRide(rideId, true, Instant.EPOCH, 0F, 0F, 0F, 0F, (short) 1, 0, rideId);

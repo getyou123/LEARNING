@@ -10,6 +10,15 @@ https://github.com/flink-china/flink-training-course/tree/master
 - 数据处理框架，我们只需要专注自己的业务逻辑
 - 分布式
 - 有状态
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304241015356.png)
+- flink 是事件驱动型的，区别于spark streaming的微批次
+  - ![spark的微批次](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304241016731.png)
+  - ![flink的事件驱动](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304241017206.png)
+
+### 如何理解流和批呢
+- 一切都是流
+- 离线数据就是有界的流
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304241021687.png)
 
 ### 如何理解数据流Stream
 
@@ -35,6 +44,11 @@ https://github.com/flink-china/flink-training-course/tree/master
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304171642615.png)
 - 越往上抽象的更高
 - 越往下可控的性更好，表达能力更强
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304241022424.png)
+  - 最底层的 有状态的流 + process function
+  - data stream api 这层是核心，常见的算子在这
+  - table api ： 声明式 + select / join 等，代码量显著减低
+  - flink sql ： 几乎标准的sql语句
 
 ### flink状态的原理
 
@@ -183,7 +197,16 @@ mvn clean package -DskipTests -Dhadoop.version=2.6.1
 ### DataStream 的转化
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304181734452.png)
 - 如何理解 KeyedStream : ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304182004619.png)
-  - 其实就是分区,主要是需要 key的数据远大于分区数
+  - 其实就是分区,主要是需要 key的数据远大于分区数，底层是一个KeySelector
+``` 
+KeyedStream<TaxiRide, Long> keyedRides = rides
+        .keyBy(new KeySelector<TaxiRide, Long>() {
+            @Override
+            public Long getKey(TaxiRide ride) throws Exception {
+                return ride.getRideId();
+            }
+        });
+```
 
 ### 关于物理分组
 - 就是按照DAG上的节点对应的实例是多个的，如何定义实例发数据到下游的哪些个实例呢？
