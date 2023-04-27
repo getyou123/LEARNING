@@ -31,8 +31,8 @@ import static org.apache.flink.configuration.TaskManagerOptions.TASK_OFF_HEAP_ME
 /**
  * Common functionality to set up execution environments for the troubleshooting training.
  */
-public class EnvironmentUtils {
-    public static final Logger LOG = LoggerFactory.getLogger(EnvironmentUtils.class);
+public class MyEnvironmentUtils {
+    public static final Logger LOG = LoggerFactory.getLogger(MyEnvironmentUtils.class);
 
     /**
      * 如果不能创建 checkpoint directory 报错
