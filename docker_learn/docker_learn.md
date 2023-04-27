@@ -393,7 +393,8 @@ services:
   --partitions 3 \
   --topic test_topic
 ```
-- 生产者发送数据
+- 生产者发送数据 && 消费者消费数据
 ``` 
-/opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic sensor
+docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+docker exec -it kafka /opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic sensor
 ```
