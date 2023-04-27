@@ -64,6 +64,24 @@ https://github.com/flink-china/flink-training-course/tree/master
   数据分析，离线的or实时的 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304171650528.png)
 - Data Driven 数据驱动型的，例如风控等场景
 
+
+### flink的运行架构
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304241556466.png)
+- 主要角色说明：
+  - 客户端：实现用于准备和发送dataflow到JobManager
+  - JobManager:
+``` 
+控制一个应用程序执行的主进程，也就是说，每个应用程序都会被一个的JobManager所控制执行。
+
+JobManager会先接收到要执行的应用程序，这个应用程序会包括：作业图（JobGraph）、逻辑数据流图（logical dataflow graph）和打包了所有的类、库和其它资源的JAR包。
+
+JobManager会把JobGraph转换成一个物理层面的数据流图，这个图被叫做“执行图”（ExecutionGraph），包含了所有可以并发执行的任务。JobManager会向资源管理器（ResourceManager）请求执行任务必要的资源，也就是任务管理器（TaskManager）上的插槽（slot）。一旦它获取到了足够的资源，就会将执行图分发到真正运行它们的TaskManager上。
+
+而在运行过程中，JobManager会负责所有需要中央协调的操作，比如说检查点（checkpoints）的协调。
+
+```
+
+
 --- 
 
 ## talk2 https://files.alicdn.com/tpsservice/b55f732fbc32522ca5394544f3834530.pdf
@@ -171,10 +189,17 @@ mvn clean package -DskipTests -Dhadoop.version=2.6.1
 ### flink 程序提交到yarn，单个job的模式 @TODO
 - HA的保证
   - yarn-site.xml配置 `yarn.resourcemanager.am.max-attempts`
+  - flink-conf.yaml 
+   ` yarn.application-attempts: 3
+    high-availability: zookeeper
+    high-availability.storageDir: hdfs://xx:8020/flink/yarn/ha
+    high-availability.zookeeper.quorum: xx:2181,xx:2181,xx:2181
+    high-availability.zookeeper.path.root: /flink-yarn
+    `
 - flink yarn 的两种模式
   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304181728564.png)
   - 推荐使用第二种 `bin/flink run -m yarn-cluster -yn 2 -yjm 1024 -ytm 1024 ./examples/batch/WordCount.jar`
-  -  注意：Client端(提交Flink任务的机器)必须要设置YARN_CONF_DIR、HADOOP_CONF_DIR或者HADOOP_HOME环境变量，Flink会通过这个环境变量来读取YARN和HDFS的配置信息，否则启动会失败。
+  - 注意：Client端(提交Flink任务的机器)必须要设置YARN_CONF_DIR、HADOOP_CONF_DIR或者HADOOP_HOME环境变量，Flink会通过这个环境变量来读取YARN和HDFS的配置信息，否则启动会失败。
 
 ### flink几个层次的图
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304181731459.png)

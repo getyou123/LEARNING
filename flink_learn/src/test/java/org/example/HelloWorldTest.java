@@ -1,15 +1,10 @@
 package org.example;
 
 import org.apache.flink.api.common.JobExecutionResult;
-import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.test.util.MiniClusterWithClientResource;
 import org.example.helloworld.DataStreamJob;
-import org.example.helloworld.WordCount;
+import org.example.helloworld.pojo.WordCount;
 import org.example.tool.ParallelTestSource;
 import org.example.tool.TestSink;
-import org.junit.ClassRule;
 import org.junit.Test;
 
 public class HelloWorldTest {

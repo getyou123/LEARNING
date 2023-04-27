@@ -359,3 +359,41 @@ docker exec -it mongo mongo admin
 - 访问 `http://localhost:9090/spring_mvc_learn/`
 
 ### docker 安装 jira
+
+
+### docker 安装kafka单机版本
+``` 
+docker-compose.yml 文件内容
+version: '2'
+
+services:
+  kafka:
+    image: wurstmeister/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: zk:2181 # 需要与下方的服务名对应
+    depends_on:
+      - zk
+
+  zk:
+    image: wurstmeister/zookeeper:latest
+    container_name: zk
+    ports:
+      - "2181:2181"
+```
+- 启动 `docker-compose up -d`
+- 创建topic 
+``` 
+/opt/kafka/bin/kafka-topics.sh --create \
+  --bootstrap-server localhost:9092 \
+  --replication-factor 2 \
+  --partitions 3 \
+  --topic test_topic
+```
+- 生产者发送数据
+``` 
+/opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic sensor
+```

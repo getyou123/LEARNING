@@ -693,6 +693,7 @@ select a.id,a.name from
 ### beeline执行sql
 beeline -u "jdbc:hive2://XXX3:2181,10.XXX.XXX.86:2181/ods;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2" -n "username" -e "";
 beeline -u "jdbc:hive2://1XXX3:2181,XXX:2181/ods;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2" -n "username" -f dwd_XXX_di_tmp.sql
+beeline -u jdbc:hive2://<hive-server-hostname>:<port>/<database> -n <username> -p <password> -e "";
 
 
 

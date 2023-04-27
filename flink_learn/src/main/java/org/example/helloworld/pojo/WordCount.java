@@ -1,4 +1,4 @@
-package org.example.helloworld;
+package org.example.helloworld.pojo;
 
 import java.io.Serializable;
 

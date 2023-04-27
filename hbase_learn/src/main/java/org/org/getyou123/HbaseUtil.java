@@ -98,7 +98,7 @@ public class HbaseUtil {
 
 
         System.out.println("==============");
-        HbaseUtil hbaseUtil = new HbaseUtil("10.XX.1.XXX", "2181");
+        HbaseUtil hbaseUtil = new HbaseUtil("10.xx.1.xx", "2181");
         hbaseUtil.getARecordByRowKey("test:intellectual_property_splice", new StringBuilder("1234567").reverse().toString());
 
 

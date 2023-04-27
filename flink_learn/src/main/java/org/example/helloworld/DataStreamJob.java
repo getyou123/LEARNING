@@ -3,20 +3,18 @@ package org.example.helloworld;
 
 
 import org.apache.flink.api.common.JobExecutionResult;
-import org.apache.flink.api.common.eventtime.WatermarkGenerator;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.util.Collector;
+import org.example.helloworld.pojo.WordCount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.flink.streaming.api.windowing.time.Time;
 
 
 public class DataStreamJob {
