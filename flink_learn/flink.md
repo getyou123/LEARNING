@@ -385,6 +385,7 @@ stream
 1. flink中的watermark的生成和time的提取，一般来说是一起生成的
 - 最最核心是 WatermarkGenerator + TimestampAssigner ，flink期望提供得到 一个 WatermarkStrategy
 - 实际就是如何往数据流中插入wm，可以定时周期来生成，可以按照数据特定类型来生成
+- [WaterMarkLearnTest.java](src%2Ftest%2Fjava%2Forg%2Fexample%2FWaterMarkLearnTest.java)
 ``` 
     public interface WatermarkStrategy<T> 
         extends TimestampAssignerSupplier<T>,
@@ -403,4 +404,12 @@ stream
         @Override
         WatermarkGenerator<T> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context);
     }
+```
+2. 如何处理迟到数据呢？
+- 即使定义了watermark但是可能还是存在比最大乱序时间慢的事件到来，flink允许时间更晚的到来，window暂时不关闭
+- window的关闭时间是 watermark  = 窗口关闭时间 + 超过时间 ，这个关闭时间 
+- 迟到的数据也可以可以触发计算的
+``` 
+.window(TumblingEventTimeWindows.of(Time.seconds(5)))
+.allowedLateness(Time.seconds(3)) // 这里设置关闭时间
 ```
