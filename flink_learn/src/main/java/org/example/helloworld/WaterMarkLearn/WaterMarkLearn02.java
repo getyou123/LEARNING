@@ -21,6 +21,11 @@ public class WaterMarkLearn02 implements WatermarkGenerator<TaxiFare> {
 
     }
 
+    /**
+     * 周期性的插入 当前时间的 5s 时延作为 wm
+     * @param output
+     */
+
     @Override
     public void onPeriodicEmit(WatermarkOutput output) {
         output.emitWatermark(new Watermark(System.currentTimeMillis() - maxTimeLag));

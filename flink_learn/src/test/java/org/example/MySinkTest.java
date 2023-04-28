@@ -1,8 +1,6 @@
 package org.example;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
-import org.apache.flink.util.Collector;
 import org.example.helloworld.SinkFunctionLearn.MySinkFunction;
 import org.example.helloworld.SinkFunctionLearn.MySinkFunctionWithPool;
 import org.example.helloworld.pojo.WaterSensor;
