@@ -299,11 +299,14 @@ bin/flink run -yd -m yarn-cluster ./examples/streaming/TopSpeedWindowing.jar # �
 - checkpoint 是作业 failover 的时候自动使用，不需要用户指定。savepoint 一般用于程序的版本更新，bug修复，A/B Test等场景，需要用户指定。
 
 ---
+
 ## talk6 https://files.alicdn.com/tpsservice/a8d224d6a3b8b82d03aa84e370c008cc.pdf
+
 主要包括：主要包括为什么要有 Window；
 Window 中的三个核心组件：WindowAssigner、Trigger 和 Evictor；
 Window 中怎么处理乱序数据，乱序数据是否允许延迟，以及怎么处理迟到的数据；
 最后我们梳理整个 Window 的数据流程，以及 Window 中怎么保证 Exactly Once 语义。
+
 ### window概念
 
 - 无限流中的使用的，收集一些数据放在某个bucket中，然后按照一定的条件，定时or定量触发 对于bucket进行计算
@@ -350,14 +353,16 @@ stream
 - evictor 如何理解：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202304281027976.png)
 
 ### flink中的window的生命周期
+
 - 每条数据过来之后，会由 WindowAssigner 分配到对应的 Window，
 - 当 Window 被触发之后，如何控制触发是 trigger
 - 会交给 Evictor(如果没有设置 Evictor 则跳过)，
 - 然后处理 UserFunction：用户自己的处理逻辑
 
-
 ### flink中的时间：
-需要注意的是，WatermarkGenerator 只适用于 EventTime 时间特征。在使用 ProcessingTime 或者 IngestionTime 时，不需要产生 Watermark。
+
+需要注意的是，WatermarkGenerator 只适用于 EventTime 时间特征。在使用 ProcessingTime 或者 IngestionTime 时，不需要产生
+Watermark。
 
 - Event-Time，Processing-Time 以及 Ingestion-Time 这三种时间
     - Event-Time：表示事件发生的时间
@@ -381,12 +386,15 @@ stream
     - wm的传播，会更新算子subtask内的时钟：水印是一种标记, 是流中的一个点, 所有在这个时间戳(水印中的时间戳)前的数据应该已经全部到达。
       一旦水印到达了算子, 则这个算子会提高他内部的时钟的值为这个水印的值。
 - 处理时间没有使用水印的必要，水印只是针对事件时间来说的一种计量机制
-- 需要注意的是，WatermarkGenerator 只适用于 EventTime 时间特征。在使用 ProcessingTime 或者 IngestionTime 时，不需要产生 Watermark。
+- 需要注意的是，WatermarkGenerator 只适用于 EventTime 时间特征。在使用 ProcessingTime 或者 IngestionTime 时，不需要产生
+  Watermark。
 
 1. flink中的watermark的生成和time的提取，一般来说是一起生成的
+
 - 最最核心是 WatermarkGenerator + TimestampAssigner ，flink期望提供得到 一个 WatermarkStrategy
 - 实际就是如何往数据流中插入wm，可以定时周期来生成，可以按照数据特定类型来生成
 - [WaterMarkLearnTest.java](src%2Ftest%2Fjava%2Forg%2Fexample%2FWaterMarkLearnTest.java)
+
 ``` 
     public interface WatermarkStrategy<T> 
         extends TimestampAssignerSupplier<T>,
@@ -406,37 +414,81 @@ stream
         WatermarkGenerator<T> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context);
     }
 ```
+
 2. 如何处理迟到数据呢？
+
 - 即使定义了watermark但是可能还是存在比最大乱序时间慢的事件到来，flink允许时间更晚的到来，window暂时不关闭
-- window的关闭时间是 watermark  = 窗口关闭时间 + 超过时间 ，这个关闭时间 
+- window的关闭时间是 watermark = 窗口关闭时间 + 超过时间 ，这个关闭时间
 - 迟到的数据也可以可以触发计算的
+
 ``` 
 .window(TumblingEventTimeWindows.of(Time.seconds(5)))
 .allowedLateness(Time.seconds(3)) // 这里设置关闭时间
 ```
 
 ---
+
 ## talk7 https://files.alicdn.com/tpsservice/1b9f5f0bda10883dce78496e6a5d648a.pdf
+
 ### 关于flink中的状态？
+
 - 什么是状态？-- 计算过程中的使用到的，需要保证其正确性和可恢复性的一些变量，区分于计算中的局部变量
 - 如果计算中无需记录中间的需要容错的变量的话就是无状态的计算
 - 有状态的场景：
-  - 去重
-  - 窗口
-  - 访问历史数据
-  - 机器学习的参数
+    - 去重
+    - 窗口
+    - 访问历史数据
+    - 机器学习的参数
 
 #### flink中状态的分类？
+
 - flink管理否？ managed-state 和 Raw-state（实际存的是字节数组）
 - managed-state 继续 细分为 Keyed State 和 Operator State：
-- 作用在keyed stream上，每个key存一个状态？ Keyed State 
-  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305021952117.png)
-  - 一个Key对应一个State: 一个算子会处理多个Key, 则访问相应的多个State
+- 作用在keyed stream上，每个key存一个状态？ Keyed State
+    - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305021952117.png)
+    - 一个Key对应一个State: 一个算子会处理多个Key, 则访问相应的多个State
 - 一个operator 实例存储 一个的状态变量 Operator State
-  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305021952724.png)
-- Keyed State 使用示例 
-  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305021952633.png)
-  - 一个算子的子任务对应一个状态
-  - 区分下 AggregatingState 和 ListState ： 比如ListState窗口计算中是全都暂存，AggregatingState 可以按照reduce那样定义然后还支持输入数据和输出的数据的格式不一致
-  - 区分下 AggregatingState 和 ReducingState ： AggregatingState 不要求输入和输出一致，ReducingState 要求必须一致
+    - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305021952724.png)
+- Keyed State 使用示例
+    - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305021952633.png)
+    - 一个算子的子任务对应一个状态
+    - 区分下 AggregatingState 和 ListState ： 比如ListState窗口计算中是全都暂存，AggregatingState
+      可以按照reduce那样定义然后还支持输入数据和输出的数据的格式不一致
+    - 区分下 AggregatingState 和 ReducingState ： AggregatingState 不要求输入和输出一致，ReducingState 要求必须一致
 - 综合对比情况：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305040946005.png)
+
+### flink中的容错机制
+
+核心思想就是周期性的定时记录状态，出错了之后就回复到前一个快照状态上，![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305041603479.png)
+
+- 一致性级别
+
+   at-most-once(最多一次):
+  这其实是没有正确性保障的委婉说法——故障发生之后，计数结果可能丢失。
+
+   at-least-once(至少一次):
+  这表示计数结果可能大于正确值，但绝不会小于正确值。也就是说，计数程序在发生故障后可能多算，但是绝不会少算。
+
+   exactly-once(严格一次):
+  这指的是系统保证在发生故障后得到的计数结果与正确值一致.既不多算也不少算
+
+
+- 状态如何保存呢？
+  - 状态的存储、访问以及维护，由一个可插入的组件决定，这个组件就叫做状态后端（state backend），状态后端主要负责两件事：	本地(taskmanager)的状态管理 和  将检查点（checkpoint）状态写入远程存储
+  - MemoryStateBackend 内存中：
+    - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305041617761.png)
+    - 存储方式:本地状态存储在TaskManager的内存中, checkpoint 存储在JobManager的内存中.
+  - FsStateBackend：
+    - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305041619963.png)
+    - 存储方式: 本地状态在TaskManager内存, Checkpoint时, 存储在文件系统(hdfs)中
+  - RocksDBStateBackend：
+    - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305041620881.png)
+    - 存储方式: 1. 本地状态存储在TaskManager的RocksDB数据库中(实际是内存+磁盘) 2. Checkpoint在外部文件系统(hdfs)中.
+
+
+---
+## talk8 https://files.alicdn.com/tpsservice/a44825ebca091345481dc2ddbb789d1d.pdf
+### flinkApi总览：
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305041624520.png)
+
+

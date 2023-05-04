@@ -6,6 +6,7 @@ import org.apache.flink.api.common.time.Time;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.MemorySize;
+import org.apache.flink.contrib.streaming.state.RocksDBStateBackend;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.runtime.state.StateBackend;
 import org.apache.flink.runtime.state.filesystem.FsStateBackend;
@@ -36,12 +37,6 @@ public class MyEnvironmentUtils {
 
     /**
      * 如果不能创建 checkpoint directory 报错
-     * Creates a streaming environment with a few pre-configured settings based on command-line
-     * parameters.
-     *
-     * @throws IOException        if the local checkpoint directory for the file system state backend*
-     *                            cannot be created
-     * @throws URISyntaxException if <code>fsStatePath</code> is not a valid URI
      */
     public static StreamExecutionEnvironment createConfiguredEnvironment(final ParameterTool parameters) throws IOException, URISyntaxException {
         final String localMode =
@@ -78,8 +73,7 @@ public class MyEnvironmentUtils {
 
             final StateBackend stateBackend;
             if (parameters.has("useRocksDB")) {
-               // stateBackend = new RocksDBStateBackend(checkpointPath.toUri());
-                stateBackend = new FsStateBackend(checkpointPath);
+               stateBackend = new RocksDBStateBackend(checkpointPath.toUri());
             } else {
                 stateBackend = new FsStateBackend(checkpointPath);
             }
