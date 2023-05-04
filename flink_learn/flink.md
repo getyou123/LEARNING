@@ -298,6 +298,7 @@ bin/flink run -yd -m yarn-cluster ./examples/streaming/TopSpeedWindowing.jar # �
   是全量做的，每次的时间较长，数据量较大，需要用户主动去触发。
 - checkpoint 是作业 failover 的时候自动使用，不需要用户指定。savepoint 一般用于程序的版本更新，bug修复，A/B Test等场景，需要用户指定。
 
+---
 ## talk6 https://files.alicdn.com/tpsservice/a8d224d6a3b8b82d03aa84e370c008cc.pdf
 主要包括：主要包括为什么要有 Window；
 Window 中的三个核心组件：WindowAssigner、Trigger 和 Evictor；
@@ -413,3 +414,25 @@ stream
 .window(TumblingEventTimeWindows.of(Time.seconds(5)))
 .allowedLateness(Time.seconds(3)) // 这里设置关闭时间
 ```
+
+---
+## talk7 https://files.alicdn.com/tpsservice/1b9f5f0bda10883dce78496e6a5d648a.pdf
+### 关于flink中的状态？
+- 什么是状态？-- 计算过程中的使用到的，需要保证其正确性和可恢复性的一些变量，区分于计算中的局部变量
+- 如果计算中无需记录中间的需要容错的变量的话就是无状态的计算
+- 有状态的场景：
+  - 去重
+  - 窗口
+  - 访问历史数据
+  - 机器学习的参数
+
+#### 状态的分类？
+- flink管理否？ managed-state 和 Raw-state（实际存的是字节数组）
+- 作用在keyed stream上，每个key存一个状态？ Keyed State 
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305021952117.png)
+- 一个operator 实例存储 一个的状态变量 Operator State
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305021952724.png)
+- Keyed State 使用示例 
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305021952633.png)
+  - 区分下 AggregatingState 和 ListState ： 比如ListState窗口计算中是全都暂存，AggregatingState 可以按照reduce那样定义然后还支持输入数据和输出的数据的格式不一致
+  - 区分下 AggregatingState 和 ReducingState ： AggregatingState 不要求输入和输出一致，ReducingState 要求必须一致
