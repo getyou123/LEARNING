@@ -12,13 +12,16 @@ import org.apache.flink.util.Collector;
 
 /**
  * 定义一个RichFlatMapFunction的实现
- * 实现功能实现没来两个就产出一下平均值
+ * 实现功能实现每来两个就产出一下平均值
  * 然后每个key状态 为 Tuple2<Long, Long> 分别为 count 和 sum
  */
 public class CountWindowAverage extends RichFlatMapFunction<Tuple2<Long, Long>, Tuple2<Long, Long>> {
 
     /**
-     * The ValueState handle. The first field is the count, the second field a running sum.
+     * The ValueState handle.
+     * The first field is the count, the second field a running sum.
+     * 每个实例都持有一个ValueState，
+     * sum.value()方法会根据当前处理的key来获取具体的key对应的state
      */
     private transient ValueState<Tuple2<Long, Long>> sum;
 
@@ -26,6 +29,10 @@ public class CountWindowAverage extends RichFlatMapFunction<Tuple2<Long, Long>, 
     public void flatMap(Tuple2<Long, Long> input, Collector<Tuple2<Long, Long>> out) throws Exception {
 
         // access the state value
+        // 这里的底层会根据当前处理是哪个key来获取状态
+        //  public S get(N namespace) {
+        //        return get(keyContext.getCurrentKey(), keyContext.getCurrentKeyGroupIndex(), namespace);
+        //    }
         Tuple2<Long, Long> currentSum = sum.value();
 
         // update the count

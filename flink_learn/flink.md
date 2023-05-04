@@ -426,13 +426,17 @@ stream
   - 访问历史数据
   - 机器学习的参数
 
-#### 状态的分类？
+#### flink中状态的分类？
 - flink管理否？ managed-state 和 Raw-state（实际存的是字节数组）
+- managed-state 继续 细分为 Keyed State 和 Operator State：
 - 作用在keyed stream上，每个key存一个状态？ Keyed State 
   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305021952117.png)
+  - 一个Key对应一个State: 一个算子会处理多个Key, 则访问相应的多个State
 - 一个operator 实例存储 一个的状态变量 Operator State
   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305021952724.png)
 - Keyed State 使用示例 
   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305021952633.png)
+  - 一个算子的子任务对应一个状态
   - 区分下 AggregatingState 和 ListState ： 比如ListState窗口计算中是全都暂存，AggregatingState 可以按照reduce那样定义然后还支持输入数据和输出的数据的格式不一致
   - 区分下 AggregatingState 和 ReducingState ： AggregatingState 不要求输入和输出一致，ReducingState 要求必须一致
+- 综合对比情况：![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202305040946005.png)
