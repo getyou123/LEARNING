@@ -30,7 +30,7 @@ import static org.apache.flink.configuration.TaskManagerOptions.TASK_HEAP_MEMORY
 import static org.apache.flink.configuration.TaskManagerOptions.TASK_OFF_HEAP_MEMORY;
 
 /**
- * Common functionality to set up execution environments for the troubleshooting training.
+ * Common functionality to set up execution environments
  */
 public class MyEnvironmentUtils {
     public static final Logger LOG = LoggerFactory.getLogger(MyEnvironmentUtils.class);

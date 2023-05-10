@@ -17,6 +17,7 @@ product(intx, hashCode, 5, "(Unstable) select hashCode generation algorithm" )
 2. question2：
    https://mp.weixin.qq.com/s/GfKUn-QbwL-CO5WionF17w 
 ``` 为什么重写 equals 时必须重写 hashCode 方法 ```
+
    hashCode其实是作为是识别唯一对象来的，如果你逻辑上认为了一个学生age+name相同就是逻辑上的一个同学的话，那么为了防止在hashtable中他们获取数据不一致的情况，是需要把hashcode进行重写的
 ```java
 public class Test {
@@ -29,24 +30,21 @@ public class Test {
         System.out.println(scores.get(s2));
     }
 }
- class Student {
-    private int age;
-    private String name;
 
-     public Student(int age, String name) {
-         this.age = age;
-         this.name = name;
-     }
-
-     @Override
-     public boolean equals(Object o) {
-         Student student = (Student) o;
-         return age == student.age &&
-                 Objects.equals(name, student.name);
-     }
- }
+class Student { private int age;private String name;
+    public Student(int age, String name) {
+        this.age = age;
+        this.name = name;
+    }
+    @Override
+    public boolean equals(Object o) {
+        Student student = (Student) o;
+        return age == student.age &&
+                Objects.equals(name, student.name);
+    }
+}
 ```
-上面的只是重写了equals方法，所以产出的数据为null，因为两个对象的hashcode是不一样的，他们两个是不同的对象，hashscode产出和本地方法有关，因为不一样所以查出的为null
+上面的只是重写了equals方法，所以产出的数据为null，因为两个对象的hashcode是不一样的，他们两个是不同的对象，hashcode产出和本地方法有关，因为不一样所以查出的为null
 
 底层实际上是 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302081148839.png)
 
@@ -59,6 +57,9 @@ public class Test {
 ```
 这样他们的hashcode值就是一样的![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202302081149961.png)
 System.out.println(scores.get(s2));就能获取到正常的数据
+
+
+note ： 综上，一个map中的student对象的相等是指，hashcode等，且equals也得相等，这两个缺一不可
 
 3.  重写 hashCode() 方法的基本原则
 - 在程序运行时，同一个对象多次调用 hashCode() 方法应该返回相同的值。
