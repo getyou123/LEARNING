@@ -1,5 +1,8 @@
 package org.example;
 
+import org.junit.Test;
+
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
@@ -105,11 +108,11 @@ public class DateLearn {
             System.out.println(calendar.get(Calendar.DAY_OF_YEAR));
 
             // 后移动
-            calendar.add(Calendar.DATE,1);
+            calendar.add(Calendar.DATE, 1);
             System.out.println(calendar.get(Calendar.DAY_OF_YEAR));
 
             // 前移动
-            calendar.add(Calendar.DATE,-10);
+            calendar.add(Calendar.DATE, -10);
             System.out.println(calendar.get(Calendar.DAY_OF_YEAR));
 
             // 转为date
@@ -180,6 +183,32 @@ public class DateLearn {
             System.out.println(parsed);
 
         }
+
+    }
+
+
+    @Test
+    public void test0001() throws ParseException {
+        LocalDate startDate = LocalDate.of(2023, 5, 15);
+        System.out.println(startDate);
+
+        // 目前欠账总数
+        BigDecimal currentOwn = new BigDecimal("521475.46");
+
+        // 执行利率
+        BigDecimal rate = new BigDecimal("0.05138");
+
+        // 需要对齐为 521475.46 还了 976,443.38 86075308050.17653
+
+
+        for (int i = 0; i <= 330; i++) { // 还需要还钱330期
+            LocalDate newDate = startDate.plusMonths(i);
+            System.out.println(i + 30 + "\t" + newDate + "\t" + currentOwn + "");
+        }
+
+    }
+
+    public static void test0002() {
 
     }
 }
