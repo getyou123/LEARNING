@@ -86,15 +86,23 @@ public class CreateHiveTableByMysql {
             return;
         }
 
-        String url = "jdbc:mysql://" + myAppArgs.dbUrl + ":3306/" + myAppArgs.dbName;
+        String url = "jdbc:mysql://" + myAppArgs.dbUrl + ":3306/" + myAppArgs.dbName + "?useUnicode=true&characterEncoding=UTF-8&useInformationSchema=true";
         Connection connection = getConnection(url, myAppArgs.userName, myAppArgs.password);
 
+        // 获取元数据
         DatabaseMetaData metaData = connection.getMetaData();
+
+        // 获取表的元数据信息
+        ResultSet tables = metaData.getTables(null, null, myAppArgs.tbName, new String[]{"TABLE"});
+        String tableComment = "";
+        if (tables.next()) {
+            tableComment = tables.getString("REMARKS");
+        }
 
         ResultSet columns = metaData.getColumns(null, null, myAppArgs.tbName, null);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("CREATE TABLE ").append("ods").append(".").append("hiveTable").append(" (");
+        sb.append("CREATE TABLE ").append("ods").append(".").append("hiveTable_hgw").append(" (");
         while (columns.next()) {
             String columnName = columns.getString("COLUMN_NAME");
             String columnComment = columns.getString("REMARKS");
@@ -105,6 +113,14 @@ public class CreateHiveTableByMysql {
         }
         sb.delete(sb.length() - 2, sb.length());
         sb.append(")");
+
+        // 添加表的注释信息
+        if (!tableComment.isEmpty()) {
+            sb.append(" COMMENT \"").append(tableComment).append("\"");
+        }
+
+        String appendStr = " partitioned by (pt string) stored as orc ";
+        sb.append(appendStr);
 
         System.out.println(sb.toString());
 
