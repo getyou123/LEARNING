@@ -727,3 +727,8 @@ user_id website
 2       www.netflix.com
 
 ```
+
+
+### 通过mysql的表结构产出hive表ddl
+- [CreateHiveTableByMysql.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2FCreateHiveTableByMysql.java)
+- 这里可能需要修改下具体的mysql类型和hive字段类型的映射
