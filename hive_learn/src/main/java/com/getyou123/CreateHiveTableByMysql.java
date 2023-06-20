@@ -7,6 +7,11 @@ import java.sql.*;
 import java.util.Arrays;
 
 
+/**
+ * TODO 1.数据库关键字的处理
+ *      2.decimal能否保留其原始精度
+ *      3.hive表名字的对应
+ */
 public class CreateHiveTableByMysql {
     /**
      * 定义需要解析的参数形式
