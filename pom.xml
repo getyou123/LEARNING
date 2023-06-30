@@ -148,6 +148,10 @@
 
         <!-- 读书笔记 -->
         <module>Book_Note</module>
+
+        <!-- leetcode -->
+        <module>leetcode</module>
+
     </modules>
 
 
