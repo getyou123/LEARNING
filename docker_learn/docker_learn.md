@@ -405,7 +405,7 @@ docker exec -it kafka /opt/kafka/bin/kafka-console-producer.sh --broker-list loc
 ``` 
 docker run -d --name clickhouse-server --ulimit nofile=262144:262144 \
 -p 8123:8123 -p 9000:9000 -p 9009:9009 --privileged=true \
--v/Users/haoguowang/Documents/clickHouseUse/log:/var/log/clickhouse-server \
+-v /Users/haoguowang/Documents/clickHouseUse/log:/var/log/clickhouse-server \
 -v /Users/haoguowang/Documents/clickHouseUse/data:/var/lib/clickhouse clickhouse/clickhouse-server:22.1.4.30
 ```
 - 本机curl验证
