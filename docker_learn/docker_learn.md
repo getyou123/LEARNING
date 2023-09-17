@@ -398,3 +398,24 @@ services:
 docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
 docker exec -it kafka /opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic sensor
 ```
+
+
+### docker创建clickhouse单机版本
+拉取和创建容器
+``` 
+docker run -d --name clickhouse-server --ulimit nofile=262144:262144 \
+-p 8123:8123 -p 9000:9000 -p 9009:9009 --privileged=true \
+-v /Users/haoguowang/Documents/clickHouseUse/log:/var/log/clickhouse-server \
+-v /Users/haoguowang/Documents/clickHouseUse/data:/var/lib/clickhouse clickhouse/clickhouse-server:22.1.4.30
+```
+- 本机curl验证
+``` 
+curl localhost:8123
+Ok.
+```
+- 客户端连接8123端口可以连接上
+- 掉启容器内的客户端
+``` 
+docker exec -it clickhouse-server bash
+docker exec -it clickhouse-server /usr/bin/clickhouse-client
+```

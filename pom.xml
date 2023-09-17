@@ -153,6 +153,9 @@
         <module>leetcode</module>
         <module>kafka_learn</module>
 
+        <!-- clickhouse -->
+        <module>clickhouse_learn</module>
+
     </modules>
 
 

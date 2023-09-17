@@ -131,7 +131,9 @@ https://www.yiibai.com/git/git_rebase.html
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171806277.png)
 
 - 之后的处理方式有两种： 要么在mywork分支上直接merge origin ； 要么使用rebase
+
   ![git rebase origin之后](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171810742.png)
+
   ![git merge origin之后](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301171811223.png)
 
 ### git pull 
@@ -149,3 +151,9 @@ https://www.yiibai.com/git/git_rebase.html
 
 ### github项目和本地项目的关联
 - 如果已经有项目 git init 过了，那就直接在github web端新建项目，本地项目git remote add origin <url>,然后git push -u origin <branch_name>
+
+### 配置本项目的账户和密码
+``` 
+git config user.name "Your Name"
+git config user.email "email@example.com"
+```
