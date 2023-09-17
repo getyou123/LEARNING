@@ -151,6 +151,7 @@
 
         <!-- leetcode -->
         <module>leetcode</module>
+        <module>kafka_learn</module>
 
     </modules>
 
