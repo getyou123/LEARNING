@@ -54,3 +54,27 @@
 
 [XXX@hadoop01 hadoop-2.7.7]$ hadoop fs -cp har:///user/XXutput/input.har/* /user/X
 
+## hadoop的三大发行版本：
+- apache hadoop
+- cdh
+- hdp
+- 合一的cdp 收费比较贵
+
+## hadoop 从 1.x 到 2.x 到 3.x的变化：
+- 1->2 增加了yarn
+- 2->3 NN不止一个
+
+##  hdfs的架构：
+- NN（active standby）
+- DN
+- QJM集群
+- zkfc
+- client
+
+## hdfs的HA是如何实现的：
+- zkfc用作选举 监控 故障转移
+- 元数据的共享 QJM集群 JNS
+
+## hdfs的读写流程：
+- 读流程
+- 写流程
