@@ -1,23 +1,36 @@
 #### 整体的学习
+- [Book_Note](Book_Note) 读书笔记
+- [clickhouse_learn](clickhouse_learn) clickhouse学习笔记 TODO
+- [Design_pattern_learn](Design_pattern_learn) 设计模式学习笔记 TODO
+- [docker_learn](docker_learn) 包含几个常见的构建环境的案例
+- [elasticsearch_learn](elasticsearch_learn) elasticsearch学习笔记 TODO
+- [flink_learn](flink_learn) flink学习笔记 TODO
+- [hadoop_learn](hadoop_learn) hadoop学习笔记 TODO
+- [hbase_learn](hbase_learn) hbase学习笔记 TODO
+- [hive_learn](hive_learn) hive笔记
+- [java_basic_learn](java_basic_learn) java基础
+- [javaweb_learn](javaweb_learn) javaWeb开发的基础知识学习，里面用到了servlet的相关知识
+- [jdbc_learn](jdbc_learn) jdbc的学习笔记
+- [juc_learn](juc_learn) juc学习笔记 TODO
+- [kafka_learn](kafka_learn) kafka学习笔记 TODO
+- [leetcode](leetcode) leetcode刷题记录
+- [maven_learn](maven_learn) maven学习笔记
+- [MyBatis_learn](MyBatis_learn) MyBatis学习笔记
+- [mysql_learn](mysql_learn) mysql笔记
+- [servlet_learn](servlet_learn) servlet基础
+- [spark_learn](spark_learn) spark学习笔记 TODO
+- [Spring_Learn](Spring_Learn) spring学习笔记 TODO
+- [springboot_learn](springboot_learn) springboot学习笔记 TODO
 - tool_learn
+  - [ansible_learn](tool_learn%2Fansible_learn) ansible学习笔记
   - [git](tool_learn%2Fgit) git笔记
-  - [shell](tool_learn%2Fshell) shell学习
+  - [hexo_learn](tool_learn%2Fhexo_learn) hexo学习
+  - [jenkins](tool_learn%2Fjenkins) jenkins学习 TODO
   - [log_learn](tool_learn%2Flog_learn) log4j2日志管理
   - [lombok_learn](tool_learn%2Flombok_learn) lombok学习
-  - [hexo_learn](tool_learn%2Fhexo_learn) hexo学习
-- [java_basic_learn](java_basic_learn) java基础
-- mysql_learn 
-- [docker_learn](docker_learn) 包含几个常见的构建环境的案例
-- [jdbc_learn](jdbc_learn) jdbc的学习笔记
-- [servlet_learn](servlet_learn) servlet基础
-- [javaweb_learn](javaweb_learn) javaWeb开发的基础知识学习，里面用到了servlet的相关知识
-- [MyBatis_learn](MyBatis_learn) MyBatis学习笔记
-- kafka_learn
-- elastic_search_learn
-- hadoop_learn
-- [maven_learn](maven_learn) maven学习笔记
-- [hive_learn](hive_learn) hive笔记
-
+  - [other](tool_learn%2Fother) 
+  - [markdown_learn](tool_learn%2Fmarkdown_learn)markdown学习
+  - [shell](tool_learn%2Fshell) shell学习
 
 ### todo
 - 项目管理工具

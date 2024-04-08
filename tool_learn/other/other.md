@@ -45,6 +45,8 @@ public class MyParams {
            .parse(args);
 ```
 
+
+如果是scala的话：
 ``` 
 object sharerHolderLabel {
 
