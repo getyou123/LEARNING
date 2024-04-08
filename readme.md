@@ -21,7 +21,7 @@
 - [spark_learn](spark_learn) spark学习笔记 TODO
 - [Spring_Learn](Spring_Learn) spring学习笔记 TODO
 - [springboot_learn](springboot_learn) springboot学习笔记 TODO
-- tool_learn
+- [tool_learn](tool_learn) tool学习笔记
   - [ansible_learn](tool_learn%2Fansible_learn) ansible学习笔记
   - [git](tool_learn%2Fgit) git笔记
   - [hexo_learn](tool_learn%2Fhexo_learn) hexo学习
