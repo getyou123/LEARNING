@@ -10,6 +10,10 @@ import org.example.entity.TaxiRide;
 import org.example.source.TaxiRideGenerator;
 
 
+/**
+ * 可以看做是这次训练的一个helle world
+ * 计算每个driverID的count
+ */
 public class RideCountExample {
 
     /**

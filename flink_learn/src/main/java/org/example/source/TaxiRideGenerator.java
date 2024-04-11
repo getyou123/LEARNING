@@ -21,6 +21,11 @@ public class TaxiRideGenerator implements SourceFunction<TaxiRide> {
     private static final int BATCH_SIZE = 5;
     private volatile boolean running = true;
 
+    /**
+     * 核心重构方法
+     * @param ctx
+     * @throws Exception
+     */
     @Override
     public void run(SourceContext<TaxiRide> ctx) throws Exception {
 
@@ -33,6 +38,7 @@ public class TaxiRideGenerator implements SourceFunction<TaxiRide> {
             // generate a batch of START events
             List<TaxiRide> startEvents = new ArrayList<TaxiRide>(BATCH_SIZE);
             for (int i = 1; i <= BATCH_SIZE; i++) {
+                // 生成开始车程的开始
                 TaxiRide ride = new TaxiRide(id + i, true);
                 startEvents.add(ride);
                 // the start times may be in order, but let's not assume that
