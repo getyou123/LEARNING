@@ -419,3 +419,22 @@ Ok.
 docker exec -it clickhouse-server bash
 docker exec -it clickhouse-server /usr/bin/clickhouse-client
 ```
+
+
+### 在docker下新建Nebula_graph & nebula studio
+0. 主要参考资料：https://zhuanlan.zhihu.com/p/658149284 （主要提供思路）  + https://docs.nebula-graph.com.cn/master/nebula-studio/deploy-connect/st-ug-deploy/ (其中的docker部署方式)
+1. 拉取 nebula 的 docker 镜像并启动
+```shell
+git clone -b release-3.6 https://github.com/vesoft-inc/nebula-docker-compose.git 
+cd nebula-docker-compose/
+docker-compose up -d
+```
+2. 下载 https://oss-cdn.nebula-graph.com.cn/nebula-graph-studio/3.9.0/nebula-graph-studio-3.9.0.tar.gz?_gl=1*1eqj6vd*_ga*MTI2MTk5NTEwLjE3MTI3NjMzMzc.*_ga_BGGB2REDGM*MTcxMzEwNjQxMS42LjEuMTcxMzEwNjUwNy42MC4wLjA.
+3. mkdir nebula-graph-studio-3.9.0 && tar -zxvf nebula-graph-studio-3.9.0.tar.gz -C nebula-graph-studio-3.9.0
+4. cd nebula-graph-studio-3.9.0
+5. docker-compose pull
+6. docker-compose up -d
+7. brower中注意换ip为具体的ip，不要使用localhost，然后密码为 root nebula
+
+
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202404142259550.png)
