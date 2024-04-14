@@ -129,6 +129,7 @@
         <module>elasticsearch_learn</module>
         <module>hbase_learn</module>
         <module>flink_learn</module>
+        <module>kafka_learn</module>
 
         <!-- DevOps 和工具 -->
         <module>maven_learn</module>
@@ -151,10 +152,12 @@
 
         <!-- leetcode -->
         <module>leetcode</module>
-        <module>kafka_learn</module>
 
         <!-- clickhouse -->
         <module>clickhouse_learn</module>
+
+        <!-- 图数据库 NebulaGraph -->
+        <module>NebulaGraph_learn</module>
 
     </modules>
 
