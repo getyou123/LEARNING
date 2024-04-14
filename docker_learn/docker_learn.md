@@ -440,3 +440,21 @@ docker-compose up -d
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202404142259550.png)
 
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202404142300098.png)
+
+
+### docker安装 neo4j
+0. 主要参考： https://zhuanlan.zhihu.com/p/389388077
+```shell
+docker run -d --name neo4j \                                                                                                             ok  base py
+    -p 7474:7474 -p 7687:7687 \
+    -v /Users/XX/Documents/Docker_use/neo4j/data:/data \
+    -v /Users/XX/Documents/Docker_use/neo4j/logs:/logs \
+    -v /Users/XX/Documents/Docker_use/neo4j/conf:/var/lib/neo4j/conf \
+    -v /Users/XX/Documents/Docker_use/neo4j/import:/var/lib/neo4j/import \
+    --env NEO4J_AUTH=neo4j/password \
+    neo4j
+```
+
+启动之后查看具体ip下的7474端口，不要使用localhost，账号密码如上所示
+
+![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202404142317603.png)
