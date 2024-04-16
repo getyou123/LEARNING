@@ -7,10 +7,10 @@ import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 
 import org.apache.flink.test.util.MiniClusterWithClientResource;
 
-import org.example.entity.TaxiFare;
+import org.example.flink_training.entity.TaxiFare;
 
 
-import org.example.exercise03.HourlyTipsExercise;
+import org.example.flink_training.exercise03.HourlyTipsExercise;
 import org.example.tool.ParallelTestSource;
 import org.example.tool.TestSink;
 import org.junit.ClassRule;

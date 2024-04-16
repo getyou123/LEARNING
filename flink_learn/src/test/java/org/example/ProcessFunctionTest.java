@@ -4,9 +4,9 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.util.Collector;
-import org.example.helloworld.ProcessFunctionLearn.MyKeyedProcessFunction;
-import org.example.helloworld.ProcessFunctionLearn.MyProcessFunction;
-import org.example.helloworld.pojo.WaterSensor;
+import org.example.flink_training.ProcessFunctionLearn.MyKeyedProcessFunction;
+import org.example.flink_training.ProcessFunctionLearn.MyProcessFunction;
+import org.example.flink_training.pojo.WaterSensor;
 import org.junit.Test;
 
 import java.util.Arrays;

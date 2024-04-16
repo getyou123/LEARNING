@@ -4,7 +4,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.test.util.MiniClusterWithClientResource;
-import org.example.helloworld.StateLearn.CountWindowAverage;
+import org.example.flink_training.StateLearn.CountWindowAverage;
 import org.junit.ClassRule;
 import org.junit.Test;
 

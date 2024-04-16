@@ -1,11 +1,9 @@
 package org.example;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.util.Collector;
-import org.example.helloworld.FilterFunctionLearn.MyFilterFunction;
-import org.example.helloworld.pojo.WaterSensor;
+import org.example.flink_training.FilterFunctionLearn.MyFilterFunction;
+import org.example.flink_training.pojo.WaterSensor;
 import org.junit.Test;
 
 import java.util.Arrays;

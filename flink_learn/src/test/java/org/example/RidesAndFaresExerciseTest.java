@@ -3,10 +3,10 @@ package org.example;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 import org.apache.flink.test.util.MiniClusterWithClientResource;
-import org.example.entity.RideAndFare;
-import org.example.entity.TaxiFare;
-import org.example.entity.TaxiRide;
-import org.example.exercise02.RidesAndFaresExercise;
+import org.example.flink_training.entity.RideAndFare;
+import org.example.flink_training.entity.TaxiFare;
+import org.example.flink_training.entity.TaxiRide;
+import org.example.flink_training.exercise02.RidesAndFaresExercise;
 import org.example.tool.ParallelTestSource;
 import org.example.tool.TestSink;
 import org.junit.ClassRule;
@@ -14,8 +14,6 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.example.SomeStaticTool.testFare;
 import static org.example.SomeStaticTool.testRide;
-
-import java.time.Instant;
 
 
 public class RidesAndFaresExerciseTest {

@@ -10,7 +10,7 @@ import org.apache.http.HttpHost;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.example.helloworld.pojo.WaterSensor;
+import org.example.flink_training.pojo.WaterSensor;
 import org.junit.Test;
 
 import java.util.ArrayList;

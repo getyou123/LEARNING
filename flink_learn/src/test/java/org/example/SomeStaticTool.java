@@ -1,8 +1,8 @@
 package org.example;
 
-import org.example.entity.TaxiFare;
-import org.example.entity.TaxiRide;
-import org.example.utils.DataGenerator;
+import org.example.flink_training.entity.TaxiFare;
+import org.example.flink_training.entity.TaxiRide;
+import org.example.flink_training.utils.DataGenerator;
 
 import java.time.Duration;
 import java.time.Instant;

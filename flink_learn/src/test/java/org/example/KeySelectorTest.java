@@ -2,9 +2,8 @@ package org.example;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.example.helloworld.FilterFunctionLearn.MyFilterFunction;
-import org.example.helloworld.KeySelectorLearn.MyKeySelector;
-import org.example.helloworld.pojo.WaterSensor;
+import org.example.flink_training.KeySelectorLearn.MyKeySelector;
+import org.example.flink_training.pojo.WaterSensor;
 import org.junit.Test;
 
 import java.util.Arrays;

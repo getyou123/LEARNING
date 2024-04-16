@@ -7,7 +7,7 @@ import org.apache.flink.streaming.connectors.redis.common.config.FlinkJedisPoolC
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisCommand;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisCommandDescription;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisMapper;
-import org.example.helloworld.pojo.WaterSensor;
+import org.example.flink_training.pojo.WaterSensor;
 
 import java.util.ArrayList;
 
