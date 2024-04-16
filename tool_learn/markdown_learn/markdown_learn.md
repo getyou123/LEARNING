@@ -1,4 +1,5 @@
 #### 摘自 https://md.mzr.me/
+#### 摘自 https://markdown.com.cn/basic-syntax/paragraphs.html
 
 # 欢迎使用 Markdown在线编辑器 MdEditor
 
@@ -347,25 +348,28 @@ China-->Andrew: How are you?
 Andrew->>China: I am good thanks!
 ```
 
+### markdown中的段落
+markdown中的是按照空行来区分是不是一个段落的。
 
-## 使用gravizo在markdown中画图(有些引擎可能不支持)
-![Alt text](https://g.gravizo.com/svg?
-digraph G {
-size ="4,4";
-main [shape=box];
-main -> parse [weight=8];
-parse -> execute;
-main -> init [style=dotted];
-main -> cleanup;
-execute -> { make_string; printf}
-init -> make_string;
-edge [color=red];
-main -> printf [style=bold,label="100 times"];
-make_string [label="make a string"];
-node [shape=box,style=filled,color=".7 .3 1.0"];
-execute -> compare;
-}
-)
+比如： 这就是一个新段落
+但是这个就不是一个新段落
 
-### 图论的演示平台
-https://csacademy.com/app/graph_editor/
+
+### markdown中的换行
+是两个空格+一个回车  
+比如：这是第一行  
+这是第二行
+
+### markdown中的引用
+> 这就是引用  
+> 明白了吧
+
+
+### markdown分割线
+
+---
+*** 
+
+### markdown中的链接
+这是一个链接 [Markdown语法](https://markdown.com.cn)。  
+这是一个链接 [Markdown语法](https://markdown.com.cn "最好的markdown教程")。

@@ -1,5 +1,5 @@
 ---
-https://markdown.com.cn/basic-syntax/paragraphs.html
+
 
 ---
 https://www.didispace.com/idea-tips/plugin/plantuml.html
@@ -9,26 +9,7 @@ https://www.didispace.com/idea-tips/plugin/plantuml.html
 图数据库
 https://docs.nebula-graph.com.cn/3.6.0/nebula-studio/deploy-connect/st-ug-connect/
 
-neo4j 
-
---- 
-在线画流程图 
-https://app.diagrams.net/
-自动排版效果
-https://www.cnblogs.com/ministep/p/15853437.html
-
----
-Graphviz + dot文件 自动布局的，可生成svg图像
-https://jeanhwea.github.io/article/drawing-graphs-with-dot.html
-https://zhuanlan.zhihu.com/p/644358139
-
----
-notion画流程图 
-https://techbiji.com/notion%E6%B5%81%E7%A8%8B%E5%9B%BE/
-
----
-图论可用的节点较少的 
-https://csacademy.com/app/graph_editor/
+neo4j
 
 ---
 flink的八种分区https://juejin.cn/post/7193598928062218297
