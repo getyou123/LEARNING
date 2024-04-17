@@ -12,8 +12,8 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
-import org.example.helloworld.WaterMarkLearn.MyWaterMarkGeneratorForWaterSersor;
-import org.example.helloworld.pojo.WaterSensor;
+import org.example.flink_training.WaterMarkLearn.MyWaterMarkGeneratorForWaterSersor;
+import org.example.flink_training.pojo.WaterSensor;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.junit.Test;
 

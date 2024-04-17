@@ -1,9 +1,9 @@
 package org.example;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.example.helloworld.MapFunctionLearn.MyMapFunction;
-import org.example.helloworld.MapFunctionLearn.MyRichMapFunction;
-import org.example.helloworld.pojo.WaterSensor;
+import org.example.flink_training.MapFunctionLearn.MyMapFunction;
+import org.example.flink_training.MapFunctionLearn.MyRichMapFunction;
+import org.example.flink_training.pojo.WaterSensor;
 import org.junit.Test;
 
 import java.util.Arrays;

@@ -1,13 +1,11 @@
 package org.example;
 
-import jline.WindowsTerminal;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
-import org.example.helloworld.FlatMapFunctionLearn.MyFlatMapFuntion;
-import org.example.helloworld.MapFunctionLearn.MyRichMapFunction;
-import org.example.helloworld.pojo.WaterSensor;
+import org.example.flink_training.FlatMapFunctionLearn.MyFlatMapFuntion;
+import org.example.flink_training.pojo.WaterSensor;
 import org.junit.Test;
 
 import java.util.Arrays;

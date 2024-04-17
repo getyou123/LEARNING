@@ -1,7 +1,7 @@
 package org.example;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.example.helloworld.StateLearn.MyCountMapper;
+import org.example.flink_training.StateLearn.MyCountMapper;
 
 import org.junit.Test;
 

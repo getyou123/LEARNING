@@ -5,7 +5,7 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
-import org.example.helloworld.pojo.WaterSensor;
+import org.example.flink_training.pojo.WaterSensor;
 import org.junit.Test;
 
 import java.time.Duration;

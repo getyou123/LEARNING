@@ -2,8 +2,8 @@ package org.example;
 
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.example.helloworld.StateLearn.WaterSensorValueState;
-import org.example.helloworld.pojo.WaterSensor;
+import org.example.flink_training.StateLearn.WaterSensorValueState;
+import org.example.flink_training.pojo.WaterSensor;
 import org.junit.Test;
 
 public class ValueStateTest {

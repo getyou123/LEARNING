@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
-import org.example.helloworld.pojo.WaterSensor;
+import org.example.flink_training.pojo.WaterSensor;
 import org.junit.Test;
 
 import java.util.ArrayList;

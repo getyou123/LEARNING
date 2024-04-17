@@ -67,5 +67,43 @@ public class FileReaderWriterLearn {
         fileWriter.write("test for love 中国");
         fileWriter.close();
     }
+    @Test
+    public void test001() throws IOException {
+        String csvFile = "src/main/resources/1.csv"; // 替换为你的 CSV 文件路径
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String line;
+            StringBuilder csvData = new StringBuilder();
+
+            while ((line = br.readLine()) != null) {
+                // 将每一行追加到 StringBuilder 中
+                String[] split = line.split(",", -1);
+                csvData.append("\"");
+                csvData.append(split.length>0?split[0]:"");
+                csvData.append("\"");
+                csvData.append("->");
+                csvData.append("\"");
+                csvData.append(split.length>1?split[1]:"");
+                csvData.append("\"");
+                csvData.append(" [label = ");
+                csvData.append("\"");
+                csvData.append(split.length>2?split[2]:"");
+                csvData.append("\"");
+                csvData.append("];");
+                csvData.append("\n"); // 添加换行符（可选）
+            }
+
+            // 将整个 CSV 数据存储到一个字符串中
+            String csvContent = csvData.toString();
+
+            // 输出整个 CSV 数据字符串
+            System.out.println(csvContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
 
 }

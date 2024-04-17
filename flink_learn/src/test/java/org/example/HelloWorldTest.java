@@ -1,8 +1,8 @@
 package org.example;
 
 import org.apache.flink.api.common.JobExecutionResult;
-import org.example.helloworld.DataStreamJob;
-import org.example.helloworld.pojo.WordCount;
+import org.example.flink_training.helloworld.DataStreamJob;
+import org.example.flink_training.pojo.WordCount;
 import org.example.tool.ParallelTestSource;
 import org.example.tool.TestSink;
 import org.junit.Test;

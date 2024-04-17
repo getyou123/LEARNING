@@ -1,9 +1,9 @@
 package org.example;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.example.helloworld.SinkFunctionLearn.MySinkFunction;
-import org.example.helloworld.SinkFunctionLearn.MySinkFunctionWithPool;
-import org.example.helloworld.pojo.WaterSensor;
+import org.example.flink_training.SinkFunctionLearn.MySinkFunction;
+import org.example.flink_training.SinkFunctionLearn.MySinkFunctionWithPool;
+import org.example.flink_training.pojo.WaterSensor;
 import org.junit.Test;
 
 import java.util.Arrays;
