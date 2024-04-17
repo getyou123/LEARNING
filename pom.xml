@@ -158,6 +158,7 @@
 
         <!-- 图数据库 NebulaGraph -->
         <module>NebulaGraph_learn</module>
+        <module>Neo4j_Learn</module>
 
     </modules>
 
