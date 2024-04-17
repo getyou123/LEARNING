@@ -51,3 +51,18 @@ Metacat
 数据字典
 
 指标体系建设工具
+
+数据目录的含义：
+
+数据目录的作用
+
+
+---
+数仓开发中的维度矩阵如何很好的展示呢  
+如何编写总线矩阵呢？  
+https://zhuanlan.zhihu.com/p/511098122
+
+
+---
+数据建模的生成是如何的  
+https://cloud.tencent.com/developer/article/1987368
