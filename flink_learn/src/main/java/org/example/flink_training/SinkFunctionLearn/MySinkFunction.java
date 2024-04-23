@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
  * 自定义的sink方法
  * 因为是Function所以是每个subtask实例构造一个Function实例
  * open方法只在subtask实例上执行一次
+ * 本示例中的sinker不是可以回放的
  */
 public class MySinkFunction extends RichSinkFunction<WaterSensor> {
 
@@ -32,7 +33,7 @@ public class MySinkFunction extends RichSinkFunction<WaterSensor> {
         conn.close();
     }
 
-    // 对于
+    // 对于每条数据执行这个函数
     @Override
     public void invoke(WaterSensor value, Context context) throws Exception {
         ps.setString(1, value.getId());
