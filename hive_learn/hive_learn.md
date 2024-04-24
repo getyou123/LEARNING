@@ -1,4 +1,75 @@
-`## hive常见的函数
+### hive是什么
+hive是一个数仓工具。
+Hive可以帮助开发人员来做完成这些苦活（将SQL语句转化为MapReduce在yarn上跑），如此开发人员就可以更加专注于业务需求了。
+
+### hive的优点和缺点：
+- 优点：处理大量数据，SQL表达
+- 缺点：时延较大，SQL的迭代不好表达
+ 
+### hive的本质
+- 转化sql为具体的spark或者mr任务，提交到集群上执行
+- 前提是文件是结构化的，通过元数据进行映射为一张表
+
+### hive的基本的数据类型
+- INT 等
+- STRUCT MAP ARRAY
+- DECIMAL(10,2)表示存储总共10位数字，其中2位是小数部分。如果小数点前面的数据超过了8为的话，会变为null
+- 大于bigint的数字需要使用DECIMAL(38,0)来表示
+
+### hive的架构
+- @TODO
+
+### hive和普通的数据库的区别
+- @TODO
+
+### hive的两种访问模式
+- 使用命令行模式
+- 使用hiveserver2，客户端使用jdbc的方式使用hive
+
+
+### hive的内部表和外部表
+- 内部表完全是hive来管理的，会移动到具体的数据仓库地址位置，数据随着表一起删除
+- 外部表可以在任何位置，建表时候只是记录了地址，删除的时候也是不删除的，只删除了元数据
+
+### hive的分区和分桶
+- hive 分区底层是分文件夹
+- hive 分桶底层是文件夹内的文件进一步的分片
+
+1.引言：
+  分区提供一个隔离数据和优化查询的便利方式。
+  不过，并非所有的数据集都可形成合理的分区。  
+2.分桶表：
+  对于一张表或者分区，Hive 可以进一步组织成桶，也就是更为细粒度的数据范围划分。
+  分桶是将数据集分解成更容易管理的若干部分的另一个技术。
+  分区针对的是数据的存储路径（细分文件夹）；分桶针对的是数据文件（按规则多文件放一起）。
+- @TODO
+
+### hive参数的配置方式：
+- 配置文件 xml文件
+- 命令行参数 启动时候指定 --hiveconf  只对本次启动有效
+- 启动seesion之后手动的set
+- 参数的优先级别 顺序
+- @TODO
+
+### hive中的动态分区
+- 动态分区就是说可以在指定分区的时候，按照结果中的分区字段的值动态的更新对应的分区
+```
+（1）开启动态分区功能（默认true，开启）
+hive (default)> set hive.exec.dynamic.partition=true;
+（2）设置为非严格模式（动态分区的模式，默认strict，表示必须指定至少一个分区为静态分区，nonstrict模式表示允许所有的分区字段都可以使用动态分区。）
+hive (default)> set hive.exec.dynamic.partition.mode=nonstrict
+（3）在所有执行MR的节点上，最大一共可以创建多少个动态分区。默认1000
+hive (default)> set hive.exec.max.dynamic.partitions=1000;
+（4）在每个执行MR的节点上，最大可以创建多少个动态分区。
+该参数需要根据实际的数据来设定。比如：源数据中包含了一年的数据，即day字段有365个值，那么该参数就需要设置成大于365，如果使用默认值100，则会报错。
+hive (default)> set hive.exec.max.dynamic.partitions.pernode=100;
+（5）整个MR Job中，最大可以创建多少个HDFS文件。默认100000
+hive (default)> set hive.exec.max.created.files=100000;
+（6）当有空分区生成时，是否抛出异常。一般不需要设置。默认false
+hive (default)> set hive.error.on.empty.partition=false;
+```
+
+## hive常见的函数
 
 ### 聚合函数
 count(),max(),min(),sum(),avg()
@@ -673,7 +744,7 @@ cluster by = distribute by +sort by，只能是升序排列。
 ``` 
 hive 实现全局有序
 1. 如果是使用order by 的话全局数据过多的时候会存在执行慢，甚至失败的情况，因为只有一个reducer
-2. 如果是需要全局数据有序的话，可以使用udf进行分区，按照排序字段的key的范围进行分区，也就是cluster by，但是要自己写 分区的类
+2. 如果是需要全局数据有序的话，可以使用udf进行分区，按照排序字段的key的范围进行分区，也就是cluster by，但是要自己写分区的类
 ```
 
 ``` 
@@ -688,13 +759,13 @@ select a.id,a.name from
  order by length(a.user_name) desc limit 10;
 ```
 
+### hive udf的分类
 
 
 ### beeline执行sql
 beeline -u "jdbc:hive2://XXX3:2181,10.XXX.XXX.86:2181/ods;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2" -n "username" -e "";
 beeline -u "jdbc:hive2://1XXX3:2181,XXX:2181/ods;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2" -n "username" -f dwd_XXX_di_tmp.sql
 beeline -u jdbc:hive2://<hive-server-hostname>:<port>/<database> -n <username> -p <password> -e "";
-
 
 
 ### hive udf注册
@@ -732,3 +803,7 @@ user_id website
 ### 通过mysql的表结构产出hive表ddl
 - [CreateHiveTableByMysql.java](src%2Fmain%2Fjava%2Fcom%2Fgetyou123%2FCreateHiveTableByMysql.java)
 - 这里可能需要修改下具体的mysql类型和hive字段类型的映射
+
+### hive窗口函数
+一个窗口函数的三个组成部分， function + over + window expression（window子句）
+- @TODO
