@@ -421,6 +421,15 @@ note: 如果存在相应的公钥可以直接发送，所以还是先去home目�
 cat 1.txt| awk -F '`' '{print $3}' |awk -F 'COMMENT ' '{print $1}' | awk '{for (i=2; i<=NF; i++) printf "%s ", $i; printf "\n"}'
 ```
 
+### eval
+执行命令
+```
+# 从文件中读取命令并逐行执行
+while IFS= read -r line; do
+    eval "$line"
+done < commands.txt
+```
+
 
 
 
