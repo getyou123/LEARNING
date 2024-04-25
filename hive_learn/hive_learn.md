@@ -760,7 +760,19 @@ select a.id,a.name from
 ```
 
 ### hive udf的分类
+- UDF 一进一出
+- UDAF 多进一出
+- UDTF 一进多出
 
+### hive中的压缩
+- map阶段的压缩
+- 数据传输过程的压缩
+- reduce产出的压缩
+
+### hive的列裁剪和分区裁剪
+- 避免使用select * 
+- 列裁剪是指 查询时候指定查询的列
+- 分区裁剪是指 查询过程指定分区，只读指定的分区的数据
 
 ### beeline执行sql
 beeline -u "jdbc:hive2://XXX3:2181,10.XXX.XXX.86:2181/ods;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2" -n "username" -e "";
@@ -807,3 +819,20 @@ user_id website
 ### hive窗口函数
 一个窗口函数的三个组成部分， function + over + window expression（window子句）
 - @TODO
+
+### hive优化，分场景的优化操作
+- 列裁剪 分区裁剪
+- 合并小文件 小文件处理
+  - map之前做小文件的合并 `set hive.input.format= org.apache.hadoop.hive.ql.io.CombineHiveInputFormat;`
+  - map-only任务的小文件合并 `SET hive.merge.mapfiles = true;`
+  - reduce任务结束时候进行合并 `SET hive.merge.mapredfiles = true;`
+  - 设置合并文件的大小，默认是256MB 当输出文件的平均大小小于该值时，启动一个独立的map-reduce任务进行文件merge `hive(default)> SET hive.merge.smallfiles.avgsize = 16777216;`
+- group by 之后 count(distinct) reducer的有的数据倾斜压力大 `这种的最好是改造sql为group by  更细的层次，然后再外面再加上一层group by + sum得到结果，去重操作都转为group by`
+- 空值处理，直接过滤或者按照业务需要进行union 一条结果
+- 不同数据类型关联产生数据倾斜，如何是int 的类型join string话，默认的Hash操作会按int型的id来进行分配，这样会导致所有string类型id的记录都分配到一个Reducer中。最好join字段的数据类型是相同的，一般来说都转为string来进行join
+- map端的combiner ：  
+  hive.map.aggr=true
+  这个参数的含义就是开启map端combiner（把reducer的逻辑前置到mapper来执行），但是存在不能开启combiner的情况，比如计算每个 key的平均值，在每个mapper段做这个reduce运算算出来的结果就是错误的；这里的运算需要满足结合律和交换律，否则会出错；
+  combiner的操作不一定是减少了开销，实际可能得不偿失,这个参数一般来说还需要设置对应的聚合操作的条数：
+  hive.groupby.mapaggr.checkinterval = 100000 TODO 这里画图
+- 
