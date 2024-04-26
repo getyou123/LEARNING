@@ -10,6 +10,9 @@ import java.util.PriorityQueue;
 import java.util.Random;
 
 
+/**
+ * 构造的数据生成器
+ */
 public class TaxiRideGenerator implements SourceFunction<TaxiRide> {
 
     public static final int SLEEP_MILLIS_PER_EVENT = 10;
