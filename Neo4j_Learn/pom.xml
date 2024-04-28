@@ -7,6 +7,6 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <artifactId>Neo4j_Learn</artifactId>
-    <name>Archetype - Neo4j_Learn</name>
+    <name>Neo4j_Learn</name>
     <url>http://maven.apache.org</url>
 </project>

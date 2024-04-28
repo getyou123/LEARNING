@@ -7,6 +7,6 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <artifactId>docker_learn</artifactId>
-    <name>Archetype - docker_learn</name>
+    <name>docker_learn</name>
     <url>http://maven.apache.org</url>
 </project>

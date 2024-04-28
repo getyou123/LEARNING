@@ -8,6 +8,6 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>jenkins</artifactId>
-    <name>Archetype - jenkins</name>
+    <name>jenkins</name>
     <url>http://maven.apache.org</url>
 </project>

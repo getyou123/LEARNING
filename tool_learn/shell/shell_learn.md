@@ -1,4 +1,4 @@
-###linux 命令行
+### linux 命令行
 
 # linux的系统：
 ![1](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz20230105175728.png)

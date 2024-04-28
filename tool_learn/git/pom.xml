@@ -8,6 +8,6 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>git</artifactId>
-    <name>Archetype - git</name>
+    <name>git</name>
     <url>http://maven.apache.org</url>
 </project>

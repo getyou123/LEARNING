@@ -5,8 +5,9 @@
         <groupId>org.example</groupId>
         <artifactId>LEARNING</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>NebulaGraph_learn</artifactId>
-    <name>NebulaGraph_learn</name>
+    <artifactId>graphviz_learn</artifactId>
+    <name>graphviz_learn</name>
     <url>http://maven.apache.org</url>
 </project>

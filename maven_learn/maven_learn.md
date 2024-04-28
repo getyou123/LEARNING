@@ -181,7 +181,7 @@ mvn dependency:tree # 可以查看当前项目的依赖树
 mvn dependency:list # 查看当前项目依赖的list
 mvn dependency:analyze # 依赖情况分析
 mvn install -Dmaven.test.skip=true # maven 使用参数
-
+mvn clean package -DskipTests -f pom3.xml # maven 指定具体的pom文件
 ```
 
 ### maven插件

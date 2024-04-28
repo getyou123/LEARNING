@@ -143,6 +143,7 @@
         <module>tool_learn/hexo_learn</module>
         <module>tool_learn/markdown_learn</module>
         <module>tool_learn/ansible_learn</module>
+        <module>tool_learn/graphviz_learn</module>
 
         <!-- 设计模式和软件架构 -->
         <module>Design_pattern_learn</module>

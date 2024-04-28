@@ -7,6 +7,6 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <artifactId>hadoop_learn</artifactId>
-    <name>Archetype - hadoop_learn</name>
+    <name>hadoop_learn</name>
     <url>http://maven.apache.org</url>
 </project>
