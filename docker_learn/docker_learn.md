@@ -117,22 +117,15 @@ dockerfile是用来构建docker的image的
 其中的命令主要包括
 
 - FROM：指定基础镜像
--
-
-RUN：用于在镜像构造过程中的执行命令，比如安装某个应用程序 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061411925.png)
-
-- CMD：指定容器中的默认命令，docker
-  run中没有指定其他命令时候就运行这个![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061411804.png)
+- RUN：用于在镜像构造过程中的执行命令，比如安装某个应用程序 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061411925.png)
+- CMD：指定容器中的默认命令，docker run中没有指定其他命令时候就运行这个![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061411804.png)
 - ENTRYPOINT： 这个是和docker run一起配置使用的，ENTRYPOINT 的 Exec
   格式用于设置容器启动时要执行的命令及其参数 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061414959.png)
--
+- WORKDIR：主要用于指定工作路径，推荐需要使用的是绝对的路径，没有的话会创建 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061407083.png)
 
-WORKDIR：主要用于指定工作路径，推荐需要使用的是绝对的路径，没有的话会创建 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202301061407083.png)
-
-- COPY： 将本机的路径文件拷贝到镜像中，容器中自然也会有 例如： COPY test.txt relativeDir/
+- COPY：将本机的路径文件拷贝到镜像中，容器中自然也会有 例如： COPY test.txt relativeDir/
 - ADD：将宿主机目录下的文件拷贝进镜像且ADD命令会自动处理URL和解压tar压缩包
 - VOLUME：容器数据卷，用于数据保存和持久化工作
--
 
 #### dockerfile中的命令的一些区别
 
@@ -458,3 +451,58 @@ docker run -d --name neo4j \                                                    
 启动之后查看具体ip下的7474端口，不要使用localhost，账号密码如上所示
 
 ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202404142317603.png)
+
+### docker 安装 graphviz-visual-editor 
+1. 拉取git代码：https://github.com/getyou123/graphviz-visual-editor.git 或者原始仓库代码 https://github.com/magjac/graphviz-visual-editor.git 或者在对应的assert中下载对应的tar包
+2. 新建Dockerfile 位置在 
+```
+├── graphviz-visual-editor-1.1.0
+│ ├── @hpcc-js -> public/@hpcc-js
+│ ├── CHANGELOG.md
+│ ├── Dockerfile -- 
+│ ├── HOWTO
+│ ├── LICENSE
+│ ├── Makefile
+│ ├── README.md
+│ ├── bin
+│ ├── codecov.yml
+│ ├── cypress
+│ ├── cypress.config.js
+│ ├── package-lock.json
+│ ├── package.json
+│ ├── public
+│ └── src
+└── graphviz-visual-editor-1.1.0.tar.gz
+```
+Dockerfile 内容如下：因为官方的readme写的是 这个执行顺序
+```
+# 使用官方的 Node.js 镜像作为基础镜像
+FROM node:16
+
+# 设置工作目录
+WORKDIR /app
+
+# 将 package.json 和 package-lock.json 复制到工作目录
+COPY package*.json ./
+
+# 安装项目依赖
+RUN npm install
+
+# 安装 make、gcc、g++ 和 python3（基于 Debian 系统）
+RUN apt update && apt install -y make gcc g++ python3
+
+# 将项目文件复制到工作目录
+COPY . .
+
+# 执行 make 命令（假设执行 make build）
+RUN make
+
+# 暴露端口，如果需要运行服务
+EXPOSE 3000
+
+# 定义启动命令
+CMD ["npm", "run", "start"]
+```
+3. 构建镜像 `docker build -t graphviz-visual-editor-1.1.0 .`
+4. 构建完成后创建容器 `docker run --name ngraph -p 8080:3000 graphviz-visual-editor-1.1.0`
+5. 访问 `http://localhost:8080/` 开始使用
