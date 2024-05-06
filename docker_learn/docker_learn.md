@@ -504,5 +504,5 @@ EXPOSE 3000
 CMD ["npm", "run", "start"]
 ```
 3. 构建镜像 `docker build -t graphviz-visual-editor-1.1.0 .`
-4. 构建完成后创建容器 `docker run --name ngraph -p 8080:3000 graphviz-visual-editor-1.1.0`
+4. 构建完成后创建容器 `docker run -d --name ngraph -p 8080:3000 graphviz-visual-editor-1.1.0`
 5. 访问 `http://localhost:8080/` 开始使用
