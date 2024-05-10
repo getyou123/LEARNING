@@ -9,6 +9,9 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * 自定义实现source
+ */
 public class MySource implements SourceFunction<WaterSensor> {
 
     private String host;
