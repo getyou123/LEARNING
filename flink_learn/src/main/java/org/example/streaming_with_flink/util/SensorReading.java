@@ -24,6 +24,11 @@ public class SensorReading {
     public String id;
     // timestamp of the reading
     public long timestamp;
+
+    public double getTemperature() {
+        return temperature;
+    }
+
     // temperature value of the reading
     public double temperature;
 
