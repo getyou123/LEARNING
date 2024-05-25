@@ -66,3 +66,13 @@ https://zhuanlan.zhihu.com/p/511098122
 ---
 数据建模的生成是如何的  
 https://cloud.tencent.com/developer/article/1987368
+
+
+---
+flink优化 shangguigu
+
+
+---
+深入浅出数据分析
+精益数据分析
+增长黑客
