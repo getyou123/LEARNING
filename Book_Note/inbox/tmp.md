@@ -70,9 +70,19 @@ https://cloud.tencent.com/developer/article/1987368
 
 ---
 flink优化 shangguigu
+flink job抽象层级
+电商flink项目总结
 
 
 ---
 深入浅出数据分析
 精益数据分析
 增长黑客
+
+
+---
+电商知识总结
+
+
+--- 
+java基础工具

@@ -36,3 +36,5 @@ hdfs:///user/haoguowang/jars/TestDevTableToDev-jar-with-dependencies.jar
 ```
 否则报错：
 ``` No suitable driver ```
+
+### spark sql转为RDD执行的过程：

@@ -430,6 +430,17 @@ while IFS= read -r line; do
 done < commands.txt
 ```
 
-
-
-
+### 在spark脚本中查找出的获取java的执行方式
+```shell
+# Find the java binary
+if [ -n "${JAVA_HOME}" ]; then
+  RUNNER="${JAVA_HOME}/bin/java"
+else
+  if [ "$(command -v java)" ]; then
+    RUNNER="java"
+  else
+    echo "JAVA_HOME is not set" >&2
+    exit 1
+  fi
+fi
+```
