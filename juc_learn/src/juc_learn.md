@@ -1,6 +1,7 @@
 ### 教程资料
 
 - https://www.bilibili.com/video/BV1Kw411Z7dF?spm_id_from=333.788.videopod.episodes&vd_source=d63883aafa94bea28d7963f231cca55b&p=2
+- https://www.bilibili.com/video/BV1ar4y1x727/?spm_id_from=333.337.search-card.all.click&vd_source=d63883aafa94bea28d7963f231cca55b
 
 ### 教程和线程的基本概念
 
@@ -204,3 +205,34 @@ java.util.ConcurrentModificationException
 
 ### 阻塞队列
 - BlockingQueue 用于线程之间有依赖的数据交互，常见于生产者和消费者
+- 多个线程共享一个队列，如果没有队列中没有数据的话就消费者阻塞，如果队列满了的话就把生产者阻塞
+- [Thread14.java](main%2Fjava%2Forg%2Fgetyou123%2FThread14.java)
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202503280829773.png)
+
+### 线程池
+- 一池多个线程，一池一个线程
+- 使用最多的是自定义线程池
+- [Thread15.java](main%2Fjava%2Forg%2Fgetyou123%2FThread15.java)
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202503280842454.png)
+
+### 多线程和多线程同步
+- https://tech.meituan.com/2024/07/19/multi-threading-and-multi-thread-synchronization.html
+- 线程是一个执行的上下文，包含诸多的状态数据，每个线程有自己的执行流、调用站、错误码、信号掩码、私有数据。
+
+- 执行流：
+
+### 总结下FutureTask的缺点：
+- get是同步阻塞的，轮询的话费CPU（isDone）
+- 在这里有体现[Thread16.java](main%2Fjava%2Forg%2Fgetyou123%2FThread16.java)
+- 后面jDk改造这部分内容，提供了CompletableFuture接口
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504041746291.png)
+
+### CompletableFuture接口基础用法
+- 同时处理多个耗时任务，为了不阻塞线程等待结果
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504041942209.png)
+- [Thread17.java](main%2Fjava%2Forg%2Fgetyou123%2FThread17.java)
+- （有返回值、无返回值）*（自定义线程池、默认的线程池）共计四种静态方法
+- [Thread17.java](main%2Fjava%2Forg%2Fgetyou123%2FThread17.java)
+
+### CompletableFuture接口非阻塞处理任务结果和异常
+- 
