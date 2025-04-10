@@ -234,5 +234,24 @@ java.util.ConcurrentModificationException
 - （有返回值、无返回值）*（自定义线程池、默认的线程池）共计四种静态方法
 - [Thread17.java](main%2Fjava%2Forg%2Fgetyou123%2FThread17.java)
 
+### join和get的区别：
+- join在编译时候不会报错，不需要处理异常，而是在执行时候才会产出异常
+- get需要在编译时候处理异常
+
 ### CompletableFuture接口非阻塞处理任务结果和异常
-- 
+- thenApply 和 thenAccept的区别：链式的处理返回值，无返回值
+- exceptionally 捕获异常
+- 任务编排：allOf anyOf
+- [Thread20.java](main%2Fjava%2Forg%2Fgetyou123%2FThread20.java)
+
+### 使用CompletableFuture加速任务的执行
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504092116000.png)
+- [Thread19.java](main%2Fjava%2Forg%2Fgetyou123%2FThread19.java)
+
+### 多个任务执行选取最新执行完成的
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504092146301.png)
+- [Thread21.java](main%2Fjava%2Forg%2Fgetyou123%2FThread21.java)
+
+### combine合并两个阶段的结果
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504092156302.png)
+- [Thread22.java](main%2Fjava%2Forg%2Fgetyou123%2FThread22.java)
