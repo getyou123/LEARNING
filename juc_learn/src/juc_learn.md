@@ -255,3 +255,35 @@ java.util.ConcurrentModificationException
 ### combine合并两个阶段的结果
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504092156302.png)
 - [Thread22.java](main%2Fjava%2Forg%2Fgetyou123%2FThread22.java)
+- 可以多个组合的，这里只是展示了两个的
+
+### 乐观锁和悲观锁
+- 悲观锁在多写操作的情况下：lock和Synchronized
+- 乐观锁不加锁：判断是否被更新过，通过版本号和CAS算法（适用于读多的场景）
+
+### 类锁和对象锁
+Synchronized 中对象锁：
+``` 
+class phone{
+public Synchronized void run()
+}
+```
+Synchronized 中类锁：
+``` 
+class phone{
+public static Synchronized void run()
+}
+```
+
+Synchronized 中对象锁,写明了是对象锁：
+``` 
+Synchronized(obj) {
+String yui = "Stri";
+}
+```
+
+那么，两个线程争抢对象锁的时候，争抢类锁的时候。
+
+### Synchronized 对应的JVM底层命令：
+- 其实是两个jvm指令
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504102156463.png)
