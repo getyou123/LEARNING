@@ -287,3 +287,38 @@ String yui = "Stri";
 ### Synchronized 对应的JVM底层命令：
 - 其实是两个jvm指令
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504102156463.png)
+
+
+### 可重入锁案例
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504110841128.png)
+- 这里获取的是同一个对象的锁
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504112224116.png)
+
+### 锁案例总结
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504120907670.png)
+
+### 什么是线程中断机制？
+- 首先线程不能被其他的线程中断，应该是其自己来中断或者停止
+- 线程状态都有哪些？
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504121732075.png)
+  - NEW
+  - RUNNABLE
+  - BLOCKED
+  - WAITING
+  - TIMED_WAITING
+  - TERMINATED
+- 不能强制中断，只能进行协商中断，中断线程只能手动调用interrupt，把线程中断设置为中断。
+- 自己线程如何感知别的线程让自己中断呢？ 自己线程手动的检测标志。
+- 这种别人设置，自己检测，然后才能主动中断的机制就叫做协商中断机制。
+
+### 中断的三个重要的API：
+- interrupt：请求线程中断，仅仅只是将线程的中断标志设置为true，发起一个协商但并不是立即停止线程。
+- interrupted态方法，检查当前线程的中断状态，并清除中断标志。第二次调用该方法会返回 false，因为中断标志已经被清除。
+- isInterrupted ：检查当前线程是否被中断。返回 true 表示线程已经被请求中断，但不会清除中断状态。
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504121743652.png)
+
+### 线程中断示例：
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504121757590.png)
+- [Thread23.java](main%2Fjava%2Forg%2Fgetyou123%2FThread23.java)
+- 通过volatile实现
+- 通过autoBoolean实现
