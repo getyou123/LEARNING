@@ -322,3 +322,14 @@ String yui = "Stri";
 - [Thread23.java](main%2Fjava%2Forg%2Fgetyou123%2FThread23.java)
 - 通过volatile实现
 - 通过autoBoolean实现
+- 这两种都是不建议使用的，因为都是线程之外的数据，有更好的
+- [Thread24.java] (main %2Fjava%2Forg%2Fgetyou123%2FThread24.java)
+
+### java中interrupt方法的特殊说明：
+- 如果线程是正常活动状态，将该线程的中断标志设置为true，仅此而已，线程响应不响应中断自己说了算
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504122049612.png)
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504122054864.png)
+- 如果线程是被阻塞的状态，别的线程调用当前线程对象的interrupt方法，那么线程立即退出被阻塞状态，并抛出异常InterruptException
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504122039086.png)
+- 不活跃线程去调用他自己的interrupt的话啥影响没有，比如线程已经销毁之后就没有意义
+- 都在 [Thread25.java](main%2Fjava%2Forg%2Fgetyou123%2FThread25.java) 有演示
