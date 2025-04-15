@@ -341,6 +341,7 @@ String yui = "Stri";
   - Lock中的await和signal方式
   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504150755564.png)
 - 这两种方式都必须要满足先获取，之后还需要保证顺序才能唤醒，否则就一直AA处于阻塞状态
-- 通过LockSupport方式可以避免以上两种的缺点：
+- 通过LockSupport方式可以避免以上两种的缺点：（类似ETC直接通过 ）
   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504150804344.png)
 - [Thread26.java](main%2Fjava%2Forg%2Fgetyou123%2FThread26.java)
+- LockSupport只能对于一个进程发一次，unpark多次也是只发一个证 
