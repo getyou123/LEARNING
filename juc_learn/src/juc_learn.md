@@ -333,3 +333,14 @@ String yui = "Stri";
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504122039086.png)
 - 不活跃线程去调用他自己的interrupt的话啥影响没有，比如线程已经销毁之后就没有意义
 - 都在 [Thread25.java](main%2Fjava%2Forg%2Fgetyou123%2FThread25.java) 有演示
+
+### java中如何实现线程阻塞？
+- 两种存在缺点的方式：
+  - object中的wait和notify
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504150730008.png)
+  - Lock中的await和signal方式
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504150755564.png)
+- 这两种方式都必须要满足先获取，之后还需要保证顺序才能唤醒，否则就一直AA处于阻塞状态
+- 通过LockSupport方式可以避免以上两种的缺点：
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504150804344.png)
+- [Thread26.java](main%2Fjava%2Forg%2Fgetyou123%2FThread26.java)
