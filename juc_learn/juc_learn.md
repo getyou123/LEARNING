@@ -345,3 +345,56 @@ String yui = "Stri";
   - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504150804344.png)
 - [Thread26.java](main%2Fjava%2Forg%2Fgetyou123%2FThread26.java)
 - LockSupport只能对于一个进程发一次，unpark多次也是只发一个证 
+
+### JMM定义和作用：
+- JMM是一种抽象的概念，他只是对于硬件平台和操作系统的内存访问差异，他只是一组规定或规范，通过这种规范
+定义了程序中各个变量的读写方式，并决定一个线程对于共享变量的写入何时以及如何变成另外一个线程可见，
+关键技术是围绕多线程的原子性、可见性和有序性。
+- JMM的三大特性：
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504170832975.png)
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504170838530.png)
+  - 可见性：内存条中的共享数据，线程私有空间操作（数据是复制到这里的），其他线程要从主内存得知更新并更新自己的内存空间=>可见
+  - 原子性：并发情况下，协作时候，比如两个线程对共享变量各自+1，最终得到2，所以(读取到本地内存+操作+回写主内存+通知其他线程主内存变更)是原子操作
+  - 有序性：最终结果不变情况下，编译器、指令并行优化、内存系统重排 ，会对指令进行重排，以优化执行速度，但是需要保证数据之间的依赖关系没变
+
+### JMM中线程对于变量的读写过程
+
+### JMM happends-before原则
+- A happends-before B，意味着A发生的事情对于B来说是可见的，无论两者是不是发生在一个线程中
+- 这个原则使得我们很多时候没有必要对好多变量加volatile关键字
+
+### 什么是指令重排？
+- 编译器和处理器为了高效执行，对指令序列进行重排
+- 只能对不存在数据依赖的语句进行重排，有数据依赖的不能重排
+
+### volatile关键字的两大特性（可见性，禁重排序）
+- 可见性：线程的操作会立即刷新到主内存，使其他线程可见；其他线程的失效会立马去重新读取，但是已经发生了计算不会重来，这是不满足原子性的
+- 有序性：
+- 无原子性
+
+### 内存屏障是volatile关键字的两大特性的基础
+- 本质是JVM的指令，编译器生成JVM指令时候插入的内存屏障
+- 内存屏障之前的所有写都要写回到主存
+- 内存屏障之后的所有读操作都能获取屏障之前的写操作的结果
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504242201657.png)
+- 四种屏障的含义：
+  - LoadLoad
+  - LoadStore
+  - StoreStore
+  - StoreLoad
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504242210768.png)
+
+### volatile关键字的可见性案例：
+- 可见性保证‌
+  - 普通变量‌：  
+    每个线程有自己的工作内存（缓存），对变量的修改可能仅停留在工作内存中，其他线程无法立即看到修改后的值，导致‌可见性问题‌。
+  - volatile变量‌：   
+    当线程写入volatile变量时，修改会‌立即刷新到主内存‌；当读取时，会‌直接从主内存获取最新值‌，而非工作内存中的副本。这确保了多线程间的可见性。
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504250835880.png)
+- [Thread27.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread27.java)
+
+### volatile关键字的无原子性的案例：
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504250902178.png)
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504250905991.png)
+- 没有原子性发生了（+1和写回）不是原子的，所以即使发生了主内存变更，但是没有重算，而且还有覆盖写
+- [Thread28.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread28.java)
