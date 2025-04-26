@@ -398,3 +398,7 @@ String yui = "Stri";
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504250905991.png)
 - 没有原子性发生了（+1和写回）不是原子的，所以即使发生了主内存变更，但是没有重算，而且还有覆盖写
 - [Thread28.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread28.java)
+
+### volatile的日常使用场景：
+- 最好用在两个线程协作的时候，感知flag的变更
+- 一个一直在检测，另外的一个置位
