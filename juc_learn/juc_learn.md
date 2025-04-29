@@ -402,3 +402,27 @@ String yui = "Stri";
 ### volatile的日常使用场景：
 - 最好用在两个线程协作的时候，感知flag的变更
 - 一个一直在检测，另外的一个置位
+
+### cas原理：（compare and swap/set）
+- 如果我要实现i++，作为一个原子操作的话，之前只能加锁，这个锁比较重
+- 使用原子类的话，就可以替换这个加锁操作，直接调用相关的原子类
+- 这种思想类似乐观锁：cas底层操作，如果内存位置和预期值相同的话，设置为更新值，不一样的话不做任何操作
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504262052947.png)
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504262058707.png)
+- 这里引出自旋的概念：线程更新不了内存的值，然后一直在这里循环，一直无法达成更新的最终行为，这种浪费CPU的行为就是自旋。自旋锁 
+
+### cas使用案例：
+- 正常的比较&set
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504262107147.png)
+- 底层使用的操作系统的指令这种是底层是对总线加锁，这是CPU底层原语实现的，硬件级别的
+- 这种比synchronized要性能更好
+- unsafe类是CAS的思想实现，但是不要轻易使用unsafe类
+- [Thread29.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread29.java)
+
+### atomicReference
+- juc中自带了很多的基础类型的实现好的atomic类，如何自己实现一个atomicStudent呢
+- [Thread30.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread30.java)
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504290835160.png)
+
+### atomic手写自旋锁
+- 就是cas的过程中，有比较和设置，如果
