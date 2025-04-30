@@ -425,4 +425,16 @@ String yui = "Stri";
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504290835160.png)
 
 ### atomic手写自旋锁
-- 就是cas的过程中，有比较和设置，如果
+- 就是cas的过程中，有比较和设置，这里通过原子引用类来实现
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504292206372.png)
+- 思路上就是AA和BB获取之后把自己放在原子引用类中，虽然这个案例是AA先的，但是不耽误演示BB处于自旋状态
+- [Thread31.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread31.java)
+
+### cas的缺点：
+- 避开重量加锁，实现比较轻的加锁效果，因为这是os层面的支持
+- 自旋浪费CPU空转
+- ABA问题：本质是：变量的值从 A 改为 B，又改回 A，但 CAS 无法感知中间的变化。
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504292222629.png)
+- 解决方式是：AtomicStampReference就是给最开始的A加上版本号，那么后续的A的版本号就不一致了
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504300840595.png)
+- 代码在这里 [Thread32.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread32.java)
