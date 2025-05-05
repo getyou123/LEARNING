@@ -438,3 +438,25 @@ String yui = "Stri";
 - 解决方式是：AtomicStampReference就是给最开始的A加上版本号，那么后续的A的版本号就不一致了
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202504300840595.png)
 - 代码在这里 [Thread32.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread32.java)
+
+### 原子类的基础操作
+- [Thread33.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread33.java)
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202505021610343.png)
+- countDownLatch使用来保证所有的线程都结束之后才执行main线程
+
+### 数组类型原子类
+- 常见的不同的线程操作不同的索引下标
+- [Thread34.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread34.java) 这里使用join
+
+### 引用类型原子类
+- 基础的实现自旋锁
+- 带版本号原子类-使用时间戳解决ABA问题，多次修改是按照时间戳来表示
+- AtomicMarkableReference：不同于ABA，这是标记是不是一次性的被修改过(true false两种值)；[Thread35.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread35.java)
+
+### 对象属性的修改原子类（FieldUpdater）
+- 本质就是原子操作更新：类对象的某个属性字段
+- 一种线程安全的方式操作非线程安全的对象中的某个字段
+- 基于反射的，对类的指定的volatile 字段进行原子更新 （必选满足 public volatile） 
+- [Thread36.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread36.java)
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202505050918183.png)
+- 如果字段是其他的class对象的话，比如在多线程环境下抢夺执行资源的初始化
