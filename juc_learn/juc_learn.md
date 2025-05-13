@@ -460,3 +460,14 @@ String yui = "Stri";
 - [Thread36.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread36.java)
 - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202505050918183.png)
 - 如果字段是其他的class对象的话，比如在多线程环境下抢夺执行资源的初始化
+
+### 原子类型增强类
+- 以下四个是从1.8开始的，优化了cas的乐观锁的重试次数，一般用于AtomicXX
+  - DoubleAccumulator
+  - DoubleAdder
+  - LongAccumulator
+  - LongAdder
+
+### 原子类实现点赞累加
+- [Thread38.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread38.java) 演示基础操作
+- [Thread39.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread39.java) 演示点赞累加的操作，longAdder 加速效果明显
