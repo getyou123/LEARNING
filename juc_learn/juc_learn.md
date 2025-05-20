@@ -471,3 +471,40 @@ String yui = "Stri";
 ### 原子类实现点赞累加
 - [Thread38.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread38.java) 演示基础操作
 - [Thread39.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread39.java) 演示点赞累加的操作，longAdder 加速效果明显
+
+### ThreadLocal简介
+- 就是让每个线程持有自己的本地变量，因为每个线程持有自己的副本所以不存在线程安全问题
+- 类比就是：公共电话亭和私人手机
+- [Thread40.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread40.java)
+- 自定义的比如要回收，避免造成内存泄漏和程序错误，尤其是在线程池的过程中，没做remove的话会有线程的复用
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202505180834119.png)
+- ![](https:// raw.githubusercontent.com/getyou123/git_pic_use/master/zz202505180844347.png)
+- ThreadLocal 最好是static的这样的话不会随着对象多次初始化，他是属于线程的而非业务对象的 
+- 必须强制remove 
+
+### ThreadLocal代码源码
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202505180855917.png)
+- Thread中持有ThreadLocal类对象，然后每个ThreadLocalMap中存着对get 和set的对象
+- Thread、ThreadLocal和ThreadLocalMap的关系：
+- ThreadLocal的实现依赖于Thread和ThreadLocalMap 
+  - 每个Thread对象持有一个ThreadLocalMap 
+  - ThreadLocalMap中存储的是以ThreadLocal为key的键值对 
+  - 这种设计实现了线程隔离的数据存储
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202505190744727.png)
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202505190746162.png)
+
+### ThreadLocal为啥是弱引用呢？
+- Object的四个引用层级：强软弱虚
+- Object的finalize方法，根可达
+  - 强引用：即使OOM也不回收
+  - 软引用：内存不够就回收
+  - 弱引用：GC就回收
+  - 虚引用：任何时候
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202505190805988.png)
+- 为啥用弱引用呢？
+  - 因为业务代码把ThreadLocal设置为null，不在使用的时候，防止ThreadLocalMap一直引用导致无法回收内存泄漏
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202505200759887.png)
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202505200810120.png)
+
+### ThreadLocal清理脏entry
+- get set remove 都会清理map中key 为null entry对应的value 直接置为null
