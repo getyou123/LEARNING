@@ -508,3 +508,26 @@ String yui = "Stri";
 
 ### ThreadLocal清理脏entry
 - get set remove 都会清理map中key 为null entry对应的value 直接置为null
+
+### 一个对象的空间分布
+- 整体来看三部分：对象头、实例数据、对齐填充
+- 对象头：Mark Word；类元信息；
+- ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202505202156197.png)
+- MarkWord（8个字节）：哈希码、GC标记、GC次数、锁标记
+- 类元信息（8个字节）：表明是哪个类的实例
+- JOL看类对象的内存分布：
+  - 加入GAV
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202505210749146.png)
+  - [Thread42.java](src%2Fmain%2Fjava%2Forg%2Fgetyou123%2FThread42.java)
+  - ![](https://raw.githubusercontent.com/getyou123/git_pic_use/master/zz202505210759512.png)
+
+### 为啥对象的最大的年龄是15呢？
+- 因为对象头中的布局限制了4bit来标志GC年龄次数 最大15
+
+### 压缩指针
+- 在64位JVM中，普通对象指针（OOP）占用8字节，
+而指针压缩通过将64位地址映射到32位偏移量（配合3位左移运算），使指针降为4字节，节省堆内存约20-30%
+- ‌压缩过程‌：实际内存地址 = 32位偏移量 << 3 + 堆基地址
+- ‌寻址范围‌：最大支持32GB堆内存（2^32 * 8字节）
+- 如果不压缩：对象头：16字节（8 MarkWord + 8 类型指针）
+- 压缩的话：对象头：12字节（8 MarkWord + 4 类型指针）
